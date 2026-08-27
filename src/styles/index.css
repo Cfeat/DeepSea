@@ -1,0 +1,700 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+  background: #1a5f7a;
+  color: #e8f4f8;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Ocean ── */
+.ocean {
+  position: relative;
+  width: 100%;
+}
+
+.sun-rays {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 80% 40% at 50% 0%,
+    rgba(255, 255, 255, 0.18) 0%,
+    transparent 70%
+  );
+}
+
+/* ── Surface ── */
+.surface-header {
+  position: relative;
+  text-align: center;
+  padding: 72px 24px 100px;
+  z-index: 2;
+}
+
+.surface-byline {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 16px;
+}
+
+.surface-header h1 {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', Georgia, serif;
+  font-size: clamp(3rem, 10vw, 5rem);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  line-height: 1.1;
+}
+
+.surface-sub {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+}
+
+/* ── Zone watermark ── */
+.zone-watermark {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.zone-watermark span {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: clamp(4rem, 18vw, 12rem);
+  font-weight: 600;
+  opacity: 0.04;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ── Depth track (fixed left) ── */
+.depth-track {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.25), transparent);
+}
+
+.depth-track-readout {
+  text-align: center;
+}
+
+.depth-track-num {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.depth-track-unit {
+  font-size: 0.6rem;
+  opacity: 0.4;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.depth-track-bar {
+  width: 2px;
+  height: min(120px, 20vh);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  position: relative;
+}
+
+.depth-track-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1px;
+  transition: height 0.1s ease-out;
+}
+
+/* ── Ocean HUD (fixed bottom) ── */
+.ocean-hud {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
+  padding: 32px 24px 16px;
+}
+
+.ocean-hud-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+.hud-zone {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.hud-depth {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.hud-sep {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hud-meta {
+  opacity: 0.5;
+}
+
+/* ── Marine snow ── */
+.marine-snow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.marine-snow-flake {
+  position: absolute;
+  top: -4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  animation: snow-fall linear infinite;
+}
+
+/* ── Zone banner ── */
+.zone-banner {
+  position: absolute;
+  left: 56px;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.35;
+  transition: opacity 0.5s;
+}
+
+.zone-banner--active {
+  opacity: 1;
+}
+
+.zone-banner-inner {
+  text-align: center;
+  padding: 28px 20px;
+  max-width: 480px;
+}
+
+.zone-depth {
+  font-size: 0.72rem;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+
+.zone-banner h2 {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.zone-name-en {
+  font-size: 0.8rem;
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.zone-desc {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  opacity: 0.55;
+  line-height: 1.55;
+}
+
+/* ── Milestones ── */
+.milestone {
+  position: absolute;
+  left: 56px;
+  right: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.milestone-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.milestone-body {
+  position: absolute;
+  right: 20px;
+  top: -8px;
+  max-width: 200px;
+  text-align: right;
+}
+
+.milestone-depth {
+  font-size: 0.68rem;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+
+.milestone-desc {
+  font-size: 0.65rem;
+  opacity: 0.28;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+/* ── Creatures: 图片标记，每深度行仅一个，中心对齐刻度 ── */
+.creature {
+  position: absolute;
+  left: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.creature-depth-line {
+  position: absolute;
+  left: -160px;
+  right: calc(100% + 52px);
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.creature-photo {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 20, 40, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.creature-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.85) brightness(0.92);
+}
+
+.creature-photo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.5;
+}
+
+.creature:hover .creature-photo,
+.creature:focus-visible .creature-photo {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+}
+
+.creature-tag {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  text-align: left;
+  max-width: 200px;
+}
+
+.creature:hover .creature-tag,
+.creature:focus-visible .creature-tag {
+  opacity: 1;
+}
+
+.creature-tag-name {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.creature-tag-depth {
+  display: block;
+  font-size: 0.65rem;
+  opacity: 0.45;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Challenger Deep ── */
+.challenger-deep {
+  position: absolute;
+  left: 56px;
+  right: 0;
+  text-align: center;
+  padding: 40px 24px 140px;
+  z-index: 5;
+}
+
+.challenger-label {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.45;
+}
+
+.challenger-depth {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: clamp(2.2rem, 7vw, 3.5rem);
+  font-weight: 600;
+  margin: 16px 0 24px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.9;
+}
+
+.challenger-text {
+  max-width: 400px;
+  margin: 0 auto;
+  font-size: 0.88rem;
+  opacity: 0.45;
+  line-height: 1.65;
+}
+
+.challenger-end {
+  margin-top: 48px;
+  font-size: 0.9rem;
+  opacity: 0.3;
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
+
+/* ── Scroll prompt ── */
+.scroll-prompt {
+  position: fixed;
+  bottom: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  animation: fade-pulse 2.5s ease-in-out infinite;
+}
+
+.scroll-prompt-text {
+  font-size: 0.72rem;
+  opacity: 0.45;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.scroll-prompt-arrow {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  animation: fade-in 0.2s ease;
+}
+
+.modal {
+  background: #0a1520;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px 12px 0 0;
+  max-width: 680px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slide-up 0.3s ease;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.modal-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.modal-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.modal-hero-text {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modal-hero-text h2 {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  padding-right: 28px;
+}
+
+.modal-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.4;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.modal-meta div {
+  display: flex;
+  gap: 5px;
+  font-size: 0.78rem;
+}
+
+.modal-meta dt {
+  opacity: 0.35;
+}
+
+.modal-meta dd {
+  opacity: 0.85;
+}
+
+.modal-body {
+  padding: 0 24px 24px;
+}
+
+.modal-lead {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 8px;
+}
+
+.modal-lead p {
+  font-size: 1.02rem;
+  opacity: 0.88;
+  line-height: 1.7;
+}
+
+.modal-body section {
+  margin-bottom: 20px;
+  padding-top: 16px;
+}
+
+.modal-body h3 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.35;
+  margin-bottom: 8px;
+}
+
+.modal-body p {
+  font-size: 0.9rem;
+  opacity: 0.78;
+  line-height: 1.65;
+}
+
+.modal-body ul {
+  list-style: none;
+}
+
+.modal-body li {
+  position: relative;
+  padding-left: 12px;
+  font-size: 0.9rem;
+  opacity: 0.78;
+  line-height: 1.55;
+  margin-bottom: 5px;
+}
+
+.modal-body li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  opacity: 0.35;
+}
+
+.modal-aside {
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+  padding-left: 14px;
+}
+
+.modal-credit {
+  padding: 0 24px 20px;
+  font-size: 0.68rem;
+  opacity: 0.25;
+}
+
+/* ── Animations ── */
+@keyframes snow-fall {
+  from { transform: translateY(-10px); }
+  to { transform: translateY(100vh); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (min-width: 769px) {
+  .modal-overlay {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .modal {
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .depth-track {
+    width: 48px;
+  }
+
+  .zone-banner,
+  .milestone,
+  .challenger-deep {
+    left: 48px;
+  }
+
+  .creature {
+    left: 56px;
+    gap: 8px;
+  }
+
+  .creature-photo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .creature {
+    height: 44px;
+  }
+
+  .modal-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-img {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .creature-tag {
+    max-width: 120px;
+  }
+}
