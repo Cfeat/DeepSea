@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "download-images": "node scripts/download-images-cn.mjs"
+    "download-images": "node scripts/download-images-cn.mjs",
+    "test": "node --test scripts/test.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

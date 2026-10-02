@@ -1,55 +1,44 @@
 # 深海 · Deep Sea
 
-类似 [neal.fun/deep-sea](https://neal.fun/deep-sea/) 的垂直滚动深海探索网站。向下滚动即下潜，点击生物查看自建百科。
+面向中文读者的海洋科普探索网站，基于 React 19、TypeScript 和 Vite。
 
-## 功能
+## 本地运行
 
-- 从海面（0 m）到挑战者深渊（10,935 m）的连续滚动体验
-- **44 种**按真实深度分布的海洋生物
-- 每种生物配有 **Wikimedia Commons 真实参考照片**
-- 左右交替布局 + 自动防重叠算法
-- 点击生物打开百科（概述、栖息地、食性、特征、补充）
-- 深度里程碑、分区标记、随深度变化的背景
-
-## 快速开始
-
-```bash
-npm install
+```sh
+npm ci
 npm run dev
+npm test
+npm run build
 ```
 
-访问 `http://localhost:5173`
+默认地址为 http://localhost:5173/DeepSea/ 。生产部署沿用 GitHub Pages 的 `/DeepSea/` 基路径。
 
-线上预览（GitHub Pages）：https://cfeat.github.io/DeepSea/
+## 体验与架构
 
-## 图片
+- 以垂直深度轴为主体验：向下滚动持续下潜，显示实时深度、海层、压力估算与进度。
+- 生物沿轴交替分布，手机端改为单侧排列；支持海层跳转、直达海底与原位打开百科。
+- 保留沉浸式海洋首屏、可检索图鉴、收藏与深海实验室。
+- 按中文名、英文名或特征搜索，海层筛选、本地收藏与本次阅读进度。
+- 原生 dialog 百科：键盘焦点约束、Esc 关闭、焦点恢复、滚动锁定。
+- 深度实验室：压力近似模型、光照分区、深度预设和带解释的问答。
+- 适配减少动态效果偏好，提供跳转主内容入口、焦点样式、图片失败回退。
 
-图片通过百度图片搜索下载到本地（国内源）：
+`src/App.tsx` 组织页面与筛选状态；`components/CreatureCard.tsx`、`EncyclopediaModal.tsx`、`DepthLab.tsx` 分别负责图鉴、百科与实验。`data/science.ts` 管理模型及参考资料，`data/zones.ts` 管理海层；原有生物内容位于 `creatureData.ts` 和 `creaturesExtra.ts`。
 
-```bash
-npm run download-images
-```
+`components/DiveExplorer.tsx` 承载主探索体验，`utils/diveLayout.ts` 统一管理深度到像素及其逆向换算。轴为明确标注的非等比例轴：拥挤区段按所需卡片空间展开，相同深度的条目分组堆叠，不隐藏生物。所有海层、刻度、读数和跳转使用同一套映射。滚动计算通过 requestAnimationFrame 合并，并在组件卸载时清理监听器。
 
-保存路径：`public/images/creatures/*.jpg`
+图鉴作为辅助入口直接展示选定数据集中的所有条目。旧探索组件保留在仓库中作为历史实现，不再使用原来按像素距离删除生物的布局方法。
 
-## 添加生物
+## 科学口径与内容维护
 
-编辑 `src/data/creatureData.ts`，并在 `src/data/imageUrls.ts` 添加对应图片 URL：
+- 海层边界采用 NOAA 常见教学划分，不代表所有海域的实测光照边界。
+- 压力以 P = P₀ + ρgh 计算，固定密度 1025 kg/m³、重力加速度 9.81 m/s²，为绝对压力近似值，不用于潜水决策。
+- 图鉴的海层是教学分组；内部 `depth` 为旧版示意位置，不应作为物种观测纪录发布。详情明确展示栖息说明。
+- 已移除原有错误里程碑，修正 Atolla 的超深渊归类和部分过度绝对化表述。历史生物条目尚需逐项文献审核；资料区的通用来源不等同于每个物种的独立引用。
+- 图片来自原项目本地图库，其原作者、物种鉴定与许可尚未完整核实。正式对外发布前，应逐图确认并替换不准确或无授权记录的素材。下载脚本仅保留兼容用途，搜索引擎不构成图片授权。
 
-```typescript
-{
-  id: 'my-fish',
-  name: '中文名',
-  nameEn: 'English Name',
-  depth: 500,
-  zone: 'mesopelagic',
-  image: creatureImage('my-fish'),
-  side: 'left',
-  fact: '一行简短介绍，显示在滚动页面上。',
-  encyclopedia: { summary, habitat, diet, features, funFact },
-}
-```
+添加生物时提供唯一 ID、中英文名称、教学分组、栖息环境、食性与特征，并核对原始文献及图片授权。不要将类群统一写成单一物种，也不要将极端纪录描述为典型行为。
 
-## 技术栈
+## 验证
 
-React 19 · TypeScript · Vite 6 · 纯 CSS
+`npm test` 覆盖压力模型、海层边界、数据 ID 唯一性、图片存在性与分组一致性，以及深度轴条目完整性、防重叠间距、同深度分组和深度换算往返一致性。`npm run build` 包含 TypeScript 严格检查与 Vite 生产构建。

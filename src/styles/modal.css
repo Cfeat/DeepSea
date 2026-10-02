@@ -1,0 +1,149 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: #020b12da;
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
+.modal {
+  position: relative;
+  width: min(850px, 100%);
+  max-height: 90svh;
+  overflow: auto;
+  border: 1px solid #35505b;
+  border-radius: 8px;
+  background: #10232b;
+  box-shadow: 0 30px 100px #0009;
+}
+.modal-close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  z-index: 2;
+  border-radius: 50%;
+  background: #07171cdd;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  font-size: 27px;
+}
+.modal-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 260px;
+}
+.modal-img {
+  width: 100%;
+  height: 100%;
+  max-height: 330px;
+  object-fit: cover;
+  background: #07171c;
+}
+.modal-hero-text {
+  padding: 60px 28px 25px;
+}
+.modal h2 {
+  font-size: 30px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.modal-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+}
+.modal-meta {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.modal-meta dt {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.modal-meta dd {
+  margin: 0;
+  font-size: 13px;
+}
+.modal-body {
+  padding: 25px 36px;
+}
+.modal-body section {
+  margin-bottom: 24px;
+}
+.modal-body h3 {
+  color: var(--accent);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.modal-body p,
+.modal-body li {
+  font-size: 13px;
+  color: #c1d0d5;
+  line-height: 2;
+}
+.modal-body ul {
+  padding-left: 20px;
+}
+.modal-lead {
+  border-left: 2px solid var(--accent);
+  padding: 10px 20px;
+  background: #92e3c708;
+}
+.modal-aside {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.modal-credit {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+  padding: 0 36px 28px;
+}
+.modal-source {
+  color: var(--accent);
+  text-decoration: underline;
+}
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+  .modal-hero {
+    grid-template-columns: 1fr;
+  }
+  .modal-img {
+    height: 210px;
+  }
+  .modal-hero-text {
+    padding: 24px;
+  }
+  .modal-body {
+    padding: 12px 24px;
+  }
+  .modal-credit {
+    padding: 0 24px 24px;
+  }
+  .modal h2 {
+    font-size: 25px;
+  }
+}
+.modal {
+  padding: 0;
+  color: inherit;
+}
+.modal::backdrop {
+  background: #020b12da;
+  backdrop-filter: blur(10px);
+}
+
+/* Top-layer dialogs must not participate in the long depth-axis document flow. */
+.modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}

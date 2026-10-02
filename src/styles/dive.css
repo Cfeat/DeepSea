@@ -1,0 +1,663 @@
+.dive-explorer {
+  position: relative;
+  background: #061820;
+  isolation: isolate;
+}
+.dive-intro {
+  padding: 64px 8% 38px;
+  background: linear-gradient(#07171c, #0c3546);
+}
+.dive-intro h2 {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 18px 0;
+}
+.dive-intro > p:not(.eyebrow) {
+  color: #b4cbd2;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.dive-method {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  color: #a5ded3;
+  font-size: 11px;
+  margin: 25px 0 0;
+}
+.dive-intro .note {
+  max-width: 850px;
+  font-size: 11px !important;
+}
+.dive-toolbar {
+  position: sticky;
+  top: 82px;
+  z-index: 15;
+  background: #0a212af5;
+  backdrop-filter: blur(16px);
+  border-top: 1px solid #81c9cc44;
+  border-bottom: 1px solid #81c9cc33;
+  padding: 13px 5% 0;
+}
+.dive-instruments {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+.dive-depth {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 270px;
+}
+.dive-depth strong {
+  font:
+    30px Georgia,
+    serif;
+  font-variant-numeric: tabular-nums;
+  min-width: 94px;
+  text-align: right;
+  color: #e2fff7;
+}
+.dive-depth small {
+  font: 11px monospace;
+  color: #a9d9d8;
+}
+.dive-current-zone {
+  font-size: 12px;
+  color: var(--accent);
+  margin-left: 12px;
+}
+.dive-pressure {
+  font: 13px monospace;
+  color: #b4d1da;
+}
+.dive-pressure small {
+  font:
+    10px "Segoe UI",
+    sans-serif;
+  margin-left: 8px;
+  color: #91afb9;
+}
+.dive-atlas-link {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--accent);
+}
+.dive-zone-nav {
+  display: flex;
+  gap: 0;
+  margin-top: 13px;
+}
+.dive-zone-nav button {
+  padding: 12px 18px;
+  border-bottom: 2px solid transparent;
+  font-size: 11px;
+  white-space: nowrap;
+  color: #a5bbc5;
+}
+.dive-zone-nav button span {
+  font: 9px monospace;
+  margin-right: 6px;
+  opacity: 0.6;
+}
+.dive-zone-nav button small {
+  font: 9px monospace;
+  margin-left: 10px;
+  opacity: 0.6;
+}
+.dive-zone-nav button[aria-pressed="true"] {
+  color: #b3f5df;
+  border-bottom-color: var(--accent);
+  background: #83e4c70a;
+}
+.dive-zone-nav button:hover {
+  background: #83e4c714;
+  color: #d8f5ef;
+}
+.dive-zone-nav .dive-bottom-jump {
+  margin-left: auto;
+  color: var(--accent);
+}
+.dive-progress {
+  height: 2px;
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  background: #173743;
+}
+.dive-progress span {
+  display: block;
+  height: 100%;
+  background: #9befd2;
+}
+.dive-stage {
+  position: relative;
+  background: #0c3546;
+  overflow: hidden;
+}
+.dive-water {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0, #427b9340, transparent 70%),
+    linear-gradient(#0c3546, #082a3b);
+}
+.dive-water-1 {
+  background:
+    radial-gradient(ellipse at 70% 20%, #20507030, transparent 60%),
+    linear-gradient(#082a3b, #071b30);
+}
+.dive-water-2 {
+  background:
+    radial-gradient(ellipse at 20% 30%, #11476730, transparent 60%),
+    linear-gradient(#071b30, #051221);
+}
+.dive-water-3 {
+  background: linear-gradient(#051221, #050d19);
+}
+.dive-water-4 {
+  background: linear-gradient(#050d19, #02070d);
+}
+.dive-water:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, #a7dff144 0.8px, transparent 1.4px),
+    radial-gradient(circle, #b1eddf22 1px, transparent 1.7px);
+  background-size:
+    117px 183px,
+    237px 297px;
+  background-position:
+    21px 48px,
+    70px 130px;
+  opacity: 0.6;
+}
+.dive-axis {
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(#8ddfc79c, #5e8f9c55);
+  z-index: 1;
+}
+.dive-tick {
+  position: absolute;
+  left: calc(50% - 4px);
+  height: 1px;
+  width: 9px;
+  background: #81a8b552;
+  z-index: 1;
+}
+.dive-tick span {
+  font: 9px monospace;
+  position: absolute;
+  left: 15px;
+  top: -4px;
+  color: #7e9caa;
+  white-space: nowrap;
+}
+.dive-tick.major {
+  width: 19px;
+  left: calc(50% - 9px);
+  background: #a4c9d3aa;
+}
+.dive-tick.major span {
+  left: 26px;
+  color: #b9d6df;
+}
+.dive-zone-banner {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  display: flex;
+  gap: 35px;
+  align-items: start;
+  z-index: 3;
+  padding: 22px 0 35px;
+  background: linear-gradient(90deg, #0a233a99, #0c2635ee, #0a233a99);
+  border-top: 1px solid #96baca55;
+}
+.dive-zone-depth {
+  min-width: calc(50% - 35px);
+  text-align: right;
+  font: 30px Georgia;
+  color: #91dbcf;
+  padding-top: 8px;
+}
+.dive-zone-banner > div {
+  max-width: 390px;
+}
+.dive-zone-banner h2 {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 36px;
+  font-weight: 400;
+  margin: 9px 0 13px;
+}
+.dive-zone-banner p:last-child {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #b0c8d5;
+}
+.dive-encounter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+.dive-anchor {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  padding-left: 20px;
+  color: #b5dedf;
+  font: 12px monospace;
+}
+.dive-anchor:before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 20px #9bf6d577;
+}
+.dive-anchor small {
+  display: block;
+  font:
+    9px "Segoe UI",
+    sans-serif;
+  color: #9fb4c1;
+  margin-top: 7px;
+}
+.dive-encounter-cards {
+  position: relative;
+  width: 38%;
+  margin-left: 7%;
+  padding-top: 0;
+}
+.on-right .dive-encounter-cards {
+  margin-left: 55%;
+}
+.on-right .dive-anchor {
+  padding: 0 20px 0 0;
+  text-align: right;
+  left: auto;
+  right: 50%;
+}
+.on-right .dive-anchor:before {
+  left: auto;
+  right: -5px;
+}
+.dive-encounter-cards:before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  width: 13.16%;
+  height: 1px;
+  background: #8bcabc55;
+  right: -13.16%;
+}
+.on-right .dive-encounter-cards:before {
+  right: auto;
+  left: -13.16%;
+}
+.dive-creature {
+  height: 204px;
+  position: relative;
+  background: linear-gradient(120deg, #163e5066, #122b3c99);
+  border: 1px solid #95cad02e;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 15px 60px #00000020;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.dive-creature:hover {
+  border-color: #a3e2d2aa;
+  transform: translateY(-3px);
+}
+.dive-creature-open {
+  display: flex;
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+.dive-photo {
+  width: 35%;
+  flex-shrink: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #071d2b;
+}
+.dive-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.8);
+}
+.dive-creature-copy {
+  padding: 23px 20px;
+  min-width: 0;
+}
+.dive-specimen {
+  display: block;
+  font:
+    8px "Segoe UI",
+    sans-serif;
+  letter-spacing: 1px;
+  color: #9bbbc9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 15px;
+}
+.dive-creature h3 {
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin: 12px 0 10px;
+}
+.dive-creature p {
+  font-size: 12px;
+  line-height: 1.85;
+  color: #bdd0d9;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.dive-read {
+  display: block;
+  font-size: 10px;
+  color: var(--accent);
+  margin-top: 15px;
+}
+.dive-save {
+  position: absolute;
+  right: 8px;
+  top: 7px;
+  font-size: 19px;
+  color: #a5c4cf;
+  padding: 3px 6px;
+  background: #102a36dd;
+  border-radius: 50%;
+}
+.dive-save[aria-pressed="true"] {
+  color: var(--accent);
+}
+.dive-finish {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 38px 24px 70px;
+  background: linear-gradient(#030a1199, #07171c);
+  z-index: 4;
+  border-top: 1px solid #829fab44;
+}
+.dive-finish h2 {
+  font:
+    30px "Songti SC",
+    "SimSun",
+    serif;
+  line-height: 1.6;
+  margin: 20px 0;
+}
+.dive-finish p {
+  font-size: 12px;
+  line-height: 2;
+  color: #9bb4c1;
+}
+.dive-finish > a {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 11px;
+  margin: 18px 0;
+}
+.dive-finish > div {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 10px 0;
+}
+.dive-finish button,
+.dive-finish > div a {
+  font-size: 12px;
+  border: 1px solid #9fddd444;
+  padding: 12px 20px;
+  border-radius: 3px;
+  color: #c1e3dd;
+}
+.dive-explorer .note {
+  max-width: 900px;
+}
+.hero {
+  min-height: 560px;
+  height: 70svh;
+  max-height: 720px;
+}
+.hero-content {
+  padding-top: 60px;
+}
+.hero-coordinate {
+  bottom: 90px;
+}
+@media (max-width: 1100px) {
+  .dive-zone-nav button {
+    padding: 12px;
+  }
+  .dive-zone-nav button small {
+    display: none;
+  }
+  .dive-creature-copy {
+    padding: 22px 14px;
+  }
+  .dive-creature h3 {
+    font-size: 18px;
+  }
+  .dive-specimen {
+    font-size: 7px;
+  }
+  .dive-creature p {
+    font-size: 11px;
+  }
+  .dive-instruments {
+    gap: 20px;
+  }
+  .dive-encounter-cards {
+    width: 41%;
+    margin-left: 4%;
+  }
+  .on-right .dive-encounter-cards {
+    margin-left: 55%;
+  }
+  .dive-encounter-cards:before {
+    width: 12.2%;
+    right: -12.2%;
+  }
+  .on-right .dive-encounter-cards:before {
+    left: -12.2%;
+  }
+  .dive-photo {
+    width: 32%;
+  }
+}
+@media (max-width: 700px) {
+  .dive-intro {
+    padding: 45px 6% 30px;
+  }
+  .dive-intro h2 {
+    font-size: 26px;
+  }
+  .dive-intro > p:not(.eyebrow) {
+    font-size: 12px;
+  }
+  .dive-method {
+    gap: 12px;
+    font-size: 10px;
+  }
+  .dive-toolbar {
+    top: 68px;
+    padding: 12px 4% 0;
+  }
+  .dive-depth {
+    min-width: 0;
+    gap: 5px;
+  }
+  .dive-depth strong {
+    font-size: 25px;
+    min-width: 80px;
+  }
+  .dive-depth .live-dot {
+    display: none;
+  }
+  .dive-current-zone {
+    font-size: 10px;
+    margin-left: 8px;
+  }
+  .dive-pressure {
+    font-size: 11px;
+    margin-left: auto;
+  }
+  .dive-pressure small {
+    display: none;
+  }
+  .dive-instruments {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .dive-atlas-link {
+    font-size: 10px;
+    margin-left: 0;
+  }
+  .dive-zone-nav {
+    margin-top: 10px;
+    justify-content: space-between;
+    overflow-x: auto;
+  }
+  .dive-zone-nav button {
+    font-size: 10px;
+    padding: 12px 7px;
+  }
+  .dive-zone-nav button span {
+    display: none;
+  }
+  .dive-zone-nav .dive-bottom-jump {
+    display: none;
+  }
+  .dive-axis {
+    left: 27px;
+  }
+  .dive-tick,
+  .dive-tick.major {
+    left: 23px;
+  }
+  .dive-tick span,
+  .dive-tick.major span {
+    left: 14px;
+    font-size: 8px;
+  }
+  .dive-zone-banner {
+    left: 27px;
+    right: 18px;
+    display: block;
+    padding: 18px 16px 24px;
+    background: #0b2433f2;
+  }
+  .dive-zone-depth {
+    font-size: 24px;
+    text-align: left;
+    display: block;
+    margin-bottom: 14px;
+  }
+  .dive-zone-banner h2 {
+    font-size: 29px;
+    margin: 7px 0 10px;
+  }
+  .dive-zone-banner p:last-child {
+    font-size: 11px;
+  }
+  .dive-encounter-cards,
+  .on-right .dive-encounter-cards {
+    width: calc(100% - 78px);
+    margin-left: 60px;
+    padding-top: 24px;
+  }
+  .dive-anchor,
+  .on-right .dive-anchor {
+    left: 27px;
+    right: auto;
+    padding-left: 15px;
+    text-align: left;
+    font-size: 11px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .dive-anchor small {
+    margin: 0;
+    font-size: 8px;
+  }
+  .dive-anchor:before,
+  .on-right .dive-anchor:before {
+    left: -4px;
+    right: auto;
+    top: 2px;
+  }
+  .dive-encounter-cards:before,
+  .on-right .dive-encounter-cards:before {
+    left: -33px;
+    right: auto;
+    width: 33px;
+    top: 7px;
+  }
+  .dive-creature {
+    height: 198px;
+  }
+  .dive-photo {
+    width: 30%;
+  }
+  .dive-creature-copy {
+    padding: 20px 12px;
+  }
+  .dive-creature h3 {
+    font-size: 17px;
+    margin: 10px 0;
+  }
+  .dive-creature p {
+    font-size: 11px;
+  }
+  .dive-read {
+    font-size: 9px;
+    margin-top: 12px;
+  }
+  .dive-finish h2 {
+    font-size: 23px;
+  }
+  .dive-finish {
+    padding: 35px 22px 50px;
+  }
+  .hero {
+    height: 620px;
+    min-height: 520px;
+    max-height: none;
+  }
+  .hero-content {
+    padding-top: 55px;
+  }
+  .dive-save {
+    font-size: 18px;
+    right: 5px;
+    top: 5px;
+  }
+}

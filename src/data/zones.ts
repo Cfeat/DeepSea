@@ -1,60 +1,59 @@
-import type { ZoneInfo, Milestone } from './types'
-
+import type { ZoneInfo, Milestone } from "./types";
 export const zones: ZoneInfo[] = [
   {
-    id: 'epipelagic',
-    name: '透光层',
-    nameEn: 'Epipelagic Zone',
+    id: "epipelagic",
+    name: "透光层",
+    nameEn: "Sunlight Zone",
     minDepth: 0,
     maxDepth: 200,
-    description: '阳光能够穿透的海域。这里集中了约 90% 的海洋生物。',
+    description: "阳光照亮海洋表层，浮游植物的光合作用支持丰富的食物网。",
   },
   {
-    id: 'mesopelagic',
-    name: '弱光层',
-    nameEn: 'Mesopelagic Zone',
+    id: "mesopelagic",
+    name: "弱光层",
+    nameEn: "Twilight Zone",
     minDepth: 200,
     maxDepth: 1000,
-    description: '又称暮光区。阳光迅速衰减，许多生物演化出发光能力。',
+    description:
+      "只剩微弱的光。许多居民借助生物发光，在暮色中隐藏、交流与捕食。",
   },
   {
-    id: 'bathypelagic',
-    name: '午夜层',
-    nameEn: 'Bathypelagic Zone',
+    id: "bathypelagic",
+    name: "午夜层",
+    nameEn: "Midnight Zone",
     minDepth: 1000,
     maxDepth: 4000,
-    description: '完全黑暗，压力约为海面的 100 倍。生物依靠化学感受与生物光生存。',
+    description: "阳光无法抵达。黑暗、高压与稀少的食物，塑造了独特的生存方式。",
   },
   {
-    id: 'abyssopelagic',
-    name: '深渊层',
-    nameEn: 'Abyssopelagic Zone',
+    id: "abyssopelagic",
+    name: "深渊层",
+    nameEn: "Abyssal Zone",
     minDepth: 4000,
     maxDepth: 6000,
-    description: '海底平原与缓坡，水温接近 4°C，食物主要来自上方沉降的有机碎屑。',
+    description: "寒冷的深层海水中，来自上方的有机物缓缓下沉，为生命带来能量。",
   },
   {
-    id: 'hadalpelagic',
-    name: '超深渊层',
-    nameEn: 'Hadalpelagic Zone',
+    id: "hadalpelagic",
+    name: "超深渊层",
+    nameEn: "Hadal Zone",
     minDepth: 6000,
     maxDepth: 11000,
-    description: '海沟深处，是地球最极端的栖息地之一。',
+    description: "走入海沟深处。即使面对极端压力，这里仍有适应环境的生命。",
   },
-]
-
+];
 export const milestones: Milestone[] = [
-  { depth: 10, label: '10 m', description: '人类日常接触海洋的深度' },
-  { depth: 40, label: '40 m', description: '休闲水肺潜水的常规极限' },
-  { depth: 200, label: '200 m', description: '阳光几乎无法抵达的边界' },
-  { depth: 332, label: '332 m', description: '人类水肺潜水最深纪录（Ahmed Gabr，2014）' },
-  { depth: 828, label: '828 m', description: '无辅助自由潜水最深纪录' },
-  { depth: 1000, label: '1,000 m', description: '进入完全黑暗的午夜层' },
-  { depth: 1090, label: '1,090 m', description: '帝企鹅潜水的最大深度' },
-  { depth: 2000, label: '2,000 m', description: '抹香鲸日常觅食的典型深度' },
-  { depth: 3800, label: '3,800 m', description: '泰坦尼克号残骸所在深度' },
-  { depth: 4000, label: '4,000 m', description: '这是海洋的平均深度' },
-  { depth: 6000, label: '6,000 m', description: '进入超深渊层' },
-  { depth: 8848, label: '8,848 m', description: '你已下潜相当于珠穆朗玛峰的高度' },
-  { depth: 10935, label: '10,935 m', description: '挑战者深渊——海洋最深处' },
-]
+  {
+    depth: 200,
+    label: "200 m",
+    description: "常用的透光层与弱光层分界，实际光照因海域而异",
+  },
+  { depth: 1000, label: "1,000 m", description: "进入阳光无法抵达的午夜层" },
+  { depth: 4000, label: "4,000 m", description: "进入深渊层" },
+  { depth: 6000, label: "6,000 m", description: "进入超深渊层" },
+  {
+    depth: 10935,
+    label: "10,935 ± 6 m",
+    description: "挑战者深渊的一项深度估计（2021 年论文，95% 置信区间）",
+  },
+];

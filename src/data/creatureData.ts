@@ -123,7 +123,7 @@ export const creaturesBase: Creature[] = [
     side: 'left',
     fact: '以海草为食，脂肪呈绿色而得名。雌龟会返回出生海滩产卵。',
     encyclopedia: {
-      summary: '绿海龟是大型海龟，在海洋生态系统中通过摄食海草维持海草床健康，长途迁徙能力惊人。',
+      summary: '绿海龟是大型海龟，摄食海草有助于维持海草床的生长。它们会在觅食地与繁殖地之间迁徙。',
       habitat: '全球热带、亚热带珊瑚礁与海草床。',
       diet: '幼年为杂食，成年后主要摄食海草和海藻。',
       features: ['可闭气长达 5 小时', '每 2–4 年返回出生海滩产卵', '寿命可达 80 年以上', 'IUCN 列为濒危'],
@@ -157,7 +157,7 @@ export const creaturesBase: Creature[] = [
     image: creatureImage('blue-whale'),
     size: '可达 30 米',
     side: 'left',
-    fact: '地球史上已知最大的动物，心跳声可在数公里外被水听器捕捉。',
+    fact: '地球上体型最大的现生动物，以磷虾为主要食物，依靠鲸须过滤海水。',
     encyclopedia: {
       summary: '蓝鲸是滤食性须鲸，以磷虾为主食。20 世纪商业捕鲸使其濒临灭绝，现受国际保护，种群缓慢恢复中。',
       habitat: '全球各大洋，夏季在高纬度觅食，冬季向低纬度繁殖。',
@@ -211,7 +211,7 @@ export const creaturesBase: Creature[] = [
     image: creatureImage('manta-ray'),
     size: '翼展可达 7 米',
     side: 'right',
-    fact: '大型滤食性魟鱼，智商在鱼类中名列前茅，能识别镜中的自己。',
+    fact: '大型滤食性魟鱼，利用头鳍引导富含浮游生物的海水进入口中。',
     encyclopedia: {
       summary: '蝠鲼是开阔水域的大型滤食者，温和且好奇，常主动接近潜水员。其种群因渔业误捕和贸易受到威胁。',
       habitat: '全球热带、亚热带外海及珊瑚礁附近。',
@@ -337,7 +337,7 @@ export const creaturesBase: Creature[] = [
     image: creatureImage('sperm-whale'),
     size: '15–20 米',
     side: 'left',
-    fact: '最大的齿鲸，可下潜至 2000 米以上捕猎巨型乌贼，脑中存储鲸蜡油。',
+    fact: '最大的齿鲸，可下潜至 2000 米以上捕猎巨型乌贼，头部有独特的鲸蜡器官。',
     encyclopedia: {
       summary: '抹香鲸以深潜捕猎头足类为主，与大王乌贼的搏斗是深海生态中最著名的捕食关系之一。',
       habitat: '全球深海，偏好外海大陆坡。',
@@ -589,7 +589,7 @@ export const creaturesBase: Creature[] = [
     image: creatureImage('anglerfish'),
     size: '20–100 厘米',
     side: 'left',
-    fact: '雌鱼头顶的"钓竿"含发光细菌，在完全黑暗中引诱猎物。雄鱼永久寄生在雌鱼身上。',
+    fact: '部分深海鮟鱇鱼借助共生发光细菌引诱猎物；某些类群的雄鱼会与雌鱼融合。',
     encyclopedia: {
       summary: '鮟鱇鱼是深海最具代表性的生物之一，其极端的雌雄差异和寄生繁殖策略在动物界独一无二。',
       habitat: '全球深海 200–2500 米，底栖或中层水域。',
@@ -710,15 +710,15 @@ export const creaturesBase: Creature[] = [
     id: 'dragonfish',
     name: '黑龙鱼',
     nameEn: 'Dragonfish',
-    depth: 4950,
-    zone: 'abyssopelagic',
+    depth: 1500,
+    zone: 'bathypelagic',
     image: creatureImage('dragonfish'),
     size: '15–40 厘米',
     side: 'right',
-    fact: '发出红光——大多数深海生物看不见红光，因此是完美的"隐形探照灯"。',
+    fact: '部分龙鱼类能发出红光，在多数深海动物不敏感的光谱范围内搜寻猎物。',
     encyclopedia: {
-      summary: '黑龙鱼是深渊层的小型凶猛掠食者，其红光生物发光在深海中是独特的"隐形手电筒"。',
-      habitat: '全球热带、亚热带 200–5000 米深海。',
+      summary: '龙鱼类包含多种深海捕食性鱼类；部分种类能发出并感知红光，这种能力并非所有种类共有。',
+      habitat: '多见于深海中层水域，具体深度范围依物种而异。',
       diet: '小型鱼类和甲壳类，利用生物光诱捕或伏击。',
       features: ['发出红光——多数深海生物无法看见', '牙齿透明且极长', '幼鱼通过长丝状附肢漂浮', '雌雄体型差异极大'],
       funFact: '黑龙鱼能看见自己发出的红光，而猎物看不见——它们在黑暗中拥有不对称的视觉优势。',
@@ -739,7 +739,7 @@ export const creaturesBase: Creature[] = [
       habitat: '全球深海 800–5000 米，大陆坡和海底山。',
       diet: '浮游生物、甲壳类和其他漂流有机物。',
       features: ['腹鳍和尾鳍延长如腿', '站立姿态节省能量', '眼睛向上看，等待上方沉降的食物', '行动迟缓'],
-      funFact: '三脚鱼像深海中的"守株待兔"——它们可以同一姿势站立数小时，等待洋流送来食物。',
+      funFact: '三脚鱼能借助延长的鳍条停留在海底，等待洋流带来食物。',
     },
   },
   {
@@ -751,13 +751,13 @@ export const creaturesBase: Creature[] = [
     image: creatureImage('snailfish'),
     size: '约 30 厘米',
     side: 'right',
-    fact: '2018 年在马里亚纳海沟 8178 米深处被确认——已知生活在最深的鱼类。',
+    fact: '蜗牛鱼包含许多物种，部分海沟种类能够适应超过 8000 米深处的高压环境。',
     encyclopedia: {
       summary: '蜗牛鱼是超深渊鱼类的代表，其凝胶状、无鳞的身体是对极端高压环境的演化适应。',
       habitat: '太平洋海沟 6000–8200 米，包括马里亚纳、日本、秘鲁-智利海沟。',
       diet: '小型甲壳类、多毛类和其他底栖无脊椎动物。',
-      features: ['缺乏鱼鳞，身体凝胶状', '没有鳔，依靠油脂调节浮力', '8178 米深处确认存活', '颜色通常为淡粉色或白色'],
-      funFact: '在 8000 米深处，压力相当于 800 个大气压——蜗牛鱼柔软的身体仿佛是为高压而"融化"演化。',
+      features: ['缺乏鱼鳞，身体凝胶状', '没有鳔，依靠油脂调节浮力', '部分海沟种类被观测于超过 8000 米深处', '颜色通常为淡粉色或白色'],
+      funFact: '8000 米深处的压力约为海面的 800 倍。海沟蜗牛鱼适应了这样的高压环境，柔软的身体只是其外形特征之一。',
     },
   },
   {
@@ -771,26 +771,26 @@ export const creaturesBase: Creature[] = [
     side: 'left',
     fact: '挑战者深渊中最常见的动物之一，几小时内就能聚集到任何食物源。',
     encyclopedia: {
-      summary: '超深渊端足类是海沟底部数量最庞大的动物，以惊人的繁殖能力和快速消耗有机碎屑维持基础生态循环。',
+      summary: '超深渊端足类是海沟底部常见的甲壳动物，摄食有机碎屑和动物尸体，参与海底物质循环。',
       habitat: '全球超深渊海沟 6000–11000 米。',
       diet: '沉降的有机碎屑、尸体和微生物。',
       features: ['在挑战者深渊样本中占主导', '几小时内聚集到食物源', '对压力变化有独特分子适应', '研究极端环境生物的模式生物'],
-      funFact: '当科学家将相机放到挑战者深渊底部，端足类会在几分钟内聚集——它们是深渊中最积极的"清道夫"。',
+      funFact: '研究人员利用带有诱饵的相机观察端足类，可以记录它们在海沟底部聚集觅食的行为。',
     },
   },
   {
     id: 'hadal-jellyfish',
     name: '深海水母',
     nameEn: 'Atolla Jellyfish',
-    depth: 9800,
-    zone: 'hadalpelagic',
+    depth: 1500,
+    zone: 'bathypelagic',
     image: creatureImage('hadal-jellyfish'),
     size: '直径 15–25 厘米',
     side: 'right',
     fact: '受威胁时发出脉冲式生物光，被称为"警报水母"。',
     encyclopedia: {
       summary: '深海水母（Atolla 属）广泛分布于深海，其受威胁时的发光行为可能用于警告同类或迷惑捕食者。',
-      habitat: '全球深海 1000–4000 米，部分种类可达超深渊。',
+      habitat: '主要生活在深海水层，不同种类的分布不同；不应将整个 Atolla 属标为超深渊生物。',
       diet: '浮游生物、小型甲壳类和其他凝胶状浮游生物。',
       features: ['受威胁时发出脉冲环状光', '身体呈深红色，在蓝光下几乎不可见', '单条触腕极长', '种类多样，分类仍在更新'],
       funFact: 'Atolla 的脉冲发光像水中的"SOS"——科学家推测这可能是在黑暗中呼叫同伴或干扰捕食者。',
@@ -811,7 +811,7 @@ const OMIT = new Set([
   'gulper-eel',
   'fangtooth',
   'tripod-fish',
-  'amphipod',
+
 ])
 
 export const creatures = [...creaturesBase, ...creaturesExtra]
