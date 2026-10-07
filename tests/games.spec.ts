@@ -123,6 +123,7 @@ test("games retain independent saves; export, import, invalid file and restart p
   ).toBeVisible();
   await page.getByRole("link", { name: "进入深海前哨 →" }).click();
   await page.getByRole("button", { name: "开始经营 →" }).click();
+  await expect(page.locator(".station-resources")).toBeInViewport();
   await page.getByRole("button", { name: "建造实验室", exact: true }).click();
   await page.getByRole("button", { name: "增加人员", exact: true }).click();
   await page.getByRole("button", { name: "推进一天 →" }).click();
@@ -164,6 +165,7 @@ test("station builds, staffs, researches, completes all expeditions and continue
   await page.goto("./#games/station");
   await page.getByRole("radio", { name: /标准预算/ }).check();
   await page.getByRole("button", { name: "开始经营 →" }).click();
+  await expect(page.locator(".station-resources")).toBeInViewport();
   let state = createStation({ name: "蓝湾站", mode: "standard", seed: 0 });
   async function act(action: StationAction) {
     expect(stationActionReason(state, action)).toBeNull();

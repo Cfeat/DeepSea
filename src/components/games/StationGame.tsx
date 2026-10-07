@@ -61,6 +61,7 @@ export default function StationGame({
   const [demolish, setDemolish] = useState(false);
   const [notice, setNotice] = useState("");
   const command = useRef<HTMLDivElement>(null);
+  const start = useRef<HTMLDivElement>(null);
   const plan = useRef<HTMLElement>(null);
   const panel = useRef<HTMLElement>(null);
   const ending = useRef<HTMLElement>(null);
@@ -70,7 +71,14 @@ export default function StationGame({
   const previousOutcome = useRef(outcome);
   function show(element: HTMLElement | null) {
     element?.focus({ preventScroll: true });
-    element?.scrollIntoView({ block: "start", behavior: "instant" });
+    if (element === command.current && start.current) {
+      const offset = window.matchMedia("(max-width: 760px)").matches ? 74 : 90;
+      window.scrollTo({
+        top:
+          window.scrollY + start.current.getBoundingClientRect().top - offset,
+        behavior: "instant",
+      });
+    } else element?.scrollIntoView({ block: "start", behavior: "instant" });
   }
   useEffect(() => {
     if (
@@ -239,6 +247,7 @@ export default function StationGame({
         </div>
       ) : (
         <>
+          <div ref={start} aria-hidden="true" />
           <div
             ref={command}
             className="station-command"
