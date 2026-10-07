@@ -5,30 +5,23 @@
   overflow: hidden;
   background: #0b2430;
 }
-.creature-art img {
+.creature-art.is-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  display: block;
 }
-.creature-art.is-schematic {
-  color: #b7dfd5;
-  background:
-    radial-gradient(ellipse at 50% 45%, #23465788, transparent 75%),
-    linear-gradient(140deg, #102e3b, #081a27);
+.card-open:hover .creature-art.is-photo img {
+  transform: none;
 }
-.creature-art.is-schematic::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(#b3dbcd06 1px, transparent 1px),
-    linear-gradient(90deg, #b3dbcd06 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-.creature-art svg {
-  width: 100%;
+.photo-placeholder {
   height: 100%;
-  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 16px;
+  color: #bdcfce;
+  font-size: 12px;
 }
 .art-label {
   z-index: 1;
@@ -76,6 +69,15 @@
 .modal-art {
   min-height: 260px;
   max-height: 330px;
+}
+.modal-art img {
+  object-fit: contain;
+}
+.photo-caption {
+  margin: 14px 0 22px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #b9d5d1;
 }
 .modal-actions {
   display: flex;

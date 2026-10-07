@@ -18,6 +18,19 @@ test("catalog search jumps to the right encounter; modal closes without moving t
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("dialog")).toContainText("270–960 m");
+  await expect(page.getByRole("dialog").locator(".art-label")).toHaveText(
+    "标本照片",
+  );
+  await expect(page.getByRole("dialog").locator(".photo-caption")).toContainText(
+    "Mitsukurina owstoni",
+  );
+  await expect
+    .poll(() =>
+      page.getByRole("dialog").locator("img").evaluate(
+        (img: HTMLImageElement) => img.naturalWidth,
+      ),
+    )
+    .toBeGreaterThan(0);
   await expect(
     page.getByRole("dialog").locator(".entry-sources a"),
   ).toHaveCount(1);
@@ -43,6 +56,9 @@ test("collections, reading and last depth survive reload; invalid links are harm
   await page
     .getByRole("button", { name: "阅读管眼鱼百科", exact: true })
     .click();
+  await expect(page.getByRole("dialog").locator(".photo-caption")).toContainText(
+    "透明头罩已不完整",
+  );
   await page.getByRole("button", { name: "关闭百科" }).click();
   await page
     .getByRole("button", { name: "在深度轴查看管眼鱼", exact: true })
@@ -68,6 +84,15 @@ test("permalink opens the correct entry; both experiments respond", async ({
 }) => {
   await page.goto("./?creature=snailfish");
   await expect(page.getByRole("dialog")).toContainText("8,336 m · 2023");
+  await expect(page.getByRole("dialog").locator(".art-label")).toHaveText(
+    "野外照片",
+  );
+  await expect(page.getByRole("dialog").locator(".photo-caption")).toContainText(
+    "Pseudoliparis swirei",
+  );
+  await expect(page.getByRole("dialog").locator("img")).toHaveCSS(
+    "object-fit", "contain",
+  );
   await expect(page.getByRole("textbox", { name: "条目链接" })).toHaveValue(
     /creature=snailfish/,
   );
@@ -145,7 +170,7 @@ test("blocked browser storage and a failed photo preserve the reading controls",
   await page.goto("./#atlas");
   await page.getByRole("searchbox", { name: "搜索生物" }).fill("蓝鲸");
   await expect(page.locator(".creature-grid .art-label")).toContainText(
-    "形态示意",
+    "图片暂不可用",
   );
   await page
     .getByRole("button", { name: "收藏蓝鲸", exact: true })

@@ -89,6 +89,11 @@ export default function EncyclopediaModal({
         </div>
       </div>
       <div className="modal-body">
+        <p className="photo-caption">
+          {creature.media.caption} ·{" "}
+          <i>{creature.media.subjectScientificName}</i>
+          {creature.media.note && <>。{creature.media.note}</>}
+        </p>
         <div className="modal-actions">
           <button onClick={onJump}>在深度轴查看 ↓</button>
           <button
@@ -222,7 +227,9 @@ export default function EncyclopediaModal({
       <p className="modal-credit">
         {creature.media ? (
           <>
-            图片：{creature.media.caption} · {creature.media.author}。
+            图片：{creature.media.caption}（{creature.media.subjectScientificName}）
+            · {creature.media.captureType} · {creature.media.author}。
+            {creature.media.modifications}
             <a href={creature.media.sourceUrl} target="_blank" rel="noreferrer">
               原始出处 ↗
             </a>{" "}
@@ -236,7 +243,7 @@ export default function EncyclopediaModal({
             </a>
           </>
         ) : (
-          "配图：本站绘制的简化形态示意，不按比例，不用于物种鉴定。"
+          "照片暂时无法加载。"
         )}
       </p>
     </dialog>

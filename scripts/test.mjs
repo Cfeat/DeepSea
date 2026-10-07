@@ -52,15 +52,6 @@ test("zone boundaries cover the complete exploration range without gaps", () => 
 test("catalog has unique IDs, available images and consistent teaching groups", () => {
   assert.equal(new Set(creatures.map((c) => c.id)).size, creatures.length);
   creatures.forEach((c) => {
-    if (c.media) {
-      assert.ok(existsSync(`public/${c.media.path}`), c.id);
-      assert.ok(
-        c.media.author &&
-          c.media.license &&
-          c.media.licenseUrl &&
-          c.media.sourceUrl,
-      );
-    }
     assert.equal(getZoneAtDepth(c.displayDepth, zones).id, c.zone, c.id);
     assert.ok(
       c.name &&
@@ -92,6 +83,34 @@ test("catalog has unique IDs, available images and consistent teaching groups", 
     creatures.find((c) => c.id === "hadal-jellyfish").zone,
     "bathypelagic",
   );
+});
+
+test("every entry has a local, credited real photo with an explicit subject and capture context", () => {
+  assert.equal(creatures.length, 37);
+  assert.equal(
+    new Set(creatures.map((c) => c.media.path)).size,
+    creatures.length,
+  );
+  for (const c of creatures) {
+    const media = c.media;
+    assert.equal(media.kind, "photo", c.id);
+    assert.match(media.path, /^images\/reviewed\/[\w-]+\.webp$/, c.id);
+    assert.ok(existsSync(`public/${media.path}`), c.id);
+    const file = readFileSync(`public/${media.path}`);
+    assert.equal(file.toString("ascii", 0, 4), "RIFF", c.id);
+    assert.equal(file.toString("ascii", 8, 12), "WEBP", c.id);
+    for (const key of [
+      "author", "caption", "license", "subjectScientificName",
+      "captureType", "modifications",
+    ])
+      assert.ok(media[key]?.trim(), `${c.id}: ${key}`);
+    for (const key of ["sourceUrl", "originalUrl", "licenseUrl"])
+      assert.equal(new URL(media[key]).protocol, "https:", `${c.id}: ${key}`);
+    if (c.taxon === "物种")
+      assert.equal(media.subjectScientificName, c.scientificName, c.id);
+    else
+      assert.ok(media.note, `${c.id}: explain the photographed member of the group`);
+  }
 });
 
 const { createDiveLayout, stopHeight } = await import(

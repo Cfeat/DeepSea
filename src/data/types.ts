@@ -20,7 +20,11 @@ export interface Reference {
 export interface CreatureMedia {
   originalUrl: string;
   path: string;
-  kind: "photo" | "illustration";
+  kind: "photo";
+  subjectScientificName: string;
+  captureType: "实景照片" | "野外照片" | "水族馆照片" | "标本照片";
+  note?: string;
+  modifications: string;
   author: string;
   license: string;
   licenseUrl: string;
@@ -54,7 +58,7 @@ export interface Creature {
   };
   sources: Reference[];
   reviewedOn: string;
-  media?: CreatureMedia;
+  media: CreatureMedia;
 }
 export interface DiveTopic {
   id: string;
