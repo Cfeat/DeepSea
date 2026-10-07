@@ -1,4 +1,4 @@
-import { useState } from "react";
+import CreatureArtwork from "./CreatureArtwork";
 import type { Creature } from "../data/types";
 import { zones } from "../data/zones";
 export default function CreatureCard({
@@ -6,13 +6,14 @@ export default function CreatureCard({
   saved,
   onSave,
   onOpen,
+  onJump,
 }: {
   creature: Creature;
   saved: boolean;
   onSave: () => void;
   onOpen: () => void;
+  onJump: () => void;
 }) {
-  const [failed, setFailed] = useState(false);
   return (
     <article className="creature-card">
       <button
@@ -21,19 +22,7 @@ export default function CreatureCard({
         aria-label={`阅读${creature.name}百科`}
       >
         <div className="card-image">
-          {failed ? (
-            <span className="image-fallback">
-              ≋<small>图片暂不可用</small>
-            </span>
-          ) : (
-            <img
-              src={creature.image}
-              alt={creature.name}
-              loading="lazy"
-              decoding="async"
-              onError={() => setFailed(true)}
-            />
-          )}
+          <CreatureArtwork creature={creature} />
           <span className="card-zone">
             {zones.find((z) => z.id === creature.zone)?.name}
           </span>
@@ -47,6 +36,14 @@ export default function CreatureCard({
             查看百科 <span>→</span>
           </span>
         </div>
+      </button>
+      <button
+        className="card-jump"
+        onClick={onJump}
+        aria-label={`在深度轴查看${creature.name}`}
+      >
+        在深度轴查看 ↓{" "}
+        <small>{creature.displayDepth.toLocaleString()} m · 示意</small>
       </button>
       <button
         className="bookmark"

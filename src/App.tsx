@@ -1,39 +1,77 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { creatures, zones, type Creature } from "./data/creatures";
-import { creatureImage } from "./data/imageUrls";
 import EncyclopediaModal from "./components/EncyclopediaModal";
 import DepthLab from "./components/DepthLab";
 import CreatureCard from "./components/CreatureCard";
-import DiveExplorer from "./components/DiveExplorer";
+import DiveExplorer, { type DiveHandle } from "./components/DiveExplorer";
 import { sources } from "./data/science";
+import { mediaById } from "./data/media";
+import { readIds, writeStorage } from "./utils/storage";
+const ids = creatures.map((c) => c.id);
 
 export default function App() {
   const [zone, setZone] = useState("all");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Creature | null>(null);
-  const [visited, setVisited] = useState<Set<string>>(new Set());
+  const [visited, setVisited] = useState<Set<string>>(
+    () => new Set(readIds("deepsea-read", ids)),
+  );
+  const dive = useRef<DiveHandle>(null);
   const [savedOnly, setSavedOnly] = useState(false);
   const [saved, setSaved] = useState<string[]>(() => {
     try {
-      const value: unknown = JSON.parse(
-        localStorage.getItem("deepsea-saved") || "[]",
-      );
-      return Array.isArray(value)
-        ? value.filter((id): id is string => typeof id === "string")
-        : [];
+      return readIds("deepsea-saved", ids);
     } catch {
       return [];
     }
   });
   const [storageError, setStorageError] = useState(false);
+  const [heroFailed, setHeroFailed] = useState(false);
   const filtered = creatures.filter(
     (c) =>
       (zone === "all" || c.zone === zone) &&
       (!savedOnly || saved.includes(c.id)) &&
-      `${c.name} ${c.nameEn} ${c.fact}`
+      `${c.name} ${c.nameEn} ${c.scientificName} ${c.fact}`
         .toLowerCase()
         .includes(query.trim().toLowerCase()),
   );
+  function markRead(creature: Creature) {
+    setVisited((previous) => {
+      const next = new Set(previous).add(creature.id);
+      return next;
+    });
+  }
+  function openCreature(creature: Creature) {
+    setSelected(creature);
+    markRead(creature);
+    const url = new URL(location.href);
+    url.searchParams.set("creature", creature.id);
+    history.pushState(null, "", url);
+  }
+  useEffect(() => {
+    writeStorage("deepsea-read", [...visited]);
+  }, [visited]);
+  function closeCreature() {
+    setSelected(null);
+    const url = new URL(location.href);
+    url.searchParams.delete("creature");
+    history.replaceState(null, "", url);
+  }
+  function jumpCreature(creature: Creature) {
+    if (selected) closeCreature();
+    requestAnimationFrame(() => dive.current?.jumpCreature(creature.id));
+  }
+  useEffect(() => {
+    function readLink() {
+      const id = new URL(location.href).searchParams.get("creature");
+      const creature = creatures.find((c) => c.id === id);
+      setSelected(creature || null);
+      if (creature) markRead(creature);
+    }
+    readLink();
+    window.addEventListener("popstate", readLink);
+    return () => window.removeEventListener("popstate", readLink);
+  }, []);
   function toggleSaved(id: string) {
     const next = saved.includes(id)
       ? saved.filter((item) => item !== id)
@@ -67,12 +105,15 @@ export default function App() {
       </header>
       <main id="main">
         <section className="hero" aria-labelledby="hero-title">
-          <img
-            className="hero-image"
-            src={creatureImage("humpback-whale")}
-            alt="海面下游动的座头鲸"
-            fetchPriority="high"
-          />
+          {!heroFailed && (
+            <img
+              className="hero-image"
+              src={`${import.meta.env.BASE_URL}${mediaById["blue-whale"].path}`}
+              alt="海面附近游动的蓝鲸，照片由 NOAA Fisheries 提供"
+              fetchPriority="high"
+              onError={() => setHeroFailed(true)}
+            />
+          )}
           <div className="hero-shade" />
           <div className="hero-content">
             <p className="eyebrow">
@@ -98,7 +139,11 @@ export default function App() {
           <div className="hero-coordinate">
             <span>01 / THE SUNLIGHT ZONE</span>
             <strong>海面附近 · 透光层</strong>
-            <small>座头鲸 · Megaptera novaeangliae</small>
+            <small>
+              {heroFailed
+                ? "海洋深度探索"
+                : "蓝鲸 · Balaenoptera musculus · NOAA Fisheries"}
+            </small>
           </div>
           <div className="hero-ruler" aria-hidden="true">
             0 m<i />
@@ -139,12 +184,10 @@ export default function App() {
           </p>
         </div>
         <DiveExplorer
+          ref={dive}
           saved={saved}
           onSave={toggleSaved}
-          onOpen={(creature) => {
-            setSelected(creature);
-            setVisited((previous) => new Set(previous).add(creature.id));
-          }}
+          onOpen={openCreature}
         />
         <section id="atlas" className="section atlas">
           <div className="section-heading">
@@ -153,11 +196,11 @@ export default function App() {
               <h2>海洋生物图鉴</h2>
             </div>
             <span className="reading-progress">
-              本次已读 <b>{visited.size}</b> / {creatures.length}
+              已读 <b>{visited.size}</b> / {creatures.length}
             </span>
           </div>
           <div className="atlas-tools">
-            <div className="filter-tabs" aria-label="按海层筛选">
+            <div className="filter-tabs" aria-label="按展示海层筛选">
               <button
                 aria-pressed={zone === "all"}
                 onClick={() => setZone("all")}
@@ -180,13 +223,15 @@ export default function App() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索中文名、英文名或特征"
+                placeholder="搜索名称、学名或特征"
                 aria-label="搜索生物"
               />
             </label>
           </div>
           <div className="results-line">
-            <span aria-live="polite">共 {filtered.length} 个结果</span>
+            <span aria-live="polite">
+              共 {filtered.length} 个结果 · 按展示海层分组
+            </span>
             <button
               className="save-filter"
               aria-pressed={savedOnly}
@@ -208,10 +253,8 @@ export default function App() {
                 creature={c}
                 saved={saved.includes(c.id)}
                 onSave={() => toggleSaved(c.id)}
-                onOpen={() => {
-                  setSelected(c);
-                  setVisited((previous) => new Set(previous).add(c.id));
-                }}
+                onOpen={() => openCreature(c)}
+                onJump={() => jumpCreature(c)}
               />
             ))}
           </div>
@@ -263,7 +306,8 @@ export default function App() {
               </a>
             ))}
             <p className="note">
-              海层划分和压力说明参考了以上资料。部分生物介绍的出处仍在核对中；图片的作者与授权信息也尚未完整确认，请勿直接用于物种鉴定或转载。
+              每个生物条目的资料出处和图片署名列在百科内。无实景照片的条目使用形态示意图，不能用于物种鉴定。资料整理日期：2026
+              年 10 月 7 日。
             </p>
           </div>
         </section>
@@ -277,8 +321,10 @@ export default function App() {
       </footer>
       {selected && (
         <EncyclopediaModal
+          key={selected.id}
           creature={selected}
-          onClose={() => setSelected(null)}
+          onClose={closeCreature}
+          onJump={() => jumpCreature(selected)}
         />
       )}
     </>

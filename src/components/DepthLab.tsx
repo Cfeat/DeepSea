@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getZoneAtDepth, MAX_DEPTH } from "../data/types";
 import { zones } from "../data/zones";
 import { pressureAtDepth } from "../data/science";
+import Experiments from "./Experiments";
 export default function DepthLab() {
   const [depth, setDepth] = useState(1000);
   const [answer, setAnswer] = useState<number | null>(null);
@@ -77,10 +78,14 @@ export default function DepthLab() {
               </strong>
             </div>
           </div>
-          <p className="note">
-            P = P₀ + ρgh；取海水密度 1,025 kg/m³、g = 9.81 m/s²、1 atm = 101,325
-            Pa。忽略密度和重力随深度的变化，为近似值，非实测数据。*光照分区为概括。
-          </p>
+          <details className="model-details">
+            <summary>计算方法与模型假设</summary>
+            <p className="note">
+              P = P₀ + ρgh；取海水密度 1,025 kg/m³、g = 9.81 m/s²、1 atm =
+              101,325
+              Pa。忽略密度和重力随深度的变化，为近似值，非实测数据。*光照分区为概括。
+            </p>
+          </details>
         </div>
         <div className="lab-story">
           <span className="eyebrow">深海里的食物从哪来</span>
@@ -116,6 +121,7 @@ export default function DepthLab() {
           </div>
         </div>
       </div>
+      <Experiments />
     </section>
   );
 }

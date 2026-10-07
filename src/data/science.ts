@@ -24,3 +24,7 @@ export const sources = [
 export function pressureAtDepth(depth: number) {
   return 1 + (1025 * 9.81 * Math.max(0, depth)) / 101325;
 }
+/** Boyle's law for a flexible sealed gas bag; fixed temperature, equilibrium. */
+export function gasVolumeFraction(depth: number) {
+  return 1 / pressureAtDepth(depth);
+}

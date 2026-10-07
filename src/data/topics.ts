@@ -1,0 +1,81 @@
+import type { DiveTopic } from "./types";
+export const topics: DiveTopic[] = [
+  {
+    id: "marine-snow",
+    depth: 1300,
+    kicker: "深海食物网",
+    title: "海洋里，也会“下雪”。",
+    kind: "snow",
+    text: "浮游生物的残骸、排泄物和其他颗粒缓缓下沉，成为海洋雪。沿途的动物和微生物不断消耗它们，只有一部分最终抵达海底。",
+    source: {
+      publisher: "NOAA",
+      title: "What is marine snow?",
+      url: "https://oceanservice.noaa.gov/facts/marinesnow.html",
+    },
+  },
+  {
+    id: "vents",
+    depth: 2500,
+    kicker: "化学能与生命",
+    title: "没有阳光，也能有食物网。",
+    kind: "vent",
+    text: "海水进入地壳裂隙，被加热后从热液喷口流出。部分微生物利用化学反应获得能量、合成有机物，管虫等动物依靠它们生活。喷口分布在特定地质环境，并非这一深度处处都有。",
+    source: {
+      publisher: "NOAA",
+      title: "What is a hydrothermal vent?",
+      url: "https://oceanservice.noaa.gov/facts/vents.html",
+    },
+  },
+  {
+    id: "whale-fall",
+    depth: 3300,
+    kicker: "海底的食物补给",
+    title: "一头鲸沉下去以后。",
+    kind: "whale",
+    text: "鲸的尸体为海底带来集中的食物。食腐动物先吃软组织，之后骨骼和周围沉积物还能支持新的群落。不同阶段持续多久，取决于环境与鲸体大小。鲸落没有固定的水深。",
+    source: {
+      publisher: "NOAA",
+      title: "What is a whale fall?",
+      url: "https://oceanservice.noaa.gov/facts/whale-fall.html",
+    },
+  },
+  {
+    id: "abyss-floor",
+    depth: 5200,
+    kicker: "认识海底",
+    title: "海底并不是一张平面。",
+    kind: "seafloor",
+    text: "深海里有平原、山脉、海山和峡谷。水深一样，底质和食物供应也可能不同。“海层”描述水深分区，不能替代对真实栖息地的描述。",
+    source: {
+      publisher: "NOAA",
+      title: "What is bathymetry?",
+      url: "https://oceanservice.noaa.gov/facts/bathymetry.html",
+    },
+  },
+  {
+    id: "trenches",
+    depth: 6600,
+    kicker: "进入海沟",
+    title: "最深的海，不在每片海域。",
+    kind: "trench",
+    text: "海沟常形成在板块俯冲的边界，一块板块向另一块板块下方移动。这里的“下潜路线”把不同海域的生物放在同一条阅读轴上，并不是一处地点的完整物种清单。",
+    source: {
+      publisher: "NOAA",
+      title: "Plate tectonics and earthquakes",
+      url: "https://www.noaa.gov/jetstream/tsunamis/tsunami-generation-earthquakes/jetstream-max-plate-tectonics-and-earthquakes",
+    },
+  },
+  {
+    id: "survey",
+    depth: 9500,
+    kicker: "深海测量",
+    title: "我们怎样知道海有多深？",
+    kind: "survey",
+    text: "声呐测深要考虑声波在海水中的传播速度，潜水器也可以用压力等数据估计深度。温度、盐度、定位和仪器误差都会影响结果，所以精确的深度通常带有不确定度。",
+    source: {
+      publisher: "Deep-Sea Research I · 2021",
+      title: "Revised depth of the Challenger Deep",
+      url: "https://repository.library.noaa.gov/view/noaa/33477",
+    },
+  },
+];

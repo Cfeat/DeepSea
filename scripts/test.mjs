@@ -24,7 +24,9 @@ function moduleUrl(file) {
   cache.set(file, url);
   return url;
 }
-const { pressureAtDepth } = await import(moduleUrl("src/data/science.ts"));
+const { pressureAtDepth, gasVolumeFraction } = await import(
+  moduleUrl("src/data/science.ts")
+);
 const { zones } = await import(moduleUrl("src/data/zones.ts"));
 const { getZoneAtDepth, MAX_DEPTH } = await import(
   moduleUrl("src/data/types.ts")
@@ -50,9 +52,40 @@ test("zone boundaries cover the complete exploration range without gaps", () => 
 test("catalog has unique IDs, available images and consistent teaching groups", () => {
   assert.equal(new Set(creatures.map((c) => c.id)).size, creatures.length);
   creatures.forEach((c) => {
-    assert.ok(existsSync(`public/images/creatures/${c.id}.jpg`), c.id);
-    assert.equal(getZoneAtDepth(c.depth, zones).id, c.zone, c.id);
-    assert.ok(c.name && c.nameEn && c.fact && c.encyclopedia.habitat, c.id);
+    if (c.media) {
+      assert.ok(existsSync(`public/${c.media.path}`), c.id);
+      assert.ok(
+        c.media.author &&
+          c.media.license &&
+          c.media.licenseUrl &&
+          c.media.sourceUrl,
+      );
+    }
+    assert.equal(getZoneAtDepth(c.displayDepth, zones).id, c.zone, c.id);
+    assert.ok(
+      c.name &&
+        c.nameEn &&
+        c.scientificName &&
+        c.fact &&
+        c.encyclopedia.habitat &&
+        c.reviewedOn,
+      c.id,
+    );
+    assert.ok(c.sources.length, c.id);
+    for (const s of c.sources) assert.equal(new URL(s.url).protocol, "https:");
+    if (c.habitatRange) {
+      assert.ok(
+        c.habitatRange.min <= c.displayDepth &&
+          c.displayDepth <= c.habitatRange.max,
+        c.id,
+      );
+      assert.ok(c.habitatRange.note);
+    }
+    if (c.depthRecord) {
+      assert.ok(
+        c.depthRecord.year && c.depthRecord.source.url && c.depthRecord.note,
+      );
+    }
   });
   assert.ok(creatures.some((c) => c.id === "amphipod"));
   assert.equal(
@@ -61,11 +94,12 @@ test("catalog has unique IDs, available images and consistent teaching groups", 
   );
 });
 
-const { createDiveLayout, DIVE_ROW_HEIGHT } = await import(
+const { createDiveLayout, stopHeight } = await import(
   moduleUrl("src/utils/diveLayout.ts")
 );
+const { topics } = await import(moduleUrl("src/data/topics.ts"));
 test("depth-axis layout keeps every creature and reserves room for dense and duplicate depths", () => {
-  const layout = createDiveLayout(creatures, zones, MAX_DEPTH);
+  const layout = createDiveLayout(creatures, zones, MAX_DEPTH, topics);
   assert.equal(
     layout.stops.flatMap((stop) => stop.creatures).length,
     creatures.length,
@@ -74,16 +108,23 @@ test("depth-axis layout keeps every creature and reserves room for dense and dup
     const previous = layout.stops[i - 1];
     const stop = layout.stops[i];
     assert.ok(stop.depth > previous.depth);
-    assert.ok(
-      stop.y - previous.y >=
-        previous.creatures.length * DIVE_ROW_HEIGHT +
-          (previous.zone ? 290 : 0) +
-          64,
-    );
+    assert.ok(stop.y - previous.y >= stopHeight(previous) + 35);
   }
   assert.equal(layout.stops.find((s) => s.depth === 1500).creatures.length, 2);
   for (let depth = 0; depth <= MAX_DEPTH; depth += 13)
     assert.ok(Math.abs(layout.toDepth(layout.toY(depth)) - depth) < 0.0001);
   assert.equal(layout.toDepth(-100), 0);
   assert.equal(layout.toDepth(layout.height + 100), MAX_DEPTH);
+  assert.equal(layout.stops.filter((s) => s.topic).length, topics.length);
+  assert.ok(
+    layout.stops.at(-1).y - layout.stops.at(-2).y <= 600,
+    "no empty 1,800-pixel tail",
+  );
+});
+test("gas volume uses absolute pressure; negative depth is surface", () => {
+  assert.equal(gasVolumeFraction(0), 1);
+  assert.equal(gasVolumeFraction(-20), 1);
+  assert.ok(Math.abs(gasVolumeFraction(10) - 0.5019) < 0.001);
+  assert.ok(gasVolumeFraction(100) < 0.1);
+  assert.equal(getZoneAtDepth(-1, zones).id, "epipelagic");
 });

@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type Ref,
+} from "react";
 import {
   creatures,
   zones,
@@ -7,7 +14,16 @@ import {
   type Creature,
 } from "../data/creatures";
 import { pressureAtDepth } from "../data/science";
-import { createDiveLayout, DIVE_ROW_HEIGHT } from "../utils/diveLayout";
+import {
+  createDiveLayout,
+  DIVE_ROW_HEIGHT,
+  ZONE_HEIGHT,
+  TOPIC_HEIGHT,
+} from "../utils/diveLayout";
+import { topics } from "../data/topics";
+import { readDiveDepth, writeStorage } from "../utils/storage";
+import CreatureArtwork from "./CreatureArtwork";
+import TopicDiagram from "./TopicDiagram";
 import "../styles/dive.css";
 
 function DiveCreature({
@@ -21,7 +37,6 @@ function DiveCreature({
   saved: boolean;
   onSave: () => void;
 }) {
-  const [failed, setFailed] = useState(false);
   return (
     <article className="dive-creature">
       <button
@@ -30,23 +45,18 @@ function DiveCreature({
         aria-label={`在深度轴上认识${creature.name}`}
       >
         <div className="dive-photo">
-          {failed ? (
-            <span className="image-fallback">≋</span>
-          ) : (
-            <img
-              src={creature.image}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              onError={() => setFailed(true)}
-            />
-          )}
+          <CreatureArtwork creature={creature} />
         </div>
         <div className="dive-creature-copy">
           <span className="dive-specimen">MARINE LIFE / {creature.nameEn}</span>
           <h3>{creature.name}</h3>
           <p>{creature.fact}</p>
-          <span className="dive-read">查看百科 ↗</span>
+          <span className="dive-read">
+            {creature.habitatRange
+              ? `栖息参考 ${creature.habitatRange.min.toLocaleString()}–${creature.habitatRange.max.toLocaleString()} m`
+              : "查看栖息环境与资料"}{" "}
+            ↗
+          </span>
         </div>
       </button>
       <button
@@ -61,22 +71,73 @@ function DiveCreature({
   );
 }
 
+export interface DiveHandle {
+  jumpCreature: (id: string) => void;
+}
 export default function DiveExplorer({
+  ref,
   onOpen,
   saved,
   onSave,
 }: {
+  ref?: Ref<DiveHandle>;
   onOpen: (creature: Creature) => void;
   saved: string[];
   onSave: (id: string) => void;
 }) {
   const layout = useMemo(
-    () => createDiveLayout(creatures, zones, MAX_DEPTH),
+    () => createDiveLayout(creatures, zones, MAX_DEPTH, topics),
     [],
   );
   const stage = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(0);
   const [immersed, setImmersed] = useState(false);
+  const [resume] = useState(readDiveDepth);
+  const [targetId, setTargetId] = useState<string | null>(null);
+  const lastDepth = useRef(resume);
+  const highlightTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  useImperativeHandle(
+    ref,
+    () => ({
+      jumpCreature(id) {
+        const encounter = document.getElementById(`encounter-${id}`);
+        if (!encounter) return;
+        const offset =
+          (document.querySelector(".site-header")?.getBoundingClientRect()
+            .height || 82) +
+          (document.querySelector(".dive-toolbar")?.getBoundingClientRect()
+            .height || 140) +
+          35;
+        window.scrollTo({
+          top: window.scrollY + encounter.getBoundingClientRect().top - offset,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "instant"
+            : "smooth",
+        });
+        setTargetId(id);
+        clearTimeout(highlightTimer.current);
+        highlightTimer.current = setTimeout(() => setTargetId(null), 5000);
+        encounter
+          .querySelector<HTMLButtonElement>("button")
+          ?.focus({ preventScroll: true });
+      },
+    }),
+    [],
+  );
+  useEffect(() => () => clearTimeout(highlightTimer.current), []);
+  useEffect(() => {
+    if (!immersed) return;
+    lastDepth.current = depth;
+    const timer = setTimeout(() => writeStorage("deepsea-depth", depth), 500);
+    return () => clearTimeout(timer);
+  }, [depth, immersed]);
+  useEffect(() => {
+    const save = () => writeStorage("deepsea-depth", lastDepth.current);
+    window.addEventListener("pagehide", save);
+    return () => window.removeEventListener("pagehide", save);
+  }, []);
   const zone = getZoneAtDepth(depth, zones);
   useEffect(() => {
     let frame = 0;
@@ -140,6 +201,11 @@ export default function DiveExplorer({
           <span>↗ 点击生物看百科</span>
           <span>≋ 深度轴非等比例</span>
         </div>
+        {resume > 0 && (
+          <button className="resume-dive" onClick={() => jump(resume)}>
+            继续上次下潜 · {resume.toLocaleString()} m ↓
+          </button>
+        )}
         <p className="note">
           为方便阅读，生物较多的区段拉开了间距。生物旁的深度仅表示图中的示意位置，不代表实际观测深度或下潜极限；栖息范围请查看百科。
         </p>
@@ -223,10 +289,38 @@ export default function DiveExplorer({
                 </div>
               </div>
             )}
+            {stop.topic && (
+              <article
+                className="dive-topic"
+                style={{ top: stop.y + (stop.zone ? ZONE_HEIGHT : 0) }}
+              >
+                <TopicDiagram kind={stop.topic.kind} />
+                <div>
+                  <p className="eyebrow">
+                    {stop.topic.kicker} · {stop.depth.toLocaleString()} m
+                    示意位置
+                  </p>
+                  <h3>{stop.topic.title}</h3>
+                  <p>{stop.topic.text}</p>
+                  <a
+                    href={stop.topic.source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    阅读 {stop.topic.source.publisher} 的介绍 ↗
+                  </a>
+                </div>
+              </article>
+            )}
             {stop.creatures.length > 0 && (
               <div
                 className={`dive-encounter ${index % 2 ? "on-left" : "on-right"}`}
-                style={{ top: stop.y + (stop.zone ? 290 : 0) }}
+                style={{
+                  top:
+                    stop.y +
+                    (stop.zone ? ZONE_HEIGHT : 0) +
+                    (stop.topic ? TOPIC_HEIGHT : 0),
+                }}
               >
                 <div className="dive-anchor">
                   <span>{stop.depth.toLocaleString()} m</span>
@@ -234,7 +328,12 @@ export default function DiveExplorer({
                 </div>
                 <div className="dive-encounter-cards">
                   {stop.creatures.map((c) => (
-                    <div key={c.id} style={{ height: DIVE_ROW_HEIGHT }}>
+                    <div
+                      key={c.id}
+                      id={`encounter-${c.id}`}
+                      className={targetId === c.id ? "encounter-target" : ""}
+                      style={{ height: DIVE_ROW_HEIGHT }}
+                    >
                       <DiveCreature
                         creature={c}
                         onOpen={() => onOpen(c)}

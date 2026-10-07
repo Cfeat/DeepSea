@@ -1,4 +1,4 @@
-import type { ZoneInfo, Milestone } from "./types";
+import type { ZoneInfo } from "./types";
 export const zones: ZoneInfo[] = [
   {
     id: "epipelagic",
@@ -40,20 +40,5 @@ export const zones: ZoneInfo[] = [
     minDepth: 6000,
     maxDepth: 11000,
     description: "走入海沟深处。即使面对极端压力，这里仍有适应环境的生命。",
-  },
-];
-export const milestones: Milestone[] = [
-  {
-    depth: 200,
-    label: "200 m",
-    description: "常用的透光层与弱光层分界，实际光照因海域而异",
-  },
-  { depth: 1000, label: "1,000 m", description: "进入阳光无法抵达的午夜层" },
-  { depth: 4000, label: "4,000 m", description: "进入深渊层" },
-  { depth: 6000, label: "6,000 m", description: "进入超深渊层" },
-  {
-    depth: 10935,
-    label: "10,935 ± 6 m",
-    description: "挑战者深渊的一项深度估计（2021 年论文，95% 置信区间）",
   },
 ];

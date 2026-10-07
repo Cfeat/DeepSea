@@ -1,4 +1,5 @@
 @import url("./modal.css");
+@import url("./refinements.css");
 :root {
   font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
   color: #e9f2f2;
@@ -315,82 +316,6 @@ nav a:hover,
   font-size: 12px;
   color: var(--muted);
   line-height: 1.9;
-}
-.zone-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  overflow: hidden;
-}
-.zone-card {
-  text-align: left;
-  padding: 24px 20px 20px;
-  position: relative;
-  border-right: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(160deg, #18445688, #0c202b);
-}
-.zone-card:last-child {
-  border: 0;
-}
-.zone-card:hover {
-  background-color: #255f68;
-}
-.zone-1 {
-  background: linear-gradient(160deg, #14303e, #0b1c2b);
-}
-.zone-2 {
-  background: linear-gradient(160deg, #142c39, #091623);
-}
-.zone-3 {
-  background: linear-gradient(160deg, #10202f, #090f1c);
-}
-.zone-4 {
-  background: linear-gradient(160deg, #181d2f, #0a0d16);
-}
-.zone-number {
-  font: 11px monospace;
-  color: #91b5c2;
-  display: flex;
-  justify-content: space-between;
-}
-.zone-art {
-  font: 60px Georgia;
-  text-align: center;
-  color: #8ccac377;
-  height: 105px;
-  display: grid;
-  place-items: center;
-}
-.zone-card small {
-  font: 10px monospace;
-  color: var(--accent);
-}
-.zone-card h3 {
-  font-size: 20px;
-  font-weight: 500;
-  margin: 12px 0 5px;
-}
-.zone-english {
-  font-size: 9px;
-  color: #96acb4;
-}
-.zone-card p {
-  font-size: 11px;
-  line-height: 1.9;
-  color: #9eafb7;
-  margin: 18px 0 22px;
-  flex: 1;
-}
-.zone-explore {
-  border-top: 1px solid var(--line);
-  padding-top: 15px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #c6d9df;
 }
 .note {
   font-size: 11px;
@@ -816,9 +741,6 @@ nav a:hover,
   .hero-content {
     padding-left: 6%;
   }
-  .zone-card {
-    padding: 20px 14px;
-  }
   .creature-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -940,49 +862,6 @@ nav a:hover,
   }
   .section-heading > p {
     font-size: 11px;
-  }
-  .zone-grid {
-    grid-template-columns: 1fr;
-    border: 0;
-    gap: 10px;
-  }
-  .zone-card {
-    display: grid;
-    grid-template-columns: 46px 1fr auto;
-    gap: 7px 15px;
-    border: 1px solid var(--line) !important;
-    border-radius: 4px;
-    padding: 20px;
-  }
-  .zone-number {
-    grid-column: 1;
-    grid-row: 1/4;
-    align-items: start;
-  }
-  .zone-number > span,
-  .zone-art {
-    display: none;
-  }
-  .zone-card small {
-    grid-column: 3;
-    grid-row: 1;
-    align-self: center;
-  }
-  .zone-card h3 {
-    grid-column: 2;
-    grid-row: 1;
-    margin: 0;
-    font-size: 18px;
-  }
-  .zone-english {
-    grid-column: 2/4;
-  }
-  .zone-card p {
-    grid-column: 2/4;
-    margin: 4px 0 7px;
-  }
-  .zone-explore {
-    grid-column: 2/4;
   }
   .creature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
