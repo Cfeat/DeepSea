@@ -15,6 +15,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
     note: "原始照片鉴定到属，未给出种名。",
+    version: "aefe31a91447",
   },
   "atlantic-cod": {
     path: "images/reviewed/atlantic-cod.webp",
@@ -28,6 +29,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Gadus morhua",
     captureType: "实景照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "4261c766a79e",
   },
   "blue-whale": {
     path: "images/reviewed/blue-whale.webp",
@@ -41,6 +43,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Balaenoptera musculus",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "89e52f3787d0",
   },
   "bottlenose-dolphin": {
     path: "images/reviewed/bottlenose-dolphin.webp",
@@ -55,6 +58,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Tursiops truncatus",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "d3b57010caff",
   },
   "green-sea-turtle": {
     path: "images/reviewed/green-sea-turtle.webp",
@@ -68,6 +72,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Chelonia mydas",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "b7e6634c5670",
   },
   "humpback-whale": {
     path: "images/reviewed/humpback-whale.webp",
@@ -82,6 +87,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Megaptera novaeangliae",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "fe3694e6f36e",
   },
   orca: {
     path: "images/reviewed/orca.webp",
@@ -95,6 +101,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Orcinus orca",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "21f06c554996",
   },
   "sperm-whale": {
     path: "images/reviewed/sperm-whale.webp",
@@ -108,6 +115,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Physeter macrocephalus",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "9d235fda7b60",
   },
   "manta-ray": {
     path: "images/reviewed/manta-ray.webp",
@@ -122,6 +130,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Mobula birostris",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "89dc359c5bad",
   },
   "cuvier-beaked-whale": {
     path: "images/reviewed/cuvier-beaked-whale.webp",
@@ -136,6 +145,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     subjectScientificName: "Ziphius cavirostris",
     captureType: "野外照片",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "f7d9c4dc71d3",
   },
   amphipod: {
     path: "images/reviewed/amphipod.webp",
@@ -149,6 +159,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     sourceUrl: "https://commons.wikimedia.org/wiki/File:Hirondellea_gigas.jpg",
     originalUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Hirondellea_gigas.jpg",
     modifications: "源文件由 Lycaon 降噪；已缩放并转换为 WebP，未改变生物外形。",
+    version: "da36ef6fcb72",
   },
   anglerfish: {
     path: "images/reviewed/anglerfish.webp",
@@ -164,6 +175,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/c/c5/Melanocetus_johnsonii_by_NOAA.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "719db5e0ecf4",
   },
   "atlantic-salmon": {
     path: "images/reviewed/atlantic-salmon.webp",
@@ -178,6 +190,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/8/8e/Atlantic_Salmon_%289680675578%29.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "49a53d719346",
   },
   barreleye: {
     path: "images/reviewed/barreleye.webp",
@@ -192,6 +205,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     sourceUrl: "https://minna-museum.jp/data/393",
     originalUrl: "https://minna-museum.jp/files/1/177309.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "ce2c0e619cb5",
   },
   blobfish: {
     path: "images/reviewed/blobfish.webp",
@@ -207,6 +221,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/9/97/Psychrolutes_phrictus_1.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "0d45cedcd776",
   },
   clownfish: {
     path: "images/reviewed/clownfish.webp",
@@ -222,6 +237,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/5/51/Amphiprion_ocellaris.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "899fc2bd14dd",
   },
   coelacanth: {
     path: "images/reviewed/coelacanth.webp",
@@ -237,6 +253,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/b/b7/Coelacanth_off_Pumula_on_the_KwaZulu-Natal_South_Coast%2C_South_Africa%2C_on_22_November_2019.png",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "242e8fe0456f",
   },
   "colossal-squid": {
     path: "images/reviewed/colossal-squid.webp",
@@ -251,6 +268,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/4/40/Colossal_squid_at_Te_Papa.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "887268dc7365",
   },
   dragonfish: {
     path: "images/reviewed/dragonfish.webp",
@@ -265,6 +283,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     sourceUrl: "https://commons.wikimedia.org/wiki/File:Aristostomias.jpg",
     originalUrl: "https://upload.wikimedia.org/wikipedia/commons/7/74/Aristostomias.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "bf9431d15835",
   },
   "emperor-penguin": {
     path: "images/reviewed/emperor-penguin.webp",
@@ -279,6 +298,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/0/07/Emperor_Penguin_Manchot_empereur.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "6baf283a4ee7",
   },
   "firefly-squid": {
     path: "images/reviewed/firefly-squid.webp",
@@ -294,6 +314,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/7/77/Watasenia_scintillans.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "7d246dd86fa0",
   },
   "giant-isopod": {
     path: "images/reviewed/giant-isopod.webp",
@@ -309,6 +330,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/2/2f/Bathynomus_giganteus_NOAA.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "eb04ed4e00bc",
   },
   "giant-squid": {
     path: "images/reviewed/giant-squid.webp",
@@ -324,6 +346,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/6/65/Architeuthis_dux_-_Smithsonain_Museum.JPG",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "988bc32752d4",
   },
   "giant-tube-worm": {
     path: "images/reviewed/giant-tube-worm.webp",
@@ -339,6 +362,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/3/31/Riftia_tube_worms_Galapagos_2011.jpg",
     modifications: "源文件已提高亮度；已缩放并转换为 WebP，未改变生物外形。",
+    version: "9252075e38fa",
   },
   "goblin-shark": {
     path: "images/reviewed/goblin-shark.webp",
@@ -354,6 +378,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/5/53/Mitsukurina_owstoni_Fishes_of_Australia.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "f05ab296c393",
   },
   "great-white-shark": {
     path: "images/reviewed/great-white-shark.webp",
@@ -368,6 +393,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/0/0e/Carcharodon_carcharias.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "36a7a2192985",
   },
   "hadal-jellyfish": {
     path: "images/reviewed/hadal-jellyfish.webp",
@@ -386,6 +412,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/e/e3/Coronate_of_the_genus_Atolla_Puerto_Rico_28_April_2015.png",
     modifications: "裁去外围部分背景，保留水母及长触手；缩放并转换为 WebP，未改变生物外形。",
+    version: "d1a4dc43e6e1",
   },
   "hammerhead-shark": {
     path: "images/reviewed/hammerhead-shark.webp",
@@ -401,6 +428,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/a/a4/Tibur%C3%B3n_martillo_com%C3%BAn_%28Sphyrna_lewini%29%2C_San_Jos%C3%A9_del_Cabo%2C_Baja_California%2C_M%C3%A9xico%2C_2024-12-21%2C_DD_01.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "de8a0d05db00",
   },
   "japanese-spider-crab": {
     path: "images/reviewed/japanese-spider-crab.webp",
@@ -416,6 +444,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/f/f8/Giant_Japanese_spider_crab_%28Macrocheira_kaempferi%29_at_the_Shedd_Aquarium%2C_Chicago%2C_IL_%286802024350%29.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "75ae24693b43",
   },
   lanternfish: {
     path: "images/reviewed/lanternfish.webp",
@@ -431,6 +460,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/b/b2/Myctophum_punctatum2.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "6958c44b5793",
   },
   narwhal: {
     path: "images/reviewed/narwhal.webp",
@@ -445,6 +475,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/9/94/Monodon_monoceros_pod.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "2faaecdd991f",
   },
   octopus: {
     path: "images/reviewed/octopus.webp",
@@ -461,6 +492,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/2/20/Enteroctopus_dofleini_in_aquarium.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "9259c9c96ad1",
   },
   "sea-pig": {
     path: "images/reviewed/sea-pig.webp",
@@ -476,6 +508,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/7/7b/Scotoplanes_globosa_and_crab.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "fcfb27199631",
   },
   "sixgill-shark": {
     path: "images/reviewed/sixgill-shark.webp",
@@ -492,6 +525,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/8/8c/Expl0447_-_Flickr_-_NOAA_Photo_Library.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "02a9ea990979",
   },
   snailfish: {
     path: "images/reviewed/snailfish.webp",
@@ -507,6 +541,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/0/0b/Pseudoliparis_swirei.png",
     modifications: "从原始科研图版中裁出 A 面板的活体照片，保留原比例尺；转换为 WebP，未改变生物外形。",
+    version: "ff923a4c7dd2",
   },
   "vampire-squid": {
     path: "images/reviewed/vampire-squid.webp",
@@ -523,6 +558,7 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/1/12/MBNMS_juvenile_vampire_squid_%2849041024167%29.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "c3ef2b9d6a17",
   },
   "whale-shark": {
     path: "images/reviewed/whale-shark.webp",
@@ -537,5 +573,6 @@ export const mediaById: Record<string, CreatureMedia> = {
     originalUrl:
       "https://upload.wikimedia.org/wikipedia/commons/0/0a/Rhincodon_typus_fgbnms.jpg",
     modifications: "已缩放并转换为 WebP，未改变生物外形。",
+    version: "cdf8e0f6389d",
   },
 };

@@ -16,7 +16,7 @@ export default function CreatureArtwork({
     >
       {!failed ? (
         <img
-          src={`${import.meta.env.BASE_URL}${media.path}`}
+          src={`${import.meta.env.BASE_URL}${media.path}?v=${media.version}`}
           alt={media.caption}
           loading="lazy"
           decoding="async"

@@ -20,6 +20,8 @@ export interface Reference {
 export interface CreatureMedia {
   originalUrl: string;
   path: string;
+  /** Content hash of the local WebP, used to invalidate cached photos. */
+  version: string;
   kind: "photo";
   subjectScientificName: string;
   captureType: "实景照片" | "野外照片" | "水族馆照片" | "标本照片";

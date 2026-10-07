@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { test } from "node:test";
+import { createHash } from "node:crypto";
 import ts from "typescript";
 // Load application TypeScript with the project's compiler, without a test framework.
 const cache = new Map();
@@ -99,6 +100,11 @@ test("every entry has a local, credited real photo with an explicit subject and 
     const file = readFileSync(`public/${media.path}`);
     assert.equal(file.toString("ascii", 0, 4), "RIFF", c.id);
     assert.equal(file.toString("ascii", 8, 12), "WEBP", c.id);
+    assert.equal(
+      media.version,
+      createHash("sha256").update(file).digest("hex").slice(0, 12),
+      `${c.id}: photo version must match the local file`,
+    );
     for (const key of [
       "author", "caption", "license", "subjectScientificName",
       "captureType", "modifications",
