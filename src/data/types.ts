@@ -70,6 +70,21 @@ export interface DiveTopic {
   text: string;
   kind: "snow" | "vent" | "whale" | "seafloor" | "trench" | "survey";
   source: Reference;
+  media: SceneMedia;
+  sections: { title: string; text: string }[];
+  relatedCreatures: string[];
+}
+export interface SceneMedia {
+  path: string;
+  version: string;
+  kind: "photo" | "data-map";
+  caption: string;
+  author: string;
+  sourceUrl: string;
+  originalUrl: string;
+  license: string;
+  licenseUrl: string;
+  modifications: string;
 }
 export const MAX_DEPTH = 11000;
 export function getZoneAtDepth(depth: number, zones: ZoneInfo[]): ZoneInfo {

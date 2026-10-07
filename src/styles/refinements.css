@@ -211,10 +211,6 @@
   display: inline-block;
   margin-top: 15px;
 }
-.topic-diagram {
-  width: 100%;
-  color: #96d3cf;
-}
 .encounter-target .dive-creature {
   border-color: var(--accent);
   box-shadow: 0 0 35px #92e3c744;
@@ -397,9 +393,6 @@ details a {
     padding: 22px;
     height: 310px;
     min-height: 0;
-  }
-  .topic-diagram {
-    display: none;
   }
   .dive-topic h3 {
     font-size: 23px;

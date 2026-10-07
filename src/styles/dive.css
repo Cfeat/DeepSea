@@ -441,17 +441,6 @@
 .dive-explorer .note {
   max-width: 900px;
 }
-.hero {
-  min-height: 560px;
-  height: 70svh;
-  max-height: 720px;
-}
-.hero-content {
-  padding-top: 60px;
-}
-.hero-coordinate {
-  bottom: 90px;
-}
 @media (max-width: 1100px) {
   .dive-zone-nav button {
     padding: 12px;
@@ -648,14 +637,6 @@
   }
   .dive-finish {
     padding: 35px 22px 50px;
-  }
-  .hero {
-    height: 620px;
-    min-height: 520px;
-    max-height: none;
-  }
-  .hero-content {
-    padding-top: 55px;
   }
   .dive-save {
     font-size: 18px;

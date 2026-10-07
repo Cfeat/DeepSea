@@ -106,8 +106,12 @@ test("every entry has a local, credited real photo with an explicit subject and 
       `${c.id}: photo version must match the local file`,
     );
     for (const key of [
-      "author", "caption", "license", "subjectScientificName",
-      "captureType", "modifications",
+      "author",
+      "caption",
+      "license",
+      "subjectScientificName",
+      "captureType",
+      "modifications",
     ])
       assert.ok(media[key]?.trim(), `${c.id}: ${key}`);
     for (const key of ["sourceUrl", "originalUrl", "licenseUrl"])
@@ -115,7 +119,10 @@ test("every entry has a local, credited real photo with an explicit subject and 
     if (c.taxon === "物种")
       assert.equal(media.subjectScientificName, c.scientificName, c.id);
     else
-      assert.ok(media.note, `${c.id}: explain the photographed member of the group`);
+      assert.ok(
+        media.note,
+        `${c.id}: explain the photographed member of the group`,
+      );
   }
 });
 
@@ -123,6 +130,39 @@ const { createDiveLayout, stopHeight } = await import(
   moduleUrl("src/utils/diveLayout.ts")
 );
 const { topics } = await import(moduleUrl("src/data/topics.ts"));
+test("all topic media are local, versioned, credited and clearly separate photos from measurement maps", () => {
+  assert.equal(topics.length, 6);
+  assert.equal(
+    topics.filter((topic) => topic.media.kind === "photo").length,
+    5,
+  );
+  assert.equal(
+    topics.filter((topic) => topic.media.kind === "data-map").length,
+    1,
+  );
+  for (const topic of topics) {
+    const media = topic.media;
+    assert.match(media.path, /^images\/topics\/[\w-]+\.webp$/);
+    const file = readFileSync(`public/${media.path}`);
+    assert.equal(file.toString("ascii", 0, 4), "RIFF");
+    assert.equal(file.toString("ascii", 8, 12), "WEBP");
+    assert.equal(
+      media.version,
+      createHash("sha256").update(file).digest("hex").slice(0, 12),
+    );
+    for (const key of ["author", "caption", "license", "modifications"])
+      assert.ok(media[key]?.trim(), `${topic.id}: ${key}`);
+    for (const key of ["originalUrl", "sourceUrl", "licenseUrl"])
+      assert.equal(new URL(media[key]).protocol, "https:");
+    assert.equal(topic.sections.length, 3);
+    for (const id of topic.relatedCreatures)
+      assert.ok(creatures.some((creature) => creature.id === id));
+  }
+  assert.match(
+    topics.find((topic) => topic.id === "trenches").media.caption,
+    /数据可视化/,
+  );
+});
 test("depth-axis layout keeps every creature and reserves room for dense and duplicate depths", () => {
   const layout = createDiveLayout(creatures, zones, MAX_DEPTH, topics);
   assert.equal(

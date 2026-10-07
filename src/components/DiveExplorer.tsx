@@ -23,7 +23,7 @@ import {
 import { topics } from "../data/topics";
 import { readDiveDepth, writeStorage } from "../utils/storage";
 import CreatureArtwork from "./CreatureArtwork";
-import TopicDiagram from "./TopicDiagram";
+import ScenePhoto from "./ScenePhoto";
 import "../styles/dive.css";
 
 function DiveCreature({
@@ -136,7 +136,10 @@ export default function DiveExplorer({
   useEffect(() => {
     const save = () => writeStorage("deepsea-depth", lastDepth.current);
     window.addEventListener("pagehide", save);
-    return () => window.removeEventListener("pagehide", save);
+    return () => {
+      save();
+      window.removeEventListener("pagehide", save);
+    };
   }, []);
   const zone = getZoneAtDepth(depth, zones);
   useEffect(() => {
@@ -194,7 +197,9 @@ export default function DiveExplorer({
     >
       <div className="dive-intro">
         <p className="eyebrow">01 / A JOURNEY FROM 0 TO 11,000 METERS</p>
-        <h2 id="dive-title">从海面开始，向下探索</h2>
+        <h1 id="dive-title" className="page-title">
+          从海面开始，向下探索
+        </h1>
         <p>向下滚动可以下潜，点击生物查看介绍，也可以选择海层直接跳转。</p>
         <div className="dive-method">
           <span>↓ 滚动即下潜</span>
@@ -294,7 +299,16 @@ export default function DiveExplorer({
                 className="dive-topic"
                 style={{ top: stop.y + (stop.zone ? ZONE_HEIGHT : 0) }}
               >
-                <TopicDiagram kind={stop.topic.kind} />
+                <a
+                  className="dive-topic-photo"
+                  href={`#topics/${stop.topic.id}`}
+                  aria-label={`阅读专题：${stop.topic.kicker}`}
+                >
+                  <ScenePhoto media={stop.topic.media} />
+                  <span className="dive-image-credit">
+                    NOAA · 图注与出处 ↗
+                  </span>
+                </a>
                 <div>
                   <p className="eyebrow">
                     {stop.topic.kicker} · {stop.depth.toLocaleString()} m
@@ -302,13 +316,7 @@ export default function DiveExplorer({
                   </p>
                   <h3>{stop.topic.title}</h3>
                   <p>{stop.topic.text}</p>
-                  <a
-                    href={stop.topic.source.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    阅读 {stop.topic.source.publisher} 的介绍 ↗
-                  </a>
+                  <a href={`#topics/${stop.topic.id}`}>阅读专题与原始资料 →</a>
                 </div>
               </article>
             )}

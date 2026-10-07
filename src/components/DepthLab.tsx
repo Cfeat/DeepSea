@@ -11,8 +11,8 @@ export default function DepthLab() {
     <section id="lab" className="section lab">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">03 / THE OCEAN LAB</p>
-          <h2>海水越深，压力有多大？</h2>
+          <p className="eyebrow">THE OCEAN LAB</p>
+          <h1 className="page-title">海水越深，压力有多大？</h1>
         </div>
         <p>
           拖动深度滑块，观察压力的变化。

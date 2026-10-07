@@ -16,7 +16,7 @@ export default function EncyclopediaModal({
   const [copyStatus, setCopyStatus] = useState("");
   const link = new URL(location.href);
   link.searchParams.set("creature", creature.id);
-  link.hash = "";
+  link.hash = "atlas";
   const citations = [
     ...new Map(
       [
@@ -227,8 +227,9 @@ export default function EncyclopediaModal({
       <p className="modal-credit">
         {creature.media ? (
           <>
-            图片：{creature.media.caption}（{creature.media.subjectScientificName}）
-            · {creature.media.captureType} · {creature.media.author}。
+            图片：{creature.media.caption}（
+            {creature.media.subjectScientificName}） ·{" "}
+            {creature.media.captureType} · {creature.media.author}。
             {creature.media.modifications}
             <a href={creature.media.sourceUrl} target="_blank" rel="noreferrer">
               原始出处 ↗
