@@ -1,6 +1,8 @@
 import type { CreatureMedia } from "./types";
+import { expandedMedia } from "./expandedMedia";
 
 export const mediaById: Record<string, CreatureMedia> = {
+  ...expandedMedia,
   "dumbo-octopus": {
     path: "images/reviewed/dumbo-octopus.webp",
     kind: "photo",

@@ -4,6 +4,7 @@ export const pages = [
   { id: "atlas", label: "生物图鉴" },
   { id: "lab", label: "深海实验室" },
   { id: "topics", label: "海洋专题" },
+  { id: "games", label: "深海游乐场" },
   { id: "sources", label: "参考资料" },
 ] as const;
 
@@ -20,6 +21,7 @@ export function readLocation() {
   return {
     pageId,
     topicId: pageId === "topics" ? topicId : undefined,
+    gameId: pageId === "games" ? topicId : undefined,
     creatureId,
   };
 }

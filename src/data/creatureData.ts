@@ -2,6 +2,7 @@ import type { Creature, Reference } from "./types";
 import { getZoneAtDepth } from "./types";
 import { zones } from "./zones";
 import { mediaById } from "./media";
+import { expandedCreatures } from "./expandedCreatures";
 
 const noaa = (slug: string): Reference => ({
   publisher: "NOAA Fisheries",
@@ -823,6 +824,7 @@ const entries: Entry[] = [
 ];
 
 export const creatures: Creature[] = entries
+  .concat(expandedCreatures)
   .map((entry) => ({
     ...entry,
     zone: getZoneAtDepth(entry.displayDepth, zones).id,

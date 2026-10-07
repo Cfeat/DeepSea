@@ -182,10 +182,10 @@ test("pages render independently; navigation, pagination, filters and browser hi
   await expect(
     page.locator(".site-navigation [aria-current='page']"),
   ).toHaveText("生物图鉴");
-  await page.getByRole("button", { name: "图鉴第 4 页", exact: true }).click();
+  await page.getByRole("button", { name: "图鉴第 5 页", exact: true }).click();
   await expect(page.locator(".creature-card")).toHaveCount(1);
   await expect(page.locator(".pagination [aria-current='page']")).toHaveText(
-    "4",
+    "5",
   );
   await page.getByRole("searchbox", { name: "搜索生物" }).fill("vampire");
   await expect(page.locator(".creature-card")).toHaveCount(1);

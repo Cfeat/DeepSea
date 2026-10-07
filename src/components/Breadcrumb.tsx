@@ -1,9 +1,11 @@
 export default function Breadcrumb({
   label,
   topic,
+  parent = "topics",
 }: {
   label: string;
   topic?: string;
+  parent?: string;
 }) {
   return (
     <nav className="breadcrumb" aria-label="当前位置">
@@ -11,7 +13,7 @@ export default function Breadcrumb({
       <span aria-hidden="true">/</span>
       {topic ? (
         <>
-          <a href="#topics">{label}</a>
+          <a href={`#${parent}`}>{label}</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">{topic}</span>
         </>

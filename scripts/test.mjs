@@ -87,7 +87,7 @@ test("catalog has unique IDs, available images and consistent teaching groups", 
 });
 
 test("every entry has a local, credited real photo with an explicit subject and capture context", () => {
-  assert.equal(creatures.length, 37);
+  assert.equal(creatures.length, 49);
   assert.equal(
     new Set(creatures.map((c) => c.media.path)).size,
     creatures.length,
@@ -192,4 +192,394 @@ test("gas volume uses absolute pressure; negative depth is surface", () => {
   assert.ok(Math.abs(gasVolumeFraction(10) - 0.5019) < 0.001);
   assert.ok(gasVolumeFraction(100) < 0.1);
   assert.equal(getZoneAtDepth(-1, zones).id, "epipelagic");
+});
+
+const story = await import(moduleUrl("src/games/storyEngine.ts"));
+const station = await import(moduleUrl("src/games/stationEngine.ts"));
+function storyPath(actions, mode = "standard", gear = ["sonar", "arm"]) {
+  let state = story.createStory({ name: "试航", mode, gear });
+  for (const id of actions) {
+    const next = story.chooseStory(state, id);
+    assert.notEqual(next, state, `${state.node}: ${id}`);
+    state = next;
+  }
+  return state;
+}
+const truthPath = [
+  "brief",
+  "observe",
+  "scan",
+  "arm",
+  "accept",
+  "film",
+  "shelter",
+  "record",
+  "charge",
+  "observe",
+  "lift",
+  "patient",
+  "report",
+];
+test("all six story endings are reachable in both difficulties and survive save replay", () => {
+  const routes = {
+    home: ["abort"],
+    rescue: ["brief", "observe", "scan", "arm", "escort"],
+    truth: truthPath,
+    discovery: [
+      "rush",
+      "follow",
+      "station",
+      "course",
+      "shelter",
+      "pass",
+      "charge",
+      "observe",
+      "lift",
+      "patient",
+      "report",
+    ],
+    archive: [...truthPath.slice(0, -2), "send"],
+    lost: [...truthPath.slice(0, -3), "deeper", "force"],
+  };
+  for (const mode of ["standard", "gentle"])
+    for (const [ending, actions] of Object.entries(routes)) {
+      const state = storyPath(actions, mode);
+      assert.equal(state.ending, ending);
+      assert.deepEqual(story.decodeStory(story.encodeStory(state)), state);
+      assert.equal(story.chooseStory(state, "abort"), state);
+      assert.ok(story.storyScore(state) > 0);
+    }
+});
+test("story branches respect equipment, resource limits and factual reading links", () => {
+  const state = storyPath(["brief", "follow"], "standard", [
+    "battery",
+    "medkit",
+  ]);
+  const scan = story.storyNode(state).choices.find((c) => c.id === "scan");
+  assert.match(story.storyChoiceReason(state, scan), /未携带/);
+  assert.equal(story.chooseStory(state, "scan"), state);
+  assert.equal(story.chooseStory(state, "unknown"), state);
+  const low = { ...state, battery: 1 };
+  assert.equal(story.chooseStory(low, "light"), low);
+  const depleted = story.chooseStory({ ...state, battery: 5 }, "light");
+  assert.equal(depleted.ending, "lost");
+  assert.equal(depleted.battery, 0);
+  for (const node of story.storyNodes) {
+    assert.equal(
+      new Set(node.choices.map((c) => c.id)).size,
+      node.choices.length,
+    );
+    if (node.creature) assert.ok(creatures.some((c) => c.id === node.creature));
+    if (node.topic) assert.ok(topics.some((t) => t.id === node.topic));
+    for (const choice of node.choices) {
+      if (choice.next && choice.next !== "finish")
+        assert.ok(story.storyNodes.some((n) => n.id === choice.next));
+      if (choice.record) assert.ok(story.storyRecords[choice.record]);
+    }
+  }
+  for (let i = 0; i < story.storyGear.length; i++)
+    for (let j = i + 1; j < story.storyGear.length; j++) {
+      const gear = [story.storyGear[i].id, story.storyGear[j].id];
+      const ending = storyPath(
+        [
+          "rush",
+          "follow",
+          "station",
+          "course",
+          "detour",
+          "pass",
+          "charge",
+          "skip",
+          "partial",
+          "patient",
+          "report",
+        ],
+        "standard",
+        gear,
+      );
+      assert.equal(ending.ending, "home");
+    }
+});
+function winStation(mode, seed) {
+  let state = station.createStation({ name: "测试站", mode, seed });
+  const act = (action) => {
+    assert.equal(
+      station.stationActionReason(state, action),
+      null,
+      `${state.day}: ${JSON.stringify(action)}`,
+    );
+    const next = station.stationAction(state, action);
+    assert.notEqual(next, state);
+    state = next;
+  };
+  const attempt = (action) => {
+    if (station.stationActionReason(state, action)) return false;
+    act(action);
+    return true;
+  };
+  act({ type: "build", slot: 6, kind: "lab" });
+  act({ type: "workers", slot: 6, delta: 1 });
+  act({ type: "build", slot: 2, kind: "dock" });
+  act({ type: "workers", slot: 2, delta: 1 });
+  act({ type: "upgrade", slot: 4 });
+  while (!state.outcome && state.day <= 30) {
+    if (state.event && !attempt({ type: "resolve", choice: "pay" }))
+      act({ type: "resolve", choice: "adapt" });
+    if (state.integrity < 75) attempt({ type: "repair" });
+    for (const id of ["sonar", "automation", "network"])
+      attempt({ type: "research", id });
+    if (!state.mission) {
+      const id = ["snow", "vent", "map"].find(
+        (id) => !state.completed.includes(id),
+      );
+      if (id) attempt({ type: "launch", id });
+    }
+    if (state.techs.includes("network") && !state.rooms[10]) {
+      if (state.resources.alloy < 50) attempt({ type: "trade", item: "alloy" });
+      if (attempt({ type: "build", slot: 10, kind: "beacon" }))
+        act({ type: "workers", slot: 10, delta: 1 });
+    }
+    act({ type: "advance" });
+  }
+  return state;
+}
+test("station can complete all expeditions, research and staffed beacon with every event order", () => {
+  for (const mode of ["relaxed", "standard"])
+    for (let seed = 0; seed < 4; seed++) {
+      const state = winStation(mode, seed);
+      assert.equal(state.outcome, "won", `${mode}/${seed}`);
+      assert.ok(state.day >= 10 && state.day <= 30);
+      assert.equal(state.completed.length, 3);
+      assert.deepEqual(
+        station.decodeStation(station.encodeStation(state)),
+        state,
+      );
+      let endless = station.stationAction(state, { type: "continue" });
+      assert.equal(endless.endless, true);
+      assert.equal(endless.outcome, null);
+      for (let day = endless.day; day < 33; day++) {
+        if (endless.event)
+          endless = station.stationAction(endless, {
+            type: "resolve",
+            choice: "adapt",
+          });
+        if (endless.integrity < 60)
+          endless = station.stationAction(endless, { type: "repair" });
+        endless = station.stationAction(endless, { type: "advance" });
+      }
+      assert.equal(endless.day, 33);
+      assert.equal(endless.outcome, null);
+      assert.deepEqual(
+        station.decodeStation(station.encodeStation(endless)),
+        endless,
+      );
+    }
+});
+test("construction connectivity, staff, beds and expedition guards prevent invalid spending", () => {
+  let state = station.createStation({ name: "边界", mode: "relaxed", seed: 0 });
+  for (const action of [
+    { type: "build", slot: 11, kind: "lab" },
+    { type: "build", slot: -1, kind: "lab" },
+    { type: "build", slot: 6, kind: "__proto__" },
+    { type: "research", id: "network" },
+    { type: "recruit" },
+    { type: "launch", id: "snow" },
+  ])
+    assert.equal(station.stationAction(state, action), state);
+  state = station.stationAction(state, { type: "build", slot: 6, kind: "lab" });
+  state = station.stationAction(state, {
+    type: "build",
+    slot: 7,
+    kind: "dock",
+  });
+  assert.match(
+    station.stationActionReason(state, { type: "demolish", slot: 6 }),
+    /连接/,
+  );
+  state = station.stationAction(state, { type: "workers", slot: 6, delta: 1 });
+  state = station.stationAction(state, { type: "workers", slot: 7, delta: 1 });
+  state = station.stationAction(state, { type: "workers", slot: 4, delta: 1 });
+  assert.equal(station.assignedWorkers(state), 6);
+  assert.match(
+    station.stationActionReason(state, { type: "workers", slot: 6, delta: 1 }),
+    /空闲/,
+  );
+  state = station.stationAction(state, { type: "launch", id: "snow" });
+  assert.match(
+    station.stationActionReason(state, { type: "demolish", slot: 7 }),
+    /尚未返回/,
+  );
+  assert.equal(
+    station.stationAction(state, { type: "launch", id: "vent" }),
+    state,
+  );
+  for (let i = 0; i < 2; i++)
+    state = station.stationAction(state, { type: "advance" });
+  assert.deepEqual(state.completed, ["snow"]);
+  assert.equal(state.mission, null);
+  assert.equal(state.resources.science, 22);
+  assert.equal(
+    station.stationActionReason(state, { type: "demolish", slot: 7 }),
+    null,
+  );
+});
+test("daily supply reflects upgrades, upkeep, paused production and shortage recovery", () => {
+  let state = station.createStation({
+    name: "收支",
+    mode: "standard",
+    seed: 0,
+  });
+  assert.equal(station.stationForecast(state).delta.energy, 5);
+  assert.equal(station.stationForecast(state).delta.credits, 24);
+  state = station.stationAction(state, { type: "upgrade", slot: 4 });
+  assert.equal(station.stationForecast(state).delta.energy, 23);
+  assert.equal(station.stationForecast(state).delta.credits, 22);
+  state = station.stationAction(state, { type: "toggle", slot: 1 });
+  assert.equal(station.stationForecast(state).delta.oxygen, -12);
+  assert.equal(station.stationForecast(state).delta.credits, 22);
+  state = station.stationAction(state, { type: "toggle", slot: 9 });
+  for (let i = 0; i < 7; i++) {
+    if (state.event)
+      state = station.stationAction(state, {
+        type: "resolve",
+        choice: "adapt",
+      });
+    state = station.stationAction(state, { type: "advance" });
+  }
+  assert.equal(state.shortageDays, 2);
+  assert.equal(state.outcome, null);
+  let recovered = station.stationAction(state, { type: "trade", item: "food" });
+  recovered = station.stationAction(recovered, {
+    type: "trade",
+    item: "oxygen",
+  });
+  recovered = station.stationAction(recovered, { type: "toggle", slot: 1 });
+  recovered = station.stationAction(recovered, { type: "toggle", slot: 9 });
+  recovered = station.stationAction(recovered, { type: "advance" });
+  assert.equal(recovered.shortageDays, 0);
+  assert.equal(recovered.outcome, null);
+  const failed = station.stationAction(state, { type: "advance" });
+  assert.equal(failed.outcome, "lost");
+  assert.equal(station.stationAction(failed, { type: "advance" }), failed);
+  let deadline = station.createStation({
+    name: "期限",
+    mode: "relaxed",
+    seed: 0,
+  });
+  while (!deadline.outcome) {
+    if (deadline.event)
+      deadline = station.stationAction(deadline, {
+        type: "resolve",
+        choice: "adapt",
+      });
+    if (deadline.integrity < 65)
+      deadline = station.stationAction(deadline, { type: "repair" });
+    deadline = station.stationAction(deadline, { type: "advance" });
+  }
+  assert.equal(deadline.day, 30);
+  assert.equal(deadline.outcome, "lost");
+  assert.equal(deadline.event, null);
+});
+
+test("workshop, living quarters, recruitment and both support technologies have working effects", () => {
+  let state = station.createStation({ name: "扩建", mode: "relaxed", seed: 0 });
+  const act = (action) => {
+    assert.equal(
+      station.stationActionReason(state, action),
+      null,
+      JSON.stringify(action),
+    );
+    state = station.stationAction(state, action);
+  };
+  for (const [slot, kind] of [
+    [6, "workshop"],
+    [10, "quarters"],
+    [2, "lab"],
+  ]) {
+    act({ type: "build", slot, kind });
+    act({ type: "workers", slot, delta: 1 });
+  }
+  act({ type: "upgrade", slot: 4 });
+  const nextDay = () => {
+    if (state.event) act({ type: "resolve", choice: "pay" });
+    act({ type: "advance" });
+  };
+  assert.equal(station.stationCapacity(state), 9);
+  assert.equal(station.stationForecast(state).morale, 1);
+  const alloyBefore = state.resources.alloy;
+  for (let i = 0; i < 4; i++) nextDay();
+  assert.equal(state.resources.alloy, alloyBefore + 32);
+  if (state.event) act({ type: "resolve", choice: "pay" });
+  act({ type: "research", id: "recycling" });
+  assert.equal(station.stationForecast(state).delta.food, 3);
+  assert.equal(station.stationForecast(state).delta.oxygen, 8);
+  act({ type: "recruit" });
+  assert.equal(state.crew, 7);
+  assert.equal(station.stationForecast(state).delta.food, 1);
+  assert.match(
+    station.stationActionReason(state, { type: "demolish", slot: 10 }),
+    /床位/,
+  );
+  for (let i = 0; i < 6; i++) nextDay();
+  while (
+    station.stationActionReason(state, { type: "research", id: "pressure" }) &&
+    state.day < 25
+  )
+    nextDay();
+  act({ type: "research", id: "pressure" });
+  assert.equal(station.stationForecast(state).wear, 0);
+  while (
+    station.stationActionReason(state, { type: "upgrade", slot: 10 }) &&
+    state.day < 25
+  )
+    nextDay();
+  act({ type: "upgrade", slot: 10 });
+  assert.equal(station.stationCapacity(state), 12);
+  act({ type: "demolish", slot: 6 });
+  assert.equal(station.assignedWorkers(state), 5);
+  assert.deepEqual(station.decodeStation(station.encodeStation(state)), state);
+});
+test("events block time, deterministic saves replay rather than trusting injected resources", () => {
+  let state = station.createStation({ name: "事件", mode: "relaxed", seed: 0 });
+  for (let i = 0; i < 4; i++)
+    state = station.stationAction(state, { type: "advance" });
+  assert.equal(state.event, "seal");
+  assert.equal(station.stationAction(state, { type: "advance" }), state);
+  const resolved = station.stationAction(state, {
+    type: "resolve",
+    choice: "pay",
+  });
+  assert.equal(resolved.resources.alloy, state.resources.alloy - 10);
+  assert.equal(
+    station.stationAction(resolved, { type: "resolve", choice: "pay" }),
+    resolved,
+  );
+  const save = {
+    ...station.encodeStation(resolved),
+    resources: { credits: 999999 },
+  };
+  assert.deepEqual(station.decodeStation(save), resolved);
+  for (const bad of [
+    null,
+    [],
+    {},
+    { ...save, version: 2 },
+    {
+      ...save,
+      actions: [...save.actions, { type: "workers", slot: 4, delta: 100 }],
+    },
+    { ...save, actions: [{ type: "build", slot: 6, kind: "constructor" }] },
+  ])
+    assert.equal(station.decodeStation(bad), null);
+  const storySave = story.encodeStory(storyPath(["brief"]));
+  assert.equal(station.decodeStation(storySave), null);
+  assert.equal(story.decodeStory(save), null);
+  assert.equal(story.decodeStory({ ...storySave, actions: ["scan"] }), null);
+  assert.equal(
+    story.decodeStory({
+      ...storySave,
+      setup: { ...storySave.setup, gear: ["arm", "arm"] },
+    }),
+    null,
+  );
 });

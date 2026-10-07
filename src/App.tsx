@@ -16,6 +16,7 @@ import Breadcrumb from "./components/Breadcrumb";
 import PageBoundary from "./components/PageBoundary";
 import { pages, readLocation } from "./utils/navigation";
 import { topics } from "./data/topics";
+import { games } from "./games/catalog";
 import { readIds, writeStorage } from "./utils/storage";
 
 const DiveExplorer = lazy(() => import("./components/DiveExplorer"));
@@ -23,6 +24,7 @@ const AtlasPage = lazy(() => import("./components/AtlasPage"));
 const DepthLab = lazy(() => import("./components/DepthLab"));
 const TopicsPage = lazy(() => import("./components/TopicsPage"));
 const SourcesPage = lazy(() => import("./components/SourcesPage"));
+const GamesPage = lazy(() => import("./components/games/GamesPage"));
 const EncyclopediaModal = lazy(() => import("./components/EncyclopediaModal"));
 const ids = creatures.map((creature) => creature.id);
 
@@ -47,7 +49,8 @@ export default function App() {
   );
   const pageLabel = pages.find((page) => page.id === route.pageId)!.label;
   const topic = topics.find((item) => item.id === route.topicId);
-  const routeKey = `${route.pageId}/${route.topicId || ""}`;
+  const game = games.find((item) => item.id === route.gameId);
+  const routeKey = `${route.pageId}/${route.topicId || route.gameId || ""}`;
 
   useEffect(() => {
     const sync = () => setRoute(readLocation());
@@ -66,8 +69,8 @@ export default function App() {
     main.current?.focus({ preventScroll: true });
   }, [routeKey]);
   useEffect(() => {
-    document.title = `${selected?.name || topic?.title || pageLabel} · 深海`;
-  }, [selected, topic, pageLabel]);
+    document.title = `${selected?.name || topic?.title || game?.name || pageLabel} · 深海`;
+  }, [selected, topic, game, pageLabel]);
   useEffect(() => {
     const id = route.creatureId;
     if (id && ids.includes(id)) {
@@ -144,7 +147,11 @@ export default function App() {
         className={`page-${route.pageId}`}
       >
         {route.pageId !== "home" && (
-          <Breadcrumb label={pageLabel} topic={topic?.kicker} />
+          <Breadcrumb
+            label={pageLabel}
+            topic={topic?.kicker || game?.name}
+            parent={route.pageId}
+          />
         )}
         <PageBoundary key={routeKey}>
           <Suspense
@@ -184,6 +191,13 @@ export default function App() {
               />
             )}
             {route.pageId === "sources" && <SourcesPage />}
+            {route.pageId === "games" && (
+              <GamesPage
+                key={route.gameId || "index"}
+                gameId={route.gameId}
+                onOpen={openCreature}
+              />
+            )}
           </Suspense>
         </PageBoundary>
         {route.pageId === "journey" && storageError && (

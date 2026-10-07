@@ -133,6 +133,21 @@ export default function HomePage() {
               <p>改变水深和亮度，观察压力、气体体积与伪装的变化。</p>
             </div>
           </a>
+          <a href="#games" className="entrance-card entrance-games">
+            <div className="entrance-game-art" aria-hidden="true">
+              <span>ϟ</span>
+              <span>◎</span>
+              <span>⚗</span>
+              <small>OUTPOST / PLAY</small>
+            </div>
+            <div>
+              <p className="eyebrow">04 / PLAY & EXPLORE</p>
+              <h3>
+                来深海玩一局 <span>↗</span>
+              </h3>
+              <p>驾驶潜器追寻一封来信，或从第一天起经营你的海底站。</p>
+            </div>
+          </a>
         </div>
         <p className="note">
           影像：NOAA / NOAA Ocean
