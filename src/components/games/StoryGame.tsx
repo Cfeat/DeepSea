@@ -13,12 +13,20 @@ import {
   storyNode,
   storyRecords,
   storyScore,
+  storyActionReason,
+  storyChoiceChance,
+  storyGoals,
+  storyObjectives,
+  storyReturnCost,
+  type StorySetup,
   type StoryGear,
   type StoryMode,
 } from "../../games/storyEngine";
 import { exportGameSave, useGameSave } from "../../games/useGameSave";
 import GameTools from "./GameTools";
+import StoryExpeditionPanel from "./StoryExpeditionPanel";
 import "../../styles/games.css";
+import "../../styles/gameplay.css";
 
 export default function StoryGame({
   onOpen,
@@ -30,10 +38,12 @@ export default function StoryGame({
   const [name, setName] = useState("远舟");
   const [mode, setMode] = useState<StoryMode>("gentle");
   const [gear, setGear] = useState<StoryGear[]>(["sonar", "arm"]);
+  const [goal, setGoal] = useState<StorySetup["goal"]>("truth");
   const [abortConfirm, setAbortConfirm] = useState(false);
   const [tab, setTab] = useState<"records" | "log">("records");
   const chapter = useRef<HTMLElement>(null);
   const dashboard = useRef<HTMLDivElement>(null);
+  const notebook = useRef<HTMLElement>(null);
   const node = state ? storyNode(state) : null;
   const previousNode = useRef(state?.node);
   const previousEnding = useRef(state?.ending);
@@ -85,7 +95,7 @@ export default function StoryGame({
           <p className="eyebrow">THE LAST TRANSMISSION / 文字探险</p>
           <h1 id="story-title">深渊来信</h1>
         </div>
-        <p>一次失联调查。你的选择，会留在航行报告里。</p>
+        <p>选一条航线，留够回程储备，把人和答案带回来。</p>
       </header>
       {!state ? (
         <div className="game-setup story-setup">
@@ -106,7 +116,7 @@ export default function StoryGame({
             <dl className="game-facts">
               <div>
                 <dt>航程</dt>
-                <dd>6 章 · 约 15–25 分钟</dd>
+                <dd>9 处地点 · 可以绕路与折返</dd>
               </div>
               <div>
                 <dt>结局</dt>
@@ -114,7 +124,7 @@ export default function StoryGame({
               </div>
               <div>
                 <dt>玩法</dt>
-                <dd>装备选择 · 分支调查 · 资源管理</dd>
+                <dd>航线规划 · 证据推理 · 风险与补给</dd>
               </div>
             </dl>
           </div>
@@ -122,7 +132,15 @@ export default function StoryGame({
             onSubmit={(event) => {
               event.preventDefault();
               if (gear.length === 2) {
-                setState(createStory({ name, mode, gear }));
+                setState(
+                  createStory({
+                    name,
+                    mode,
+                    gear,
+                    goal,
+                    seed: Math.floor(Math.random() * 1000000),
+                  }),
+                );
                 setWarning("");
               }
             }}
@@ -164,6 +182,23 @@ export default function StoryGame({
                       onChange={() => setMode(item.id)}
                     />
                     <strong>{item.label}</strong>
+                    <span>{item.text}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>这次为什么出航？</legend>
+              <div className="campaign-options">
+                {storyGoals.map((item) => (
+                  <label key={item.id}>
+                    <input
+                      type="radio"
+                      name="story-goal"
+                      checked={goal === item.id}
+                      onChange={() => setGoal(item.id)}
+                    />
+                    <strong>{item.name}</strong>
                     <span>{item.text}</span>
                   </label>
                 ))}
@@ -243,6 +278,33 @@ export default function StoryGame({
               ))}
             </div>
           </div>
+          {state.expedition && (
+            <div className="story-shortcuts" aria-label="探险区域导航">
+              <button
+                onClick={() => {
+                  chapter.current?.focus({ preventScroll: true });
+                  chapter.current?.scrollIntoView({
+                    block: "start",
+                    behavior: "instant",
+                  });
+                }}
+              >
+                现场调查
+              </button>
+              <button
+                onClick={() => {
+                  notebook.current?.focus({ preventScroll: true });
+                  notebook.current?.scrollIntoView({
+                    block: "start",
+                    behavior: "instant",
+                  });
+                }}
+              >
+                航线与物资
+              </button>
+              <span>已到访 {state.expedition.visited.length}/9</span>
+            </div>
+          )}
           <div className="story-layout">
             <article
               ref={chapter}
@@ -258,6 +320,16 @@ export default function StoryGame({
                   <h2 id="chapter-title">{storyEndings[state.ending].title}</h2>
                   <p>{storyEndings[state.ending].text}</p>
                   <div className="ending-stats">
+                    {state.expedition && (
+                      <span>
+                        航行目标{" "}
+                        <strong>
+                          {storyObjectives(state).every((item) => item.done)
+                            ? "完成"
+                            : "尚未完成"}
+                        </strong>
+                      </span>
+                    )}
                     <span>
                       航行评分 <strong>{storyScore(state)}</strong>
                     </span>
@@ -276,7 +348,10 @@ export default function StoryGame({
                     </span>
                   </div>
                   <p className="note">
-                    改变装备和路线，能遇到不同结果。下面的日志保留了本局的所有选择。
+                    {state.flags.includes("evacuated")
+                      ? "人员已经返回，潜器留在了海底。"
+                      : "改变目标、装备和航线，下一次会是不同的旅程。"}
+                    下面的日志保留了本局的所有选择。
                   </p>
                   <button className="game-button" onClick={reset}>
                     再开始一次航程
@@ -297,6 +372,13 @@ export default function StoryGame({
                       </span>
                     ))}
                   </div>
+                  {state.expedition && (
+                    <p className="eyebrow">
+                      {state.expedition.encounter
+                        ? "航行遭遇 / 先处理当前情况"
+                        : "自由调查 / 不必按深度顺序行动"}
+                    </p>
+                  )}
                   <p className="chapter-speaker">{node!.speaker}</p>
                   <h2 id="chapter-title">{node!.title}</h2>
                   {state.log.length > 0 && (
@@ -317,9 +399,11 @@ export default function StoryGame({
                   <div className="story-choices" aria-label="选择下一步">
                     {node!.choices.map((choice, index) => {
                       const reason = storyChoiceReason(state, choice);
+                      const chance = storyChoiceChance(state, choice);
                       return (
                         <button
                           key={choice.id}
+                          data-choice={choice.id}
                           disabled={!!reason}
                           onClick={() => choose(choice.id)}
                         >
@@ -328,7 +412,10 @@ export default function StoryGame({
                           </span>
                           <span>
                             <strong>{choice.label}</strong>
-                            <small>{reason || choice.hint}</small>
+                            <small>
+                              {reason ||
+                                `${choice.hint}${chance !== null ? ` · 当前成功率 ${chance}%` : ""}`}
+                            </small>
                           </span>
                           <span aria-hidden="true">→</span>
                         </button>
@@ -344,14 +431,29 @@ export default function StoryGame({
                   {abortConfirm && (
                     <div className="game-confirm">
                       <p>
-                        现在返航会结束本次调查，已有观察会保留在航行报告中。
+                        {state.expedition
+                          ? `正常返航需要 ${storyReturnCost(state).oxygen} 氧气、${storyReturnCost(state).battery} 电量。现有资料会保留；请先使用物资，或发出信标等待接应。`
+                          : "现在返航会结束本次调查，已有观察会保留在航行报告中。"}
                       </p>
                       <button
                         className="game-button secondary"
+                        disabled={
+                          !!state.expedition &&
+                          !!storyActionReason(state, "abort")
+                        }
                         onClick={() => choose("abort")}
                       >
                         确认返航
                       </button>
+                      {state.expedition && (
+                        <button
+                          className="game-button secondary"
+                          disabled={!!storyActionReason(state, "evacuate")}
+                          onClick={() => choose("evacuate")}
+                        >
+                          放弃潜器，等待接应
+                        </button>
+                      )}
                       <button
                         className="text-button"
                         onClick={() => setAbortConfirm(false)}
@@ -363,7 +465,20 @@ export default function StoryGame({
                 </>
               )}
             </article>
-            <aside className="story-notebook" aria-label="航行笔记">
+            <aside
+              ref={notebook}
+              tabIndex={-1}
+              className="story-notebook"
+              aria-label="航行笔记"
+            >
+              {state.expedition && (
+                <StoryExpeditionPanel state={state} onAction={choose} />
+              )}
+              {!state.expedition && (
+                <p className="setup-tip">
+                  这份旧存档沿用原航程规则。重新开始时可以体验自由航线与证据调查。
+                </p>
+              )}
               <h2>航行笔记</h2>
               <p className="equipment-note">
                 {state.setup.gear
@@ -445,11 +560,13 @@ export default function StoryGame({
       <details className="game-rules">
         <summary>玩法与说明</summary>
         <p>
-          选择两件装备出航。每个选项都标明资源变化；不满足装备或资源要求时不能选择。船体、氧气或电量降到
-          0，航程中止。你可以在任何章节主动返航，取得已有观察对应的结局。
+          选择目标和两件装备出航。现场行动和航行各推进一个时刻，使用物资不推进。先定位林岑，再在时刻
+          20 前完成救援；时刻 22
+          起海面天气变差。每次行动都标明成本，已领取的补给不能重复领取。船体、氧气、电量降到
+          0 或紧张达到 100，航程中止。
         </p>
         <p>
-          救援、完整档案、热液观测和对环境的处理方式，会影响最终报告。观察笔记和每次选择都在右侧日志里。进度自动保存在当前浏览器，导出的存档可在其他设备导入。
+          地图上选择相邻地点，再确认航行。旧中继舱有补给和检修册；在回声站选择两份证据核实故障，才能取得完整档案。可以随时用已知路线返航，但需要预留氧气与电量。目标、救援和带回的资料影响报告。风险判定会随本局行动固定，刷新页面不会重新判定。
         </p>
         <p>
           人物、站点和事件均为虚构。场景深度、氧气、电量、维修和应急流程用于游戏叙事，不是现实潜水或潜器操作指南。生物与环境知识可从相关百科查看原始资料。

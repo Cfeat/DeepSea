@@ -11,7 +11,7 @@ function hasSave(key: string) {
     if (!raw || raw.length > 300000) return false;
     const parsed = JSON.parse(raw);
     return (
-      parsed?.version === 1 &&
+      [1, 2].includes(parsed?.version) &&
       typeof parsed.setup?.name === "string" &&
       Array.isArray(parsed.actions)
     );

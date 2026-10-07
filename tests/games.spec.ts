@@ -10,7 +10,8 @@ import {
   stationEvents,
   encodeStation,
   type StationAction,
-} from "../src/games/stationEngine";
+} from "../src/games/stationLegacy";
+import { createStory, encodeStory } from "../src/games/storyLegacy";
 
 async function fit(page: Page) {
   expect(
@@ -55,7 +56,7 @@ test("new real-photo species are searchable, readable and still on the depth axi
   await expect(page.locator(".dive-creature")).toHaveCount(49);
   await fit(page);
 });
-test("story plays through, opens real encyclopedia, restores choices and reaches the full ending", async ({
+test("old story saves keep their original playable route and ending", async ({
   page,
 }) => {
   await page.goto("./");
@@ -67,6 +68,12 @@ test("story plays through, opens real encyclopedia, restores choices and reaches
   await expect(page.getByRole("checkbox", { name: /备用电池/ })).toBeDisabled();
   await page.getByRole("radio", { name: /标准航程/ }).check();
   await page.getByRole("button", { name: "登上潜器，开始调查 ↓" }).click();
+  await importSave(
+    page,
+    encodeStory(
+      createStory({ name: "远舟", mode: "standard", gear: ["sonar", "arm"] }),
+    ),
+  );
   await page.getByRole("button", { name: /先和队员核对任务/ }).click();
   await expect(page.locator("#chapter-title")).toHaveText("像雪一样落下来");
   await page.getByRole("button", { name: "认识吸血鬼乌贼 ↗" }).click();
@@ -134,10 +141,10 @@ test("games retain independent saves; export, import, invalid file and restart p
   await expect(page.locator('[data-resource="credits"]')).toHaveText(before);
   await page.getByRole("button", { name: "取消", exact: true }).click();
   await page.goto("./#games/story");
-  await expect(page.locator("#chapter-title")).toHaveText("像雪一样落下来");
+  await expect(page.locator("#chapter-title")).toHaveText("导航浮标");
   await page.getByRole("button", { name: "重新开始", exact: true }).click();
   await page.getByRole("button", { name: "取消", exact: true }).click();
-  await expect(page.locator("#chapter-title")).toHaveText("像雪一样落下来");
+  await expect(page.locator("#chapter-title")).toHaveText("导航浮标");
   await page.getByRole("button", { name: "重新开始", exact: true }).click();
   await page.getByRole("button", { name: "确认重新开始", exact: true }).click();
   await page.reload();
@@ -145,7 +152,7 @@ test("games retain independent saves; export, import, invalid file and restart p
     page.getByRole("button", { name: "登上潜器，开始调查 ↓" }),
   ).toBeVisible();
   await importSave(page, save);
-  await expect(page.locator("#chapter-title")).toHaveText("像雪一样落下来");
+  await expect(page.locator("#chapter-title")).toHaveText("导航浮标");
   await page.goto("./#games/station");
   await expect(page.locator(".station-day")).toHaveText("第 2 天");
   await expect(
@@ -167,6 +174,7 @@ test("station builds, staffs, researches, completes all expeditions and continue
   await page.getByRole("button", { name: "开始经营 →" }).click();
   await expect(page.locator(".station-resources")).toBeInViewport();
   let state = createStation({ name: "蓝湾站", mode: "standard", seed: 0 });
+  await importSave(page, encodeStation(state));
   async function act(action: StationAction) {
     expect(stationActionReason(state, action)).toBeNull();
     const button = (name: string) =>

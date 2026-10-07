@@ -10,7 +10,6 @@ import {
   stationAction,
   stationActionReason,
   stationCapacity,
-  stationEvents,
   stationForecast,
   STATION_KEY,
   stationMissions,
@@ -19,6 +18,14 @@ import {
   stationTechs,
   storageCap,
   upgradeCost,
+  stationEvent,
+  stationWeather,
+  stationScenarios,
+  stationGoals,
+  stationObjectives,
+  stationRoomBonus,
+  stationMissionPlan,
+  eventTech,
   type RoomKind,
   type StationAction,
   type StationResource,
@@ -26,7 +33,14 @@ import {
 } from "../../games/stationEngine";
 import { exportGameSave, useGameSave } from "../../games/useGameSave";
 import GameTools from "./GameTools";
+import {
+  ExpeditionApproach,
+  StationContractPanel,
+  StationStrategyPanel,
+  StationWeatherPanel,
+} from "./StationSystemsPanel";
 import "../../styles/games.css";
+import "../../styles/gameplay.css";
 
 const roomKinds = Object.keys(roomSpecs).filter(
   (kind) => kind !== "core",
@@ -44,6 +58,8 @@ const tabs = [
   { id: "research", label: "科研" },
   { id: "missions", label: "考察" },
   { id: "supply", label: "站务" },
+  { id: "systems", label: "排班" },
+  { id: "contracts", label: "委托" },
   { id: "log", label: "日志" },
 ] as const;
 
@@ -56,6 +72,8 @@ export default function StationGame({
     useGameSave(STATION_KEY, decodeStation, encodeStation);
   const [name, setName] = useState("蓝湾站");
   const [mode, setMode] = useState<StationSetup["mode"]>("relaxed");
+  const [scenario, setScenario] = useState<StationSetup["scenario"]>("bay");
+  const [goal, setGoal] = useState<StationSetup["goal"]>("network");
   const [selected, setSelected] = useState(6);
   const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("build");
   const [demolish, setDemolish] = useState(false);
@@ -98,6 +116,7 @@ export default function StationGame({
     previousEvent.current = pendingEvent;
   }, [active, outcome, pendingEvent]);
   const forecast = state ? stationForecast(state) : null;
+  const currentEvent = state ? stationEvent(state) : null;
   const room = state?.rooms[selected];
   function act(action: StationAction) {
     if (!state) return;
@@ -179,7 +198,7 @@ export default function StationGame({
               </div>
               <div>
                 <dt>系统</dt>
-                <dd>8 种可建舱室 · 5 项科技 · 3 类考察</dd>
+                <dd>设施布局 · 轮班 · 科研 · 海域考察</dd>
               </div>
               <div>
                 <dt>通关后</dt>
@@ -195,6 +214,8 @@ export default function StationGame({
                   name,
                   mode,
                   seed: Math.floor(Math.random() * 1000000),
+                  scenario,
+                  goal,
                 }),
               );
               setWarning("");
@@ -243,8 +264,42 @@ export default function StationGame({
                 ))}
               </div>
             </fieldset>
+            <fieldset>
+              <legend>在哪里建站？</legend>
+              <div className="campaign-options">
+                {stationScenarios.map((item) => (
+                  <label key={item.id}>
+                    <input
+                      type="radio"
+                      name="station-scenario"
+                      checked={scenario === item.id}
+                      onChange={() => setScenario(item.id)}
+                    />
+                    <strong>{item.name}</strong>
+                    <span>{item.text}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>这次的项目目标</legend>
+              <div className="campaign-options">
+                {stationGoals.map((item) => (
+                  <label key={item.id}>
+                    <input
+                      type="radio"
+                      name="station-goal"
+                      checked={goal === item.id}
+                      onChange={() => setGoal(item.id)}
+                    />
+                    <strong>{item.name}</strong>
+                    <span>{item.text}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             <p className="setup-tip">
-              先建实验室、分配一名队员，再建考察坞。发电舱升级后，就能支撑更多设备。
+              第一次可以先选蓝湾盆地。实验室和考察坞能带来启动成果；加班能赶进度，持续疲劳会让所有设备效率下降。
             </p>
             <button type="submit" className="game-button">
               开始经营 →
@@ -330,15 +385,27 @@ export default function StationGame({
               );
             })}
           </div>
-          {(notice || state.shortageDays > 0 || forecast!.shortPower) && (
-            <p role="status" className="game-warning">
-              {notice ||
-                (forecast!.shortPower
-                  ? "明日电能不足：用电舱将停产，结构和士气受损。可以升级发电、调配人员或暂停耗电舱。"
-                  : `生活供给已连续不足 ${state.shortageDays} 天，连续 3 天会结束本局。`)}
+          {state.systems ? (
+            <StationWeatherPanel state={state} />
+          ) : (
+            <p className="setup-tip">
+              旧存档保留原经营规则。重新建站时，可选择海域、项目与新的排班系统。
             </p>
           )}
-          {state.event && !state.outcome && (
+          {(notice ||
+            state.shortageDays > 0 ||
+            forecast!.shortPower ||
+            forecast!.shed.length > 0) && (
+            <p role="status" className="game-warning">
+              {notice ||
+                (forecast!.shed.length
+                  ? `明日有 ${forecast!.shed.length} 座设施将因缺电停产。生活保障优先供电，排班页可查看每座设备的预测。`
+                  : forecast!.shortPower
+                    ? "明日电能不足：用电舱将停产，结构和士气受损。可以升级发电、调配人员或暂停耗电舱。"
+                    : `生活供给已连续不足 ${state.shortageDays} 天，连续 3 天会结束本局。`)}
+            </p>
+          )}
+          {state.event && currentEvent && !state.outcome && (
             <section
               ref={eventPanel}
               tabIndex={-1}
@@ -347,12 +414,12 @@ export default function StationGame({
             >
               <div>
                 <p className="eyebrow">站点待办 / DAY {state.day}</p>
-                <h2 id="event-title">{stationEvents[state.event].title}</h2>
-                <p>{stationEvents[state.event].text}</p>
+                <h2 id="event-title">{currentEvent.title}</h2>
+                <p>{currentEvent.text}</p>
               </div>
               <div className="event-choices">
                 {(["pay", "adapt"] as const).map((choice) => {
-                  const event = stationEvents[state.event!];
+                  const event = currentEvent;
                   const reason = stationActionReason(state, {
                     type: "resolve",
                     choice,
@@ -386,6 +453,20 @@ export default function StationGame({
                     </button>
                   );
                 })}
+                {state.systems && eventTech(state) && (
+                  <div>
+                    {control(
+                      { type: "resolve", choice: "tech" },
+                      `用${stationTechs.find((item) => item.id === eventTech(state))!.name}处理`,
+                    )}
+                    <p className="action-reason">
+                      {stationActionReason(state, {
+                        type: "resolve",
+                        choice: "tech",
+                      }) || "已有技术可以处理，无需额外备件。"}
+                    </p>
+                  </div>
+                )}
               </div>
             </section>
           )}
@@ -404,7 +485,7 @@ export default function StationGame({
               </h2>
               <p>
                 {state.outcome === "won"
-                  ? "三项考察完成，观测阵列开始值守，供给与站体通过验收。你的试验站获批长期运行。"
+                  ? `${state.systems ? stationGoals.find((item) => item.id === state.setup.goal)!.name : "长期站点"}项目通过验收。队员与供给已经就绪，你的试验站获批长期运行。`
                   : state.shortageDays >= 3
                     ? "生活供给连续三天不足，团队已安全撤离。下一次可以先看明日收支，再扩张设备。"
                     : state.integrity <= 0 || state.morale <= 0
@@ -416,7 +497,10 @@ export default function StationGame({
                   经营评分 <strong>{stationScore(state)}</strong>
                 </span>
                 <span>
-                  完成考察 <strong>{state.completed.length}/3</strong>
+                  完成考察{" "}
+                  <strong>
+                    {state.completed.length}/{state.systems ? 6 : 3}
+                  </strong>
                 </span>
                 <span>
                   已研究 <strong>{state.techs.length}/5</strong>
@@ -441,7 +525,15 @@ export default function StationGame({
                   <p className="eyebrow">STATION BLUEPRINT / 游戏示意</p>
                   <h2 id="plan-title">站点布局</h2>
                 </div>
-                <span>虚构站点 · 2,400 m</span>
+                <span>
+                  虚构站点 ·{" "}
+                  {(
+                    stationScenarios.find(
+                      (item) => item.id === state.setup.scenario,
+                    )?.depth ?? 2400
+                  ).toLocaleString()}{" "}
+                  m
+                </span>
               </div>
               <p className="note">
                 点击舱室安排人员；点击相邻空位选择建造。每舱最多 2 人。
@@ -477,68 +569,115 @@ export default function StationGame({
                         ? item.kind === "core"
                           ? "COMMAND"
                           : `${item.level} 级 · ${item.workers} 人${!item.enabled ? " · 停用" : ""}`
-                        : "EMPTY SLOT"}
+                        : state.systems
+                          ? stationRoomBonus(state, index).thermal
+                            ? "热源接口"
+                            : stationRoomBonus(state, index).sheltered
+                              ? "背流位置"
+                              : "迎流位置"
+                          : "EMPTY SLOT"}
                     </span>
                   </button>
                 ))}
               </div>
               <div className="station-objectives">
-                <h3>长期站点的验收条件</h3>
-                <ul>
-                  <li className={state.completed.length === 3 ? "done" : ""}>
-                    三类考察全部完成 <strong>{state.completed.length}/3</strong>
-                  </li>
-                  <li
-                    className={
-                      state.rooms.some(
-                        (item) =>
-                          item?.kind === "beacon" &&
-                          item.enabled &&
-                          item.workers,
-                      )
-                        ? "done"
-                        : ""
-                    }
-                  >
-                    观测阵列建成并有人值守
-                  </li>
-                  <li
-                    className={
-                      state.integrity >= 65 && state.morale >= 40 ? "done" : ""
-                    }
-                  >
-                    结构 ≥65 · 士气 ≥40
-                  </li>
-                  <li
-                    className={
-                      state.resources.food >= 30 &&
-                      state.resources.oxygen >= 30 &&
-                      state.resources.energy >= 20
-                        ? "done"
-                        : ""
-                    }
-                  >
-                    食物、氧气 ≥30 · 电能 ≥20
-                  </li>
-                  <li className={state.day >= 10 ? "done" : ""}>
-                    第 10–30 天内，推进一天后验收
-                  </li>
-                </ul>
+                <h3>
+                  {state.systems
+                    ? stationGoals.find((item) => item.id === state.setup.goal)!
+                        .name
+                    : "长期站点"}
+                  的验收条件
+                </h3>
+                {state.systems ? (
+                  <ul>
+                    {stationObjectives(state).map((item) => (
+                      <li className={item.done ? "done" : ""} key={item.text}>
+                        {item.text}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <ul>
+                    <li className={state.completed.length === 3 ? "done" : ""}>
+                      三类考察全部完成{" "}
+                      <strong>{state.completed.length}/3</strong>
+                    </li>
+                    <li
+                      className={
+                        state.rooms.some(
+                          (item) =>
+                            item?.kind === "beacon" &&
+                            item.enabled &&
+                            item.workers,
+                        )
+                          ? "done"
+                          : ""
+                      }
+                    >
+                      观测阵列建成并有人值守
+                    </li>
+                    <li
+                      className={
+                        state.integrity >= 65 && state.morale >= 40
+                          ? "done"
+                          : ""
+                      }
+                    >
+                      结构 ≥65 · 士气 ≥40
+                    </li>
+                    <li
+                      className={
+                        state.resources.food >= 30 &&
+                        state.resources.oxygen >= 30 &&
+                        state.resources.energy >= 20
+                          ? "done"
+                          : ""
+                      }
+                    >
+                      食物、氧气 ≥30 · 电能 ≥20
+                    </li>
+                    <li className={state.day >= 10 ? "done" : ""}>
+                      第 10–30 天内，推进一天后验收
+                    </li>
+                  </ul>
+                )}
+                {state.systems && (
+                  <p className="note">
+                    {state.endless
+                      ? "项目已通过评估，接下来可以按自己的目标经营。"
+                      : "第 10–30 天内评估，事件处理后推进一天。"}
+                  </p>
+                )}
               </div>
               <details className="production-breakdown">
                 <summary>查看每日结算规则</summary>
+                {state.systems ? (
+                  <>
+                    <p>
+                      工作效率受疲劳与士气影响，排班页显示各设备真实产出。相邻设施和建造位置有加成与噪声影响，选中舱室即可查看。
+                    </p>
+                    <p>
+                      发电先结算，生活保障优先供电。剩余设备按排班页的优先级分配电能，缺电设备单独停产。每人每天消耗
+                      2 氧气；伙食随安排变化。关键供給连续短缺三天需要撤离。
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      生活区每人每天消耗 2 食物和 2 氧气，指挥舱消耗 6
+                      电能。拨款先入账，再扣各舱维护费。运行并有人值守的舱室，按人数
+                      × 等级生产、用电；停用或无人舱仍有维护费。
+                    </p>
+                    <p>
+                      发电与用电同日结算。电能不足时，制氧、水培、科研与加工停产。食物或氧气用尽、或电能不足，记为一天供给短缺；连续
+                      3 天结束本局。生活储备上限均为 200，超出部分不会入库。
+                    </p>
+                  </>
+                )}
                 <p>
-                  生活区每人每天消耗 2 食物和 2 氧气，指挥舱消耗 6
-                  电能。拨款先入账，再扣各舱维护费。运行并有人值守的舱室，按人数
-                  × 等级生产、用电；停用或无人舱仍有维护费。
-                </p>
-                <p>
-                  发电与用电同日结算。电能不足时，制氧、水培、科研与加工停产。食物或氧气用尽、或电能不足，记为一天供给短缺；连续
-                  3 天结束本局。生活储备上限均为 200，超出部分不会入库。
-                </p>
-                <p>
-                  标准预算每日损耗 1 结构；没有居住舱值守时每日士气
-                  −1。考察奖励与事件会在日末到账。
+                  {state.systems
+                    ? "海况、站址和迎流位置也会造成结构损耗；耐压维护可降低额外损耗，不能替代所有维修。考察出发时锁定风险，刷新页面不会重新判定。"
+                    : "标准预算每日损耗 1 结构；没有居住舱值守时每日士气 −1。考察奖励与事件会在日末到账。"}
                 </p>
               </details>
             </section>
@@ -552,15 +691,21 @@ export default function StationGame({
                 className="game-tab-row station-tabs"
                 aria-label="站点操作视图"
               >
-                {tabs.map((item) => (
-                  <button
-                    key={item.id}
-                    aria-pressed={tab === item.id}
-                    onClick={() => setTab(item.id)}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+                {tabs
+                  .filter(
+                    (item) =>
+                      state.systems ||
+                      !["systems", "contracts"].includes(item.id),
+                  )
+                  .map((item) => (
+                    <button
+                      key={item.id}
+                      aria-pressed={tab === item.id}
+                      onClick={() => setTab(item.id)}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
               </div>
               {tab === "build" && (
                 <div className="station-panel-body">
@@ -568,6 +713,11 @@ export default function StationGame({
                     {selected + 1} 号位置 ·{" "}
                     {room ? roomSpecs[room.kind].name : "建造新舱室"}
                   </h2>
+                  {state.systems && (
+                    <p className="layout-bonus">
+                      {stationRoomBonus(state, selected).text}
+                    </p>
+                  )}
                   {room ? (
                     <>
                       <p className="note">{roomSpecs[room.kind].text}</p>
@@ -742,8 +892,13 @@ export default function StationGame({
                 <div className="station-panel-body">
                   <h2>出海考察</h2>
                   <p className="note">
-                    只有一艘考察艇，同一时间执行一项任务。完成过的考察仍可重复，验收只计三种不同任务。
+                    {state.systems
+                      ? "考察艇同一时间只执行一项任务。海况、疲劳与准备方式影响航程；深入调查需要更高级的考察坞。重复考察的基础奖励逐次降低，最低保留 40%。"
+                      : "只有一艘考察艇，同一时间执行一项任务，验收计三种不同任务。"}
                   </p>
+                  {state.systems && (
+                    <ExpeditionApproach state={state} onAction={act} />
+                  )}
                   {state.mission && (
                     <p className="setup-tip" role="status">
                       进行中：
@@ -755,64 +910,83 @@ export default function StationGame({
                       · 还需 {state.mission.remaining} 天
                     </p>
                   )}
-                  {stationMissions.map((mission) => (
-                    <article className="game-project" key={mission.id}>
-                      <h3>
-                        {mission.name}
-                        <span>
-                          {state.completed.includes(mission.id)
-                            ? "已完成 ✓"
-                            : `${mission.days} 天`}
-                        </span>
-                      </h3>
-                      <p>{mission.text}</p>
-                      <small>
-                        出发：经费 {mission.credits} · 电能 {mission.energy}
-                      </small>
-                      <small>
-                        奖励：
-                        {(
-                          Object.entries(mission.reward) as [
-                            StationResource,
-                            number,
-                          ][]
-                        )
-                          .map(
-                            ([key, value]) =>
-                              `${stationResourceNames[key]} +${value}`,
+                  {stationMissions
+                    .filter(
+                      (mission) =>
+                        state.systems ||
+                        ["snow", "vent", "map"].includes(mission.id),
+                    )
+                    .map((mission) => (
+                      <article className="game-project" key={mission.id}>
+                        <h3>
+                          {mission.name}
+                          <span>
+                            {state.completed.includes(mission.id)
+                              ? "已完成 ✓"
+                              : `${state.systems ? stationMissionPlan(state, mission.id).days : mission.days} 天`}
+                          </span>
+                        </h3>
+                        <p>{mission.text}</p>
+                        {state.systems && (
+                          <p className="mission-risk">
+                            {mission.depth.toLocaleString()} m · {mission.dock}{" "}
+                            级考察坞 · 接应概率{" "}
+                            {stationMissionPlan(state, mission.id).risk}% ·
+                            本次基础奖励{" "}
+                            {Math.round(
+                              stationMissionPlan(state, mission.id).factor *
+                                100,
+                            )}
+                            %
+                          </p>
+                        )}
+                        <small>
+                          出发：经费 {mission.credits} · 电能 {mission.energy}
+                        </small>
+                        <small>
+                          奖励：
+                          {(
+                            Object.entries(mission.reward) as [
+                              StationResource,
+                              number,
+                            ][]
                           )
-                          .join(" · ")}
-                      </small>
-                      <p className="action-reason">
-                        {stationActionReason(state, {
-                          type: "launch",
-                          id: mission.id,
-                        }) || "考察艇就绪。"}
-                      </p>
-                      {control(
-                        { type: "launch", id: mission.id },
-                        `派出${mission.name}`,
-                      )}
-                      <button
-                        className="game-reading-link"
-                        onClick={() =>
-                          onOpen(
+                            .map(
+                              ([key, value]) =>
+                                `${stationResourceNames[key]} +${value}`,
+                            )
+                            .join(" · ")}
+                        </small>
+                        <p className="action-reason">
+                          {stationActionReason(state, {
+                            type: "launch",
+                            id: mission.id,
+                          }) || "考察艇就绪。"}
+                        </p>
+                        {control(
+                          { type: "launch", id: mission.id },
+                          `派出${mission.name}`,
+                        )}
+                        <button
+                          className="game-reading-link"
+                          onClick={() =>
+                            onOpen(
+                              creatures.find(
+                                (item) => item.id === mission.creature,
+                              )!,
+                            )
+                          }
+                        >
+                          认识真实的
+                          {
                             creatures.find(
                               (item) => item.id === mission.creature,
-                            )!,
-                          )
-                        }
-                      >
-                        认识真实的
-                        {
-                          creatures.find(
-                            (item) => item.id === mission.creature,
-                          )!.name
-                        }{" "}
-                        ↗
-                      </button>
-                    </article>
-                  ))}
+                            )!.name
+                          }{" "}
+                          ↗
+                        </button>
+                      </article>
+                    ))}
                 </div>
               )}
               {tab === "supply" && (
@@ -843,13 +1017,26 @@ export default function StationGame({
                   </article>
                   <article className="game-project">
                     <h3>应急补给</h3>
-                    <p>购买即时到账，储备超过上限的部分不入库。</p>
+                    <p>
+                      购买即时到账，储备超过上限的部分不入库。
+                      {state.systems
+                        ? "海面风暴时采用应急运输，价格上调 50%。"
+                        : ""}
+                    </p>
                     {(["food", "oxygen", "alloy"] as const).map((item) => (
                       <div className="trade-row" key={item}>
                         <span>
                           {stationResourceNames[item]} +
                           {item === "alloy" ? 20 : 30}
-                          <small>经费 −{item === "alloy" ? 35 : 25}</small>
+                          <small>
+                            经费 −
+                            {Math.ceil(
+                              (item === "alloy" ? 35 : 25) *
+                                (state.systems
+                                  ? stationWeather(state, state.day).price
+                                  : 1),
+                            )}
+                          </small>
                         </span>
                         {control(
                           { type: "trade", item },
@@ -860,11 +1047,18 @@ export default function StationGame({
                   </article>
                 </div>
               )}
+              {tab === "systems" && state.systems && (
+                <StationStrategyPanel state={state} onAction={act} />
+              )}
+              {tab === "contracts" && state.systems && (
+                <StationContractPanel state={state} onAction={act} />
+              )}
               {tab === "log" && (
                 <div className="station-panel-body">
                   <h2>值守日志</h2>
                   <p className="note">
-                    保留最近 60 条记录。导出的存档包含完整操作历史。
+                    保留最近 {state.systems ? 80 : 60}{" "}
+                    条记录。导出的存档包含完整操作历史。
                   </p>
                   <ol className="station-log">
                     {[...state.log].reverse().map((item, index) => (
@@ -887,9 +1081,8 @@ export default function StationGame({
           人。升级发电舱，查看“明日”用电是否平衡，然后派出海洋雪观测。考察奖励能支持下一次研究和建设。
         </p>
         <p>
-          在第 30
-          天评估之前完成三类考察，研究地形声呐与自动控制，再研究海底观测网。建成观测阵列、分配值守人员，达到左侧供给与站体条件后推进一天。最早第
-          10 天可以通关，之后可继续自由经营。
+          选择一个海域与项目，每个项目的验收条件不同。海况每七天循环，未来三天的预报可用来规划补给、维修与考察。疲劳影响生产，加班、轮休、伙食和空闲人数都需要考虑。阵列需要连续三天正常运行。在第
+          10–30 天内完成项目，可以继续自由经营、调查新海域和接受委托。
         </p>
         <p>
           没有操作限时。只在点击“推进一天”时生产和消耗；离开页面会保留当前进度。事件必须作出选择后才能继续，可以导出存档跨设备游玩。

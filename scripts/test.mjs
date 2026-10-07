@@ -1,30 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
 import { test } from "node:test";
 import { createHash } from "node:crypto";
-import ts from "typescript";
+import { moduleUrl } from "./load-typescript.mjs";
 // Load application TypeScript with the project's compiler, without a test framework.
-const cache = new Map();
-function moduleUrl(file) {
-  file = resolve(file);
-  if (cache.has(file)) return cache.get(file);
-  let code = ts.transpileModule(readFileSync(file, "utf8"), {
-    compilerOptions: {
-      module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ES2020,
-    },
-  }).outputText;
-  code = code.replace(/import\.meta\.env\.BASE_URL/g, "'/DeepSea/'");
-  code = code.replace(
-    /from ['"](\.[^'"]+)['"]/g,
-    (_, specifier) =>
-      `from '${moduleUrl(resolve(dirname(file), `${specifier}.ts`))}'`,
-  );
-  const url = `data:text/javascript;base64,${Buffer.from(code).toString("base64")}`;
-  cache.set(file, url);
-  return url;
-}
 const { pressureAtDepth, gasVolumeFraction } = await import(
   moduleUrl("src/data/science.ts")
 );
@@ -194,8 +173,8 @@ test("gas volume uses absolute pressure; negative depth is surface", () => {
   assert.equal(getZoneAtDepth(-1, zones).id, "epipelagic");
 });
 
-const story = await import(moduleUrl("src/games/storyEngine.ts"));
-const station = await import(moduleUrl("src/games/stationEngine.ts"));
+const story = await import(moduleUrl("src/games/storyLegacy.ts"));
+const station = await import(moduleUrl("src/games/stationLegacy.ts"));
 function storyPath(actions, mode = "standard", gear = ["sonar", "arm"]) {
   let state = story.createStory({ name: "试航", mode, gear });
   for (const id of actions) {
