@@ -197,6 +197,7 @@ test("station builds, staffs, researches, completes all expeditions and continue
       ).click();
     } else if (action.type === "resolve") {
       const event = stationEvents[state.event!];
+      await expect(page.locator("#event-title")).toBeInViewport();
       await page
         .getByRole("button", {
           name: new RegExp(

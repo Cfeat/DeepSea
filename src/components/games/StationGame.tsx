@@ -65,10 +65,13 @@ export default function StationGame({
   const plan = useRef<HTMLElement>(null);
   const panel = useRef<HTMLElement>(null);
   const ending = useRef<HTMLElement>(null);
+  const eventPanel = useRef<HTMLElement>(null);
   const active = !!state;
   const previousActive = useRef(active);
   const outcome = state?.outcome;
   const previousOutcome = useRef(outcome);
+  const pendingEvent = state?.event;
+  const previousEvent = useRef(pendingEvent);
   function show(element: HTMLElement | null) {
     element?.focus({ preventScroll: true });
     if (element === command.current && start.current) {
@@ -88,9 +91,12 @@ export default function StationGame({
       show(command.current);
     else if (outcome && outcome !== previousOutcome.current)
       show(ending.current);
+    else if (pendingEvent && pendingEvent !== previousEvent.current)
+      show(eventPanel.current);
     previousActive.current = active;
     previousOutcome.current = outcome;
-  }, [active, outcome]);
+    previousEvent.current = pendingEvent;
+  }, [active, outcome, pendingEvent]);
   const forecast = state ? stationForecast(state) : null;
   const room = state?.rooms[selected];
   function act(action: StationAction) {
@@ -333,7 +339,12 @@ export default function StationGame({
             </p>
           )}
           {state.event && !state.outcome && (
-            <section className="station-event" aria-labelledby="event-title">
+            <section
+              ref={eventPanel}
+              tabIndex={-1}
+              className="station-event"
+              aria-labelledby="event-title"
+            >
               <div>
                 <p className="eyebrow">站点待办 / DAY {state.day}</p>
                 <h2 id="event-title">{stationEvents[state.event].title}</h2>

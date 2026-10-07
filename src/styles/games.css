@@ -917,6 +917,7 @@
 }
 .station-plan,
 .station-panel,
+.station-event,
 .station-ending {
   scroll-margin-top: 240px;
   outline: none;
@@ -1661,6 +1662,7 @@
   }
   .station-plan,
   .station-panel,
+  .station-event,
   .station-ending {
     scroll-margin-top: 265px;
   }
