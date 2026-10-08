@@ -13,7 +13,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Vite 的默认地址是 `http://localhost:5173/DeepSea/`。浏览器回归测试启动独立的生产预览服务，使用 5176 端口。GitHub Actions 在数据测试、构建和浏览器测试通过后发布 GitHub Pages，并请求公网入口、主程序、样式与错误恢复页检查响应。也可以运行 `npm run verify:pages` 手动检查公网发布。
+Vite 的默认地址是 `http://localhost:5173/DeepSea/`。浏览器回归测试启动独立的生产预览服务，使用 5176 端口。GitHub Actions 在数据测试、构建和浏览器测试通过后发布 GitHub Pages，并检查原始网址与绕过缓存的网址、iPhone Safari 和安卓微信浏览器标识下的首页及物种入口、主程序、样式与错误恢复页。检查也会拒绝降到 HTTP 或跳出项目的重定向；这些请求不能代替真实手机网络上的验证。也可以运行 `npm run verify:pages` 手动检查公网发布。项目 Pages 设置已开启 Enforce HTTPS，正式路径是大小写敏感的 `/DeepSea/`。
 
 ## 页面与数据
 
