@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#07171c" />
+    <title>页面未找到 · 深海</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #07171c;
+        color: #d4e5e4;
+        font:
+          16px/1.9 system-ui,
+          sans-serif;
+      }
+      main {
+        width: min(640px, calc(100% - 40px));
+        margin: 15vh auto 40px;
+        padding: 36px;
+        border: 1px solid #345763;
+        border-radius: 6px;
+        background: #0b2530;
+      }
+      .brand {
+        color: #9edac8;
+        text-decoration: none;
+        font-size: 20px;
+      }
+      .eyebrow {
+        color: #91b9bc;
+        font-size: 12px;
+        letter-spacing: 0.15em;
+        margin-top: 42px;
+      }
+      h1 {
+        font-size: clamp(26px, 5vw, 36px);
+        font-weight: 500;
+        margin: 10px 0;
+      }
+      p {
+        color: #b0c7cd;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+      nav a {
+        min-height: 44px;
+        padding: 9px 16px;
+        border: 1px solid #517d83;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #c3e4de;
+      }
+      nav a:first-child {
+        color: #0b282b;
+        background: #a0dec9;
+        border-color: #a0dec9;
+      }
+      a:focus-visible {
+        outline: 2px solid #f7c584;
+        outline-offset: 4px;
+      }
+      @media (max-width: 480px) {
+        main {
+          padding: 24px;
+          margin-top: 10vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="brand" href="/DeepSea/#home">≋ 深海</a>
+      <p class="eyebrow">404 / DEEP SEA</p>
+      <h1 id="page-title">这页没有找到</h1>
+      <p id="page-message">
+        地址可能已变更。可以回到首页，或从下面的入口继续探索。
+      </p>
+      <nav aria-label="继续探索">
+        <a href="/DeepSea/#home">返回首页 →</a>
+        <a href="/DeepSea/#games">深海游乐场</a>
+        <a href="/DeepSea/#atlas">生物图鉴</a>
+      </nav>
+    </main>
+    <script>
+      // GitHub Pages serves this file for missing paths. The app uses hash routes.
+      const base = "/DeepSea/";
+      const path = location.pathname.startsWith(base)
+        ? location.pathname
+            .slice(base.length)
+            .replace(/(?:\/index\.html|\.html)?\/?$/, "")
+            .toLowerCase()
+        : "";
+      const route =
+        /^(?:home|journey|atlas|lab|sources|topics(?:\/[a-z0-9-]+)?|games(?:\/[a-z0-9-]+)?)$/;
+      if (route.test(path)) {
+        document.title = "正在打开页面 · 深海";
+        document.getElementById("page-title").textContent = "正在打开页面";
+        document.getElementById("page-message").textContent =
+          "正在前往深海的新入口。";
+        const hash = location.hash.slice(1).replace(/^\//, "");
+        location.replace(
+          base + location.search + "#" + (route.test(hash) ? hash : path),
+        );
+      }
+    </script>
+  </body>
+</html>

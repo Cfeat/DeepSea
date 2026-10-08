@@ -13,12 +13,13 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Vite 的默认地址是 `http://localhost:5173/DeepSea/`。浏览器回归测试启动独立的生产预览服务，使用 5176 端口。GitHub Actions 在数据测试、构建和浏览器测试通过后发布 GitHub Pages。
+Vite 的默认地址是 `http://localhost:5173/DeepSea/`。浏览器回归测试启动独立的生产预览服务，使用 5176 端口。GitHub Actions 在数据测试、构建和浏览器测试通过后发布 GitHub Pages，并请求公网入口、主程序、样式与错误恢复页检查响应。也可以运行 `npm run verify:pages` 手动检查公网发布。
 
 ## 页面与数据
 
 - 首页、深度探索、生物图鉴、深海实验室、海洋专题、深海游乐场、参考资料分别独立渲染。固定导航标出当前页面，手机端提供可用 Esc 关闭的菜单；面包屑、页面标题和浏览器前进后退保持同步。
 - 使用 hash 路由兼容 GitHub Pages 的静态部署：`#home`、`#journey`、`#atlas`、`#lab`、`#topics`、`#games`、`#sources`。专题详情使用 `#topics/<id>`，两款游戏分别使用 `#games/story` 和 `#games/station`，刷新和直接访问不需要服务器回退规则；此前的锚点入口仍有效。
+- `public/404.html` 是独立的中文恢复页，不依赖应用脚本或样式。`/DeepSea/games/story`、`/DeepSea/atlas/index.html` 等页面路径会自动转到对应的 hash 入口并保留查询参数；未知路径提供回到首页、图鉴和游乐场的链接。
 - 垂直深度轴是主要体验，保留滚动下潜、左右交替的生物卡片、深度和压力读数、海层跳转。
 - 浅水区按卡片所需空间展开，稀疏区压缩空白；海洋雪、热液喷口、鲸落、海底地形、海沟和深度测量构成六个科普停留点，并链接到各自的独立专题。
 - 图鉴每页 12 个条目，可搜索中文名、英文名、学名和特征，支持收藏与跳回深度轴。切换页面保留当前筛选，改变筛选回到第一页。百科链接使用 `?creature=<id>#atlas`，旧的无 hash 链接仍能直接打开对应条目。
