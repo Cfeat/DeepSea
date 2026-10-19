@@ -90,6 +90,9 @@ export default function DiveExplorer({
     [],
   );
   const stage = useRef<HTMLDivElement>(null);
+  const scenesFrame = useRef<HTMLIFrameElement>(null);
+  const scenesButton = useRef<HTMLButtonElement>(null);
+  const [scenesOpen, setScenesOpen] = useState(false);
   const [depth, setDepth] = useState(0);
   const [immersed, setImmersed] = useState(false);
   const [resume] = useState(readDiveDepth);
@@ -167,6 +170,44 @@ export default function DiveExplorer({
       window.removeEventListener("resize", schedule);
     };
   }, [layout]);
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.source !== scenesFrame.current?.contentWindow) return;
+      const data = event.data as { type?: string; id?: string } | null;
+      if (data?.type === "deepsea:open-creature" && data.id) {
+        const creature = creatures.find((item) => item.id === data.id);
+        if (creature) onOpen(creature);
+      }
+      if (data?.type === "deepsea:close-scenes") setScenesOpen(false);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [onOpen]);
+  useEffect(() => {
+    if (!scenesOpen) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtml = html.style.overflow;
+    const previousBody = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    const onKey = (event: KeyboardEvent) => {
+      if (
+        event.key === "Escape" &&
+        !document.querySelector("dialog.modal[open]")
+      )
+        setScenesOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const focus = requestAnimationFrame(() => scenesFrame.current?.focus());
+    return () => {
+      html.style.overflow = previousHtml;
+      body.style.overflow = previousBody;
+      window.removeEventListener("keydown", onKey);
+      cancelAnimationFrame(focus);
+      scenesButton.current?.focus({ preventScroll: true });
+    };
+  }, [scenesOpen]);
   function jump(target: number) {
     if (!stage.current) return;
     const cursor = Math.max(240, window.innerHeight * 0.45);
@@ -192,7 +233,7 @@ export default function DiveExplorer({
   return (
     <section
       id="journey"
-      className="dive-explorer"
+      className={`dive-explorer${scenesOpen ? " is-scenes-open" : ""}`}
       aria-labelledby="dive-title"
     >
       <div className="dive-intro">
@@ -206,6 +247,23 @@ export default function DiveExplorer({
           <span>↗ 点击生物看百科</span>
           <span>≋ 深度轴非等比例</span>
         </div>
+        <button
+          ref={scenesButton}
+          className="scenes-launch"
+          type="button"
+          onClick={() => setScenesOpen(true)}
+        >
+          <span className="scenes-launch-mark" aria-hidden="true">
+            ◈
+          </span>
+          <span className="scenes-launch-copy">
+            <strong>打开海层剧场</strong>
+            <small>五个海层 · 18 个可交互模型 · 点击卡片看生物百科</small>
+          </span>
+          <span className="scenes-launch-arrow" aria-hidden="true">
+            进入 ↗
+          </span>
+        </button>
         {resume > 0 && (
           <button className="resume-dive" onClick={() => jump(resume)}>
             继续上次下潜 · {resume.toLocaleString()} m ↓
@@ -376,6 +434,21 @@ export default function DiveExplorer({
           </div>
         </div>
       </div>
+      {scenesOpen && (
+        <div
+          className="scenes-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="海层剧场"
+        >
+          <iframe
+            ref={scenesFrame}
+            src={`${import.meta.env.BASE_URL}depth-scenes.html?embed=1`}
+            title="海层剧场：五个海层的可交互生物场景"
+            allow="fullscreen"
+          />
+        </div>
+      )}
     </section>
   );
 }

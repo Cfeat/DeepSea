@@ -78,8 +78,11 @@ for (let attempt = 1; attempt <= 4; attempt++) {
         throw new Error("An entry script is missing");
       entryAssets.forEach((asset) => assets.add(asset));
     }
-    const [missingPage] = await Promise.all([
+    const [missingPage, shallows, depthScenes, shallowsVendor] = await Promise.all([
       read("404.html", "text/html", { fresh: true }),
+      read("ocean-shallows.html", "text/html", { fresh: true }),
+      read("depth-scenes.html", "text/html", { fresh: true }),
+      read("vendor/three.min.js", "javascript", { fresh: true }),
       ...[undefined, ...phones.map((phone) => phone.userAgent)].flatMap(
         (userAgent) =>
           [...assets].map((asset) =>
@@ -91,8 +94,17 @@ for (let attempt = 1; attempt <= 4; attempt++) {
     ]);
     if (!missingPage.includes("这页没有找到"))
       throw new Error("The recovery page is missing");
+    if (
+      !shallows.includes("浅海 · Ocean Shallows") ||
+      !shallows.includes("cdnjs.cloudflare.com/ajax/libs/three.js/r128")
+    )
+      throw new Error("The shallow-water page is missing");
+    if (!shallowsVendor.includes("THREE"))
+      throw new Error("The Three.js fallback is missing");
+    if (!depthScenes.includes("海层剧场"))
+      throw new Error("The depth theatre page is missing");
     console.log(
-      `Pages verified: ${site.href}, ordinary and fresh entries, ${phones.map((phone) => phone.name).join(" + ")}, ${assets.size} app assets, 404 recovery page`,
+      `Pages verified: ${site.href}, ordinary and fresh entries, ${phones.map((phone) => phone.name).join(" + ")}, ${assets.size} app assets, shallow-water page, depth theatre + fallback, 404 recovery page`,
     );
     break;
   } catch (error) {

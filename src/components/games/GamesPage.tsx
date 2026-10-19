@@ -66,6 +66,40 @@ export default function GamesPage({
           两段独立的旅程，从这里开始。
         </p>
       </div>
+      <article className="shallows-invite" aria-labelledby="shallows-invite-title">
+        <div className="shallows-invite-art" aria-hidden="true">
+          <span className="shallows-sand" />
+          <span className="shallows-sun" />
+          <span className="shallows-ray ray-a" />
+          <span className="shallows-ray ray-b" />
+          <span className="shallows-jelly jelly-a" />
+          <span className="shallows-jelly jelly-b" />
+          <span className="shallows-ripple ripple-a" />
+          <span className="shallows-ripple ripple-b" />
+          <small>0–8 M / SUNLIT REEF</small>
+        </div>
+        <div className="shallows-invite-copy">
+          <p className="eyebrow">NEW / INTERACTIVE FIELD NOTE</p>
+          <h2 id="shallows-invite-title">
+            浅海观察 <span>把鳐鱼和水母放回海里</span>
+          </h2>
+          <p>
+            换一个角度看海。从正上方俯瞰珊瑚礁浅海，听浪、看光，
+            把五张生物卡片抛进水里，或拖着它们悬在水面上。
+          </p>
+          <ul>
+            <li>实时 GPU 波纹与折射</li>
+            <li>鳐鱼、水母与旋涡</li>
+            <li>雨声、浪声与放生</li>
+          </ul>
+          <a
+            className="game-button"
+            href={`${import.meta.env.BASE_URL}ocean-shallows.html`}
+          >
+            进入浅海 <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </article>
       <div className="game-entry-grid">
         {games.map((game, index) => (
           <article className={`game-entry entry-${game.id}`} key={game.id}>

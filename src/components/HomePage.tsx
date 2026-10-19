@@ -145,7 +145,7 @@ export default function HomePage() {
               <h3>
                 来深海玩一局 <span>↗</span>
               </h3>
-              <p>驾驶潜器追寻一封来信，或从第一天起经营你的海底站。</p>
+              <p>驾驶潜器追寻来信，经营海底站，或走进一片可以放生鳐鱼的浅海。</p>
             </div>
           </a>
         </div>

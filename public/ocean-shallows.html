@@ -1,0 +1,3407 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#04232b" />
+<meta name="description" content="浅海：从正上方俯瞰一片热带珊瑚礁浅海，把鳐鱼与水母放回海中，听浪、看光。" />
+<title>浅海 · Ocean Shallows</title>
+<style>
+:root{
+  --paper:#f6f1df;
+  --paper-dim:rgba(246,241,223,.68);
+  --paper-faint:rgba(246,241,223,.42);
+  --mint:#a9f5df;
+  --mint-deep:#39cbb8;
+  --ink:#03222b;
+  --glass:rgba(233,255,248,.10);
+  --glass-strong:rgba(233,255,248,.17);
+  --line:rgba(232,255,249,.26);
+  --line-soft:rgba(232,255,249,.13);
+  --shadow:0 28px 80px rgba(0,18,25,.42);
+  --display:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#04232b;color:var(--paper)}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit;border:0;background:none;padding:0}
+a{color:inherit;text-decoration:none}
+canvas{display:block}
+::selection{background:rgba(120,244,214,.35);color:#fff}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid rgba(196,255,238,.9);outline-offset:3px}
+
+#sea{position:fixed;inset:0;width:100%;height:100%;z-index:0;touch-action:none;background:#0b6370}
+.vignette,.grain,.rain-layer{position:fixed;inset:0;pointer-events:none}
+.vignette{z-index:1;background:
+  radial-gradient(120% 85% at 48% 42%,transparent 46%,rgba(1,21,27,.07) 76%,rgba(0,14,20,.23) 100%),
+  linear-gradient(180deg,rgba(2,27,34,.12),transparent 24% 78%,rgba(1,18,24,.20))}
+.grain{z-index:2;opacity:.055;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='.42'/></svg>")}
+.rain-layer{z-index:2;opacity:0;transition:opacity 1.1s ease;background-image:repeating-linear-gradient(104deg,transparent 0 27px,rgba(210,255,248,.14) 28px,transparent 30px 58px);background-size:116px 118px;animation:rainfall .52s linear infinite;filter:blur(.35px)}
+body.is-raining .rain-layer{opacity:.52}
+@keyframes rainfall{from{transform:translate3d(0,-118px,0)}to{transform:translate3d(-116px,0,0)}}
+
+.brand{position:fixed;top:25px;left:27px;z-index:8;display:flex;align-items:center;gap:9px;padding:9px 13px 8px;border:1px solid var(--line-soft);border-radius:99px;background:rgba(5,44,54,.18);backdrop-filter:blur(14px) saturate(1.15);font-size:9px;letter-spacing:.2em;color:var(--paper-dim);transition:opacity .45s ease,transform .45s ease}
+.brand i{width:18px;height:18px;border:1px solid rgba(200,255,241,.44);border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px;color:var(--mint)}
+.brand b{font-weight:400;letter-spacing:.26em;color:var(--paper)}
+.brand span{color:var(--paper-faint);letter-spacing:.16em}
+
+.masthead{position:fixed;top:34px;right:38px;z-index:7;text-align:right;max-width:min(370px,34vw);pointer-events:none;text-shadow:0 2px 30px rgba(0,26,34,.22);transition:opacity .45s ease,transform .45s ease}
+.masthead .kicker{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin:0 0 13px;font-size:9px;letter-spacing:.33em;color:rgba(238,255,248,.76)}
+.masthead .kicker::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,255,240,.65))}
+.masthead h1{margin:0;font-family:var(--display);font-size:clamp(58px,7.4vw,108px);font-weight:400;line-height:.83;letter-spacing:.055em;color:#fbf7e9}
+.masthead h1 em{display:block;margin-top:14px;font:italic 400 clamp(10px,1vw,12px)/1.4 Georgia,"Times New Roman",serif;letter-spacing:.24em;color:rgba(223,255,247,.72)}
+.masthead .lede{margin:20px 0 0 auto;max-width:300px;font-size:11px;line-height:2;letter-spacing:.08em;color:rgba(240,249,235,.7)}
+.masthead .coordinate{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:18px;padding-top:12px;border-top:1px solid rgba(220,255,244,.2);font-size:8px;letter-spacing:.18em;color:rgba(236,250,238,.55)}
+.masthead .coordinate b{font-weight:400;color:rgba(217,255,242,.9)}
+
+.toolbar{position:fixed;top:26px;left:50%;transform:translateX(-50%);z-index:9;display:flex;align-items:stretch;gap:3px;padding:5px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(135deg,rgba(231,255,249,.14),rgba(9,58,68,.24));backdrop-filter:blur(25px) saturate(1.35);box-shadow:0 16px 46px rgba(1,23,30,.24),inset 0 1px 0 rgba(255,255,255,.14);transition:opacity .45s ease,transform .45s ease}
+.toolbar button{position:relative;min-width:60px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px 10px 5px;border:1px solid transparent;border-radius:14px;color:rgba(244,249,235,.66);cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .25s}
+.toolbar button:hover{background:rgba(212,255,244,.09);color:var(--paper)}
+.toolbar button[aria-pressed="true"]{background:rgba(160,251,224,.15);border-color:rgba(180,255,234,.3);color:#e9fff8;box-shadow:inset 0 0 20px rgba(137,255,223,.07)}
+.toolbar button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;opacity:.92}
+.toolbar button .label{font-size:8.5px;letter-spacing:.13em;white-space:nowrap}
+.toolbar kbd{position:absolute;right:5px;top:4px;font:7px/1 Georgia,serif;color:rgba(232,255,245,.4);letter-spacing:0}
+.toolbar .sep{width:1px;align-self:center;height:28px;background:rgba(219,255,243,.14);margin:0 2px}
+
+.creature-stats{position:fixed;left:34px;bottom:225px;z-index:7;min-width:170px;padding:11px 17px 12px 18px;border-left:1px solid rgba(195,255,239,.45);background:linear-gradient(90deg,rgba(4,42,51,.36),rgba(4,42,51,.06));backdrop-filter:blur(12px);text-shadow:0 2px 18px rgba(0,20,25,.4);pointer-events:none;transition:opacity .45s ease,transform .45s ease}
+.creature-stats .stat-label{margin:0 0 7px;font-size:7.5px;letter-spacing:.32em;color:rgba(221,255,245,.55)}
+.creature-stats .stat-line{display:flex;align-items:baseline;gap:7px;font-family:var(--display);color:rgba(243,249,235,.82);font-size:13px;letter-spacing:.05em;white-space:nowrap}
+.creature-stats .stat-line b{font:400 25px/1 var(--display);color:#fbf7e9;letter-spacing:.01em}
+.creature-stats .stat-line i{font-style:normal;color:rgba(218,255,244,.36)}
+.creature-stats .stat-cap{margin:7px 0 0;font-size:7.5px;letter-spacing:.18em;color:rgba(219,255,244,.43)}
+
+.dock{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:10;width:min(1128px,calc(100vw - 62px));padding:14px 15px 11px;border:1px solid rgba(223,255,247,.3);border-radius:21px;background:linear-gradient(132deg,rgba(232,255,248,.16),rgba(7,52,62,.35) 52%,rgba(4,41,53,.5));backdrop-filter:blur(28px) saturate(1.28);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(0,35,45,.18);transition:opacity .45s ease,transform .45s ease}
+.dock::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.12),transparent 23% 76%,rgba(189,255,238,.06));mask:linear-gradient(#000,transparent 60%)}
+.dock-head{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 5px 9px;position:relative;z-index:1}
+.dock-head p{margin:0;display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.19em;color:rgba(235,250,238,.58)}
+.dock-head p::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--mint);box-shadow:0 0 9px rgba(151,255,223,.7)}
+.dock-head strong{color:rgba(246,249,235,.9);font-weight:400;letter-spacing:.12em}
+.dock-head .capacity{font-size:8px;letter-spacing:.16em;color:rgba(228,255,245,.45)}
+.dock-head .capacity b{font-weight:400;color:rgba(245,255,248,.82)}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;position:relative;z-index:1}
+.card{position:relative;height:105px;overflow:hidden;border:1px solid rgba(227,255,247,.19);border-radius:13px;background:linear-gradient(155deg,rgba(189,255,239,.08),rgba(1,34,46,.24));cursor:grab;text-align:left;transition:transform .28s cubic-bezier(.2,.8,.2,1),border-color .28s,background .28s,box-shadow .28s;touch-action:none;isolation:isolate}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(125deg,rgba(255,255,255,.16),transparent 28% 72%,rgba(143,255,228,.05));opacity:.7}
+.card:hover{transform:translateY(-4px);border-color:rgba(194,255,238,.5);background:linear-gradient(155deg,rgba(197,255,241,.15),rgba(3,43,55,.3));box-shadow:0 12px 30px rgba(0,20,27,.28)}
+.card:active{cursor:grabbing;transform:translateY(-4px) scale(.985)}
+.card canvas{position:absolute;inset:2px 2px 25px;width:calc(100% - 4px);height:calc(100% - 27px);filter:drop-shadow(0 4px 8px rgba(0,27,36,.2))}
+.card .num{position:absolute;top:8px;left:9px;z-index:2;font:7px/1 Georgia,serif;letter-spacing:.12em;color:rgba(231,255,246,.52)}
+.card .tag{position:absolute;top:7px;right:7px;z-index:2;padding:3px 5px 2px;border:1px solid rgba(218,255,243,.21);border-radius:99px;background:rgba(4,38,47,.22);font-size:6.5px;letter-spacing:.14em;color:rgba(224,255,245,.56)}
+.card .copy{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:4px;padding:8px 9px 7px;background:linear-gradient(transparent,rgba(1,28,38,.78))}
+.card .copy b{font-size:11px;font-weight:400;letter-spacing:.1em;color:#f8f3e3;white-space:nowrap}
+.card .copy small{font:italic 7px/1 Georgia,serif;letter-spacing:.07em;color:rgba(226,255,246,.47);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.is-spawning{animation:cardPulse .6s ease}
+@keyframes cardPulse{0%{border-color:rgba(183,255,234,.9);box-shadow:0 0 0 0 rgba(160,255,226,.25)}100%{border-color:rgba(227,255,247,.19);box-shadow:0 0 0 18px rgba(160,255,226,0)}}
+
+.hint{position:fixed;left:50%;bottom:216px;z-index:6;transform:translateX(-50%);margin:0;display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.17em;color:rgba(235,251,240,.5);pointer-events:none;transition:opacity .5s;text-shadow:0 2px 16px rgba(0,20,27,.5)}
+.hint i{font-style:normal;color:rgba(181,255,233,.8)}
+.toast{position:fixed;left:50%;bottom:168px;z-index:20;transform:translate(-50%,10px);padding:10px 16px;border:1px solid rgba(216,255,244,.26);border-radius:99px;background:rgba(4,43,53,.7);backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(0,17,23,.3);font-size:10px;letter-spacing:.12em;color:rgba(246,252,239,.9);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.show-ui{position:fixed;right:22px;bottom:22px;z-index:18;width:48px;height:48px;border:1px solid var(--line);border-radius:50%;background:rgba(7,47,57,.62);backdrop-filter:blur(15px);color:var(--mint);font-size:18px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .4s,transform .4s,visibility .4s;cursor:pointer}
+body.ui-hidden .brand,body.ui-hidden .masthead,body.ui-hidden .toolbar,body.ui-hidden .creature-stats,body.ui-hidden .dock,body.ui-hidden .hint{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:translateY(10px)}
+body.ui-hidden .show-ui{opacity:1;visibility:visible;transform:none}
+
+.loading{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#0c5660,#031d27 64%);transition:opacity .9s ease,visibility .9s ease;overflow:hidden}
+.loading::after{content:"";position:absolute;width:60vmax;height:60vmax;border:1px solid rgba(177,255,233,.1);border-radius:50%;box-shadow:0 0 0 18vmax rgba(177,255,233,.025),0 0 0 36vmax rgba(177,255,233,.018);animation:breathe 5s ease-in-out infinite}
+.loading .load-copy{position:relative;z-index:1;text-align:center;color:rgba(244,251,238,.85)}
+.loading .load-copy span{display:block;margin-bottom:16px;font:7px/1.4 Georgia,serif;letter-spacing:.35em;color:rgba(211,255,243,.5)}
+.loading .load-copy b{display:block;font-family:var(--display);font-size:clamp(36px,5vw,58px);font-weight:400;letter-spacing:.18em}
+.loading .load-copy i{display:block;margin-top:18px;font-style:normal;font-size:9px;letter-spacing:.3em;color:rgba(195,255,237,.45)}
+.loading.done{opacity:0;visibility:hidden;pointer-events:none}
+@keyframes breathe{50%{transform:scale(1.035);opacity:.75}}
+
+@media (max-width:900px){
+  .brand{top:14px;left:14px;padding:7px 10px;font-size:8px}
+  .brand span{display:none}
+  .masthead{top:18px;right:16px;max-width:50vw}
+  .masthead .kicker{font-size:7px;margin-bottom:9px;letter-spacing:.22em}
+  .masthead h1{font-size:clamp(40px,12vw,62px)}
+  .masthead h1 em{margin-top:8px;font-size:7px;letter-spacing:.17em}
+  .masthead .lede,.masthead .coordinate{display:none}
+  .toolbar{top:auto;bottom:156px;left:12px;right:12px;transform:none;overflow-x:auto;justify-content:flex-start;gap:1px;padding:4px;border-radius:15px;scrollbar-width:none}
+  .toolbar::-webkit-scrollbar{display:none}
+  .toolbar button{min-width:50px;height:43px;padding:3px 7px;gap:2px;flex:0 0 auto}
+  .toolbar button svg{width:15px;height:15px}
+  .toolbar button .label{font-size:7.5px;letter-spacing:.06em}
+  .toolbar kbd{display:none}
+  .toolbar .sep{height:22px;margin:0}
+  .creature-stats{top:61px;bottom:auto;left:14px;padding:7px 11px 8px 12px;min-width:0;background:rgba(4,42,51,.2);border-left-color:rgba(195,255,239,.3)}
+  .creature-stats .stat-label{margin-bottom:4px;font-size:6.5px}
+  .creature-stats .stat-line{font-size:10px;gap:5px}
+  .creature-stats .stat-line b{font-size:18px}
+  .creature-stats .stat-cap{display:none}
+  .dock{bottom:7px;width:calc(100vw - 14px);padding:8px 8px 7px;border-radius:16px}
+  .dock-head{margin:0 3px 6px;gap:8px}
+  .dock-head p{font-size:6.5px;letter-spacing:.11em}
+  .dock-head p::before{width:4px;height:4px}
+  .dock-head .capacity{font-size:6.5px;letter-spacing:.08em;white-space:nowrap}
+  .cards{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding-bottom:1px}
+  .cards::-webkit-scrollbar{display:none}
+  .card{flex:0 0 118px;height:86px;scroll-snap-align:start;border-radius:11px}
+  .card canvas{inset:2px 2px 21px;width:calc(100% - 4px);height:calc(100% - 23px)}
+  .card .copy{padding:6px 7px 5px}
+  .card .copy b{font-size:9.5px}
+  .card .copy small{display:none}
+  .card .tag{font-size:6px;padding:2px 4px}
+  .hint{bottom:140px;font-size:7px;letter-spacing:.1em;width:100%;justify-content:center}
+  .toast{bottom:157px;font-size:9px}
+  .show-ui{right:14px;bottom:14px;width:42px;height:42px}
+}
+@media (max-height:560px){
+  .masthead .lede,.masthead .coordinate{display:none}
+  .toolbar{bottom:142px}
+  .creature-stats{opacity:.82}
+  .dock{height:132px}
+  .card{height:76px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .rain-layer{animation:none}
+  .loading::after{animation:none}
+  *{scroll-behavior:auto!important}
+}
+@media (max-width:640px){
+  .cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;overflow:visible;scroll-snap-type:none;padding-bottom:0}
+  .card{width:auto;min-width:0;height:84px;flex:none;border-radius:9px}
+  .card canvas{inset:1px 1px 20px;width:calc(100% - 2px);height:calc(100% - 21px)}
+  .card .copy{padding:4px 4px 3px;gap:0}
+  .card .copy b{font-size:8.5px;letter-spacing:0;line-height:1.2}
+  .card .copy small{display:none}
+  .card .tag{display:none}
+  .card .num{top:3px;left:3px;font-size:5px}
+  .dock-head p{font-size:5.7px;letter-spacing:.04em;gap:5px}
+  .dock-head .capacity{font-size:5.8px;letter-spacing:.04em}
+  .dock-head{margin:0 2px 5px}
+  .hint{bottom:138px}
+}
+</style>
+</head>
+<body>
+<canvas id="sea" aria-label="浅海俯视图：沙滩、珊瑚礁、鳐鱼和水母"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="rain-layer" id="rain-layer" aria-hidden="true"></div>
+
+<a class="brand" href="./#games" aria-label="返回深海游乐场"><i>≋</i><b>深海</b><span>/ 浅海观察</span></a>
+
+<header class="masthead" aria-labelledby="page-title">
+  <p class="kicker">01 / 珊瑚礁边缘 · 0–8 M</p>
+  <h1 id="page-title">浅海<em>OCEAN SHALLOWS</em></h1>
+  <p class="lede">阳光落进不到十米深的海。白沙、海草与珊瑚之间，鳐鱼掠过自己的影子，水母像一小口呼吸，慢慢漂远。</p>
+  <p class="coordinate"><span>28° 16′ N</span><b>能见度 18 m</b><span>水温 28°C</span></p>
+</header>
+
+<nav class="toolbar" id="toolbar" aria-label="海面控制">
+  <button type="button" data-action="rain" aria-pressed="false" title="阵雨（R）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 14.5H6a3.2 3.2 0 0 1-.2-6.4 4.6 4.6 0 0 1 8.9-1.4A3.6 3.6 0 0 1 18.4 13"/><path d="m8.3 17.2-1 3.2M12.3 17.2l-1 3.2M16.3 17.2l-1 3.2"/></svg>
+    <span class="label">阵雨</span><kbd>R</kbd>
+  </button>
+  <button type="button" data-action="whirl" aria-pressed="false" title="旋涡（W），开启后拖动水面移动">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 10.1c-.6-4-4.2-6.6-8.2-6.2-3.8.4-6.6 3.4-6.4 7 .1 3.2 2.7 5.6 5.8 5.6 2.6 0 4.6-1.8 4.7-4.1.1-2.1-1.5-3.7-3.5-3.7-1.7 0-3 1.2-3 2.7 0 1.3 1 2.3 2.3 2.3"/></svg>
+    <span class="label">旋涡</span><kbd>W</kbd>
+  </button>
+  <span class="sep" aria-hidden="true"></span>
+  <button type="button" data-action="calm" aria-pressed="false" title="静海（C）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5c3.2 0 3.2-1.4 6.4-1.4S12.6 9.5 15.8 9.5 19 8.1 21 8.1M3 14.2c3.2 0 3.2-1.1 6.4-1.1s3.2 1.1 6.4 1.1 3.1-1.1 5.2-1.1M3 18.6h11.8"/></svg>
+    <span class="label">静海</span><kbd>C</kbd>
+  </button>
+  <button type="button" data-action="clear" aria-pressed="false" title="澄澈海水（M）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2v3M12 17.8v3M3.2 12h3M17.8 12h3M5.8 5.8l2.1 2.1M16.1 16.1l2.1 2.1M18.2 5.8l-2.1 2.1M7.9 16.1l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
+    <span class="label">澄澈</span><kbd>M</kbd>
+  </button>
+  <button type="button" data-action="sound" aria-pressed="false" title="海浪声音（S）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3.2L12 18V6L7.2 10H4Z"/><path d="M15.5 9.1a4.2 4.2 0 0 1 0 5.8M18.2 6.8a7.6 7.6 0 0 1 0 10.4"/></svg>
+    <span class="label">声音</span><kbd>S</kbd>
+  </button>
+  <span class="sep" aria-hidden="true"></span>
+  <button type="button" data-action="hide" title="收起界面（H）">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 12s3.1-5.2 8.6-5.2S20.6 12 20.6 12s-3.1 5.2-8.6 5.2S3.4 12 3.4 12Z"/><circle cx="12" cy="12" r="2.1"/><path d="m4.5 4.5 15 15"/></svg>
+    <span class="label">收起</span><kbd>H</kbd>
+  </button>
+</nav>
+
+<aside class="creature-stats" aria-live="polite" aria-atomic="false">
+  <p class="stat-label">SHALLOWS RESIDENTS / 浅海居民</p>
+  <div class="stat-line"><b id="ray-count">4</b> 条鳐 <i>·</i> <b id="jelly-count">5</b> 只水母</div>
+  <p class="stat-cap" id="cap-line">当前 9 位 · 上限 48 位</p>
+</aside>
+
+<section class="dock" id="dock" aria-labelledby="dock-title">
+  <div class="dock-head">
+    <p id="dock-title"><strong>放生台</strong> 拖起一张卡片，放到你想看的地方</p>
+    <span class="capacity"><b id="creature-total">9</b> / 48 位居民</span>
+  </div>
+  <div class="cards" id="cards" role="group" aria-label="可放生的浅海生物"></div>
+</section>
+
+<p class="hint" id="hint"><i>↖</i> 点按卡片抛入海中 · 拖动卡片把它悬在水面上</p>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="show-ui" id="show-ui" type="button" title="显示界面（H）" aria-label="显示界面">◌</button>
+
+<div class="loading" id="loading">
+  <div class="load-copy">
+    <span>0 – 8 M · INDIAN OCEAN</span>
+    <b>浅海</b>
+    <i>正在等潮水漫上来</i>
+  </div>
+</div>
+
+<script id="glsl-noise" type="x-shader/x-fragment">
+float hash21(vec2 p){
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float vnoise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+float fbm(vec2 p){
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++){
+    v += a * vnoise(p);
+    p = p * 2.03 + vec2(9.7, 3.1);
+    a *= 0.5;
+  }
+  return v;
+}
+</script>
+<script id="glsl-shore" type="x-shader/x-fragment">
+uniform vec2 uShoreCenter;
+uniform float uShoreRadius;
+float shoreDist(vec2 p){
+  vec2 q = p - uShoreCenter;
+  float ang = atan(q.y, q.x);
+  float r = length(q * vec2(1.0, 0.94));
+  float wobble = 0.22 * sin(ang * 5.0 + 0.8) + 0.12 * sin(ang * 9.0 - 1.3) + 0.06 * sin(ang * 15.0 + 2.2);
+  return r - (uShoreRadius + wobble);
+}
+</script>
+<script id="sim-frag" type="x-shader/x-fragment">
+precision highp float;
+uniform sampler2D tState;
+uniform vec2 uTexel;
+uniform float uTime;
+uniform vec4 uRipples[8];
+varying vec2 vUv;
+
+void main(){
+  vec4 state = texture2D(tState, vUv);
+  float h = state.r * 2.0 - 1.0;
+  float prev = state.g * 2.0 - 1.0;
+
+  float hl = texture2D(tState, vUv - vec2(uTexel.x, 0.0)).r * 2.0 - 1.0;
+  float hr = texture2D(tState, vUv + vec2(uTexel.x, 0.0)).r * 2.0 - 1.0;
+  float hu = texture2D(tState, vUv + vec2(0.0, uTexel.y)).r * 2.0 - 1.0;
+  float hd = texture2D(tState, vUv - vec2(0.0, uTexel.y)).r * 2.0 - 1.0;
+  float laplacian = hl + hr + hu + hd - 4.0 * h;
+
+  float next = 2.0 * h - prev + 0.265 * laplacian;
+  next *= 0.994;
+
+  float edge = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
+  next *= mix(0.30, 1.0, smoothstep(0.0, 0.115, edge));
+
+  for (int i = 0; i < 8; i++){
+    vec4 r = uRipples[i];
+    float age = uTime - r.z;
+    if (age > 0.0 && age < 0.13){
+      vec2 delta = vUv - r.xy;
+      float g = exp(-dot(delta, delta) * 13500.0);
+      next += sin(age * 92.0) * g * r.w;
+    }
+  }
+
+  next = clamp(next, -1.0, 1.0);
+  gl_FragColor = vec4(next * 0.5 + 0.5, h * 0.5 + 0.5, 0.0, 1.0);
+}
+</script>
+<script id="floor-frag" type="x-shader/x-fragment">
+precision highp float;
+uniform float uTime;
+uniform float uClear;
+varying vec3 vWorld;
+varying vec2 vUv;
+
+void main(){
+  vec2 p = vWorld.xz;
+  float d = shoreDist(p);
+  float sea = smoothstep(-0.12, 0.14, d);
+  float depth = clamp(d / 17.0, 0.0, 1.0);
+
+  float broad = fbm(p * 0.19 + vec2(1.7, -0.4));
+  float fine = hash21(floor(p * 105.0));
+  float ripple = sin((p.x * 1.35 + p.y * 0.48) * 3.2 + 2.2 * fbm(p * 0.5));
+  float beachGrain = vnoise(p * 62.0);
+
+  vec3 dry = mix(vec3(0.72, 0.63, 0.44), vec3(0.96, 0.86, 0.63), broad);
+  dry = mix(dry, vec3(0.84, 0.72, 0.51), 0.28 + 0.22 * ripple);
+  dry *= 0.91 + 0.17 * fine;
+  dry *= 0.96 + 0.04 * beachGrain;
+
+  vec3 submerged = mix(vec3(0.72, 0.65, 0.47), vec3(0.34, 0.40, 0.35), smoothstep(0.0, 1.0, depth));
+  submerged *= 0.84 + 0.19 * ripple;
+  submerged = mix(submerged, vec3(0.47, 0.47, 0.33), smoothstep(0.25, 0.92, ripple) * 0.14);
+  submerged *= 0.93 + 0.12 * fine;
+
+  float meadow = smoothstep(0.48, 0.72, fbm(p * 0.34 + vec2(5.0, -2.0)));
+  submerged = mix(submerged, vec3(0.19, 0.31, 0.20), meadow * (1.0 - smoothstep(0.4, 0.9, depth)) * 0.55);
+
+  vec3 col = mix(dry, submerged, sea);
+
+  float wet = (1.0 - smoothstep(0.0, 3.05, -d)) * (1.0 - sea);
+  col = mix(col, col * vec3(0.55, 0.60, 0.55), wet * 0.7);
+  col += wet * vec3(0.10, 0.14, 0.12) * (0.35 + 0.65 * vnoise(p * 14.0));
+
+  float shell = step(0.9965, hash21(floor(p * 32.0))) * (1.0 - sea);
+  col = mix(col, vec3(0.94, 0.88, 0.74), shell * 0.7);
+
+  float pebble = step(0.9935, hash21(floor(p * 18.0 + 8.0))) * sea;
+  col = mix(col, vec3(0.34, 0.36, 0.31), pebble * 0.48);
+
+  col += vec3(0.02, 0.035, 0.032) * smoothstep(0.4, 1.0, depth);
+  col = mix(col, col * vec3(0.86, 0.94, 0.96), uClear * 0.18);
+
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+<script id="water-frag" type="x-shader/x-fragment">
+precision highp float;
+uniform sampler2D tScene;
+uniform sampler2D tRipple;
+uniform vec2 uResolution;
+uniform vec4 uView;
+uniform vec2 uSimTexel;
+uniform float uTime;
+uniform float uRain;
+uniform float uCalm;
+uniform float uClear;
+uniform vec4 uPool;
+varying vec2 vUv;
+
+float caustic(vec2 p, float t){
+  vec2 q = p * 2.05;
+  float a = sin(q.x * 1.55 + sin(q.y * 1.2 + t * 0.73) * 1.65 + t * 0.6);
+  float b = sin(q.y * 1.38 + sin(q.x * 1.1 - t * 0.55) * 1.8 - t * 0.45);
+  float c = abs(a + b);
+  return pow(1.0 - clamp(c * 0.52, 0.0, 1.0), 10.0);
+}
+
+void main(){
+  vec2 uv = vUv;
+  vec2 texel = uSimTexel;
+  vec3 scene = texture2D(tScene, uv).rgb;
+
+  float heightL = texture2D(tRipple, uv - vec2(texel.x, 0.0)).r - 0.5;
+  float heightR = texture2D(tRipple, uv + vec2(texel.x, 0.0)).r - 0.5;
+  float heightD = texture2D(tRipple, uv - vec2(0.0, texel.y)).r - 0.5;
+  float heightU = texture2D(tRipple, uv + vec2(0.0, texel.y)).r - 0.5;
+  vec2 rippleGrad = vec2(heightR - heightL, heightU - heightD);
+
+  float worldX = mix(uView.x, uView.y, uv.x);
+  float worldZ = mix(uView.w, uView.z, uv.y);
+  vec2 p = vec2(worldX, worldZ);
+  float d = shoreDist(p);
+  float waterMask = smoothstep(-0.12, 0.17, d);
+  float depth = clamp(d / 24.0, 0.0, 1.0);
+  float shallow = 1.0 - smoothstep(0.05, 8.0, d);
+
+  vec2 swellDir = normalize(vec2(-0.58, -0.82));
+  float swellPhase = dot(p, swellDir) * 1.35 - uTime * 1.15;
+  float swell = sin(swellPhase) * 0.5 + 0.5;
+  float crossSwell = sin(dot(p, vec2(0.82, -0.42)) * 3.3 + uTime * 1.9) * 0.5 + 0.5;
+  float calm = mix(1.0, 0.28, uCalm);
+  float waveAmp = mix(1.0, 0.45, uClear) * calm;
+
+  vec2 normal = vec2(0.0);
+  normal += swellDir * cos(swellPhase) * 0.042 * waveAmp;
+  normal += vec2(0.75, -0.34) * cos(dot(p, vec2(0.75, -0.34)) * 4.7 + uTime * 2.2) * 0.012 * waveAmp;
+  normal += rippleGrad * 23.0;
+  normal += vec2(
+    sin(p.x * 7.1 + p.y * 2.3 - uTime * 3.1),
+    cos(p.y * 6.4 - p.x * 1.7 + uTime * 2.6)
+  ) * 0.0022 * waveAmp;
+
+  float edge = smoothstep(0.0, 0.075, min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y)));
+  normal *= mix(0.35, 1.0, edge);
+
+  vec2 refract = normal * (0.006 + depth * 0.024) * waterMask;
+  refract.x *= uResolution.y / max(uResolution.x, 1.0);
+  vec2 sampleUv = clamp(uv + refract, vec2(0.001), vec2(0.999));
+  vec3 refracted;
+  refracted.r = texture2D(tScene, sampleUv).r;
+  refracted.g = texture2D(tScene, sampleUv + refract * 0.018).g;
+  refracted.b = texture2D(tScene, sampleUv - refract * 0.018).b;
+
+  vec3 turquoise = vec3(0.36, 1.0, 0.88);
+  vec3 lagoon = vec3(0.035, 0.70, 0.77);
+  vec3 sapphire = vec3(0.012, 0.18, 0.55);
+  vec3 deepBlue = vec3(0.005, 0.055, 0.27);
+  vec3 body = mix(turquoise, lagoon, smoothstep(0.0, 0.22, depth));
+  body = mix(body, sapphire, smoothstep(0.18, 0.64, depth));
+  body = mix(body, deepBlue, smoothstep(0.66, 1.0, depth));
+  float clarity = mix(0.86, 1.14, uClear);
+  vec3 tint = mix(vec3(0.63, 0.99, 0.94), vec3(0.17, 0.45, 0.89), smoothstep(0.0, 0.78, depth));
+  tint *= clarity;
+
+  float caust = caustic(p * 1.12, uTime * 0.77) * 0.66 + caustic(p * 1.9 + vec2(5.2, 1.7), uTime * 0.5) * 0.34;
+  float caustMask = smoothstep(0.0, 0.22, d) * (1.0 - smoothstep(7.5, 14.0, d));
+  caustMask *= mix(0.75, 1.25, uClear);
+  refracted += caust * vec3(0.86, 1.0, 0.94) * caustMask * 0.145;
+
+  float waterAlpha = mix(0.18, 0.88, smoothstep(0.0, 12.5, d));
+  waterAlpha = mix(waterAlpha, 0.10, shallow * 0.35);
+  waterAlpha *= mix(1.0, 0.72, uClear);
+  waterAlpha *= waterMask;
+  vec3 waterCol = refracted * tint * 0.74 + body * mix(0.55, 0.76, depth);
+  waterCol += body * shallow * 0.13;
+  waterCol = mix(refracted, waterCol, waterAlpha);
+
+  float crest = smoothstep(0.63, 0.94, swell) * (0.35 + 0.65 * shallow) * calm;
+  waterCol += crest * vec3(0.16, 0.42, 0.42) * 0.34;
+  float surfaceBand = smoothstep(0.62, 0.96, swell) * (1.0 - smoothstep(0.0, 0.16, depth));
+  waterCol += surfaceBand * vec3(0.05, 0.17, 0.17) * 0.42;
+
+  float sparkle = step(0.9936, hash21(floor(uv * uResolution * 0.52) + floor(uTime * 13.0) * 17.0));
+  sparkle *= smoothstep(0.0, 0.4, d) * (0.55 + 0.45 * crossSwell);
+  sparkle *= mix(0.2, 1.0, uClear) * (1.0 - uRain * 0.8) * (1.0 - uCalm * 0.55);
+  waterCol += sparkle * vec3(1.0, 0.95, 0.73) * 0.92;
+
+  float glint = pow(max(0.0, cos(swellPhase + normal.x * 12.0 + normal.y * 10.0) * 0.5 + 0.5), 28.0);
+  waterCol += glint * vec3(0.66, 1.0, 0.88) * 0.075 * (1.0 - uRain * 0.6);
+
+  float breakerFront = mod(uTime * 0.52, 5.1);
+  float breaker = smoothstep(0.35, 0.0, abs(d - breakerFront));
+  breaker *= smoothstep(0.0, 0.7, d) * (1.0 - smoothstep(4.0, 7.0, d));
+  float breakerLace = smoothstep(0.50, 0.76, fbm(p * 3.6 + vec2(uTime * 0.11, 0.0)));
+  float shoreFoam = smoothstep(0.78, 0.0, d);
+  shoreFoam *= smoothstep(0.20, 0.66, fbm(p * 4.2 + vec2(0.0, uTime * 0.16)) + 0.23 * sin(p.x * 12.0 + p.y * 7.0));
+  float foam = (breaker * (0.22 + 0.78 * breakerLace) * 0.88 + shoreFoam * 0.6) * waterMask * calm;
+  waterCol = mix(waterCol, vec3(0.92, 0.99, 0.95), clamp(foam * 1.0, 0.0, 0.78));
+
+  float cycle = fract(uTime * 0.12 + 0.18);
+  float run = sin(cycle * 3.14159265);
+  run = smoothstep(0.0, 0.72, run) * (0.5 + 0.5 * sin(uTime * 0.23 + 1.4));
+  float reach = 0.25 + run * 2.55;
+  float swash = smoothstep(-reach - 0.34, -reach + 0.24, d);
+  swash *= 1.0 - smoothstep(-0.12, 0.08, d);
+  float swashEdge = exp(-pow((d + reach) / 0.15, 2.0));
+  float lace = smoothstep(0.40, 0.72, fbm(p * 5.2 + vec2(uTime * 0.21, -uTime * 0.15)));
+  float laceFine = smoothstep(0.55, 0.86, fbm(p * 12.0 + vec2(uTime * 0.3, 0.0)));
+  float swashFoam = swash * (0.08 + 0.22 * lace) + swashEdge * (0.35 + 0.65 * lace) * (0.55 + 0.45 * laceFine);
+  swashFoam *= (1.0 - uCalm * 0.35);
+
+  float land = 1.0 - waterMask;
+  if (land > 0.001) {
+    vec3 sand = scene;
+    float inland = -d;
+    float wet = 1.0 - smoothstep(0.0, 3.5, inland);
+    float wetNoise = vnoise(p * 9.0 + vec2(0.0, uTime * 0.01));
+    wet *= 0.78 + 0.22 * wetNoise;
+    vec3 wetSand = sand * vec3(0.58, 0.63, 0.58);
+    wetSand += vec3(0.11, 0.16, 0.14) * wetNoise * 0.5;
+    sand = mix(sand, wetSand, wet * 0.62);
+    float sheen = pow(max(0.0, 1.0 - abs(d + reach) * 1.1), 6.0);
+    float gloss = smoothstep(0.35, 0.95, fbm(p * 7.0 + vec2(uTime * 0.04, 0.0)) + 0.22 * sin(p.x * 8.0 - p.y * 11.0));
+    sand += vec3(0.17, 0.25, 0.22) * (sheen * 0.92 + gloss * wet * 0.22);
+    sand = mix(sand, vec3(0.93, 0.98, 0.92), clamp(swashFoam, 0.0, 0.92));
+    if (uRain > 0.5) {
+      float rainRing = step(0.992, hash21(floor(p * 48.0) + floor(uTime * 9.0) * 11.0));
+      sand += rainRing * vec3(0.11, 0.15, 0.13);
+    }
+    waterCol = mix(waterCol, sand, land);
+  }
+
+  float poolMask = smoothstep(uPool.z, uPool.z * 0.08, length(p - uPool.xy)) * uPool.w;
+  if (poolMask > 0.001) {
+    vec2 q = p - uPool.xy;
+    float r = length(q);
+    float a = atan(q.y, q.x);
+    float arms = pow(max(0.0, sin(a * 3.0 + r * 5.5 - uTime * 4.2)), 18.0);
+    float inner = smoothstep(uPool.z, 0.0, r);
+    waterCol = mix(waterCol, vec3(0.78, 0.98, 0.93), arms * inner * 0.30);
+    waterCol += vec3(0.20, 0.50, 0.48) * exp(-r * 1.7) * 0.06;
+    waterCol *= 1.0 - exp(-r * 1.6) * 0.20 * inner;
+    normal += normalize(q + 0.0001) * sin(a * 4.0 - r * 8.0 + uTime * 3.0) * 0.05 * poolMask;
+  }
+
+  float rainDim = 1.0 - uRain * 0.12;
+  waterCol *= rainDim;
+  waterCol *= 1.0 - 0.16 * pow(clamp(length(uv - 0.5) * 1.25, 0.0, 1.0), 2.0);
+  gl_FragColor = vec4(waterCol, 1.0);
+}
+</script>
+<script id="ray-vert" type="x-shader/x-vertex">
+attribute float aSide;
+uniform float uSpan;
+uniform float uLen;
+uniform float uTime;
+uniform float uPhase;
+uniform float uFlap;
+uniform float uMode;
+varying vec2 vP;
+varying float vSide;
+varying float vLift;
+void main(){
+  vP = vec2(position.x / max(uSpan, 0.001), position.z / max(uLen, 0.001));
+  vec3 p = position;
+  float sx = clamp(abs(position.x) / max(uSpan, 0.001), 0.0, 1.0);
+  float wave = sin(uTime * 3.0 - sx * 3.4 + uPhase) * uFlap;
+  if (uMode > 0.5) {
+    wave = sin(uTime * 3.7 - length(position.xz) * 4.2 + uPhase) * uFlap;
+  }
+  float bend = wave * pow(sx, 1.55);
+  p.y += bend;
+  vLift = bend;
+  vSide = aSide;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+}
+</script>
+<script id="ray-frag" type="x-shader/x-fragment">
+precision highp float;
+varying vec2 vP;
+varying float vSide;
+varying float vLift;
+uniform float uTime;
+
+float spotField(vec2 p, float threshold){
+  vec2 g = p;
+  vec2 id = floor(g);
+  vec2 f = fract(g) - 0.5;
+  float h = hash21(id);
+  return smoothstep(0.17, 0.045, length(f)) * step(threshold, h);
+}
+float ringField(vec2 p, float threshold){
+  vec2 id = floor(p);
+  vec2 f = fract(p) - 0.5;
+  float h = hash21(id + 7.0);
+  return smoothstep(0.045, 0.0, abs(length(f) - 0.28)) * step(threshold, h);
+}
+
+void main(){
+  vec3 top;
+  vec3 bottom;
+
+#if SPECIES == 0
+  top = mix(vec3(0.014, 0.024, 0.032), vec3(0.055, 0.09, 0.11), smoothstep(0.08, 0.72, abs(vP.x)));
+  float shoulder = smoothstep(0.21, 0.12, length(vec2((abs(vP.x) - 0.43) * 1.17, (vP.y + 0.16) * 1.12)));
+  top = mix(top, vec3(0.91, 0.92, 0.85), shoulder * 0.92);
+  float eye = smoothstep(0.048, 0.008, length(vec2(abs(vP.x) - 0.33, vP.y + 0.43)));
+  top = mix(top, vec3(0.0), eye);
+  bottom = vec3(0.87, 0.87, 0.79);
+  float bellyDots = spotField(vP * 6.5 + vec2(2.0, 1.0), 0.57);
+  bottom = mix(bottom, vec3(0.07, 0.09, 0.09), bellyDots * 0.83);
+#elif SPECIES == 1
+  top = mix(vec3(0.024, 0.049, 0.054), vec3(0.06, 0.10, 0.10), smoothstep(0.1, 0.8, abs(vP.x)));
+  float dots = spotField(vP * 5.1 + vec2(1.0, 3.0), 0.52);
+  float rings = ringField(vP * 4.2 + vec2(0.4, 2.1), 0.59);
+  top = mix(top, vec3(0.88, 0.90, 0.83), max(dots * 0.86, rings * 0.60));
+  bottom = vec3(0.80, 0.82, 0.74);
+  bottom = mix(bottom, vec3(0.17, 0.21, 0.19), spotField(vP * 7.0, 0.58) * 0.58);
+#else
+  top = mix(vec3(0.60, 0.40, 0.22), vec3(0.78, 0.59, 0.35), smoothstep(0.1, 0.85, abs(vP.x)));
+  float blue = max(spotField(vP * 6.2 + vec2(4.0, 0.0), 0.47), spotField(vP * 8.8 + vec2(1.0, 5.0), 0.58) * 0.85);
+  top = mix(top, vec3(0.01, 0.52, 1.0), blue * 0.98);
+  float spiracle = smoothstep(0.09, 0.012, length(vec2(abs(vP.x) - 0.25, vP.y + 0.27)));
+  top = mix(top, vec3(0.02, 0.18, 0.26), spiracle * 0.92);
+  float eye = smoothstep(0.05, 0.008, length(vec2(abs(vP.x) - 0.16, vP.y + 0.4)));
+  top = mix(top, vec3(0.015, 0.02, 0.025), eye);
+  top *= 0.95 + 0.05 * sin(vP.x * 13.0 + vP.y * 9.0);
+  bottom = vec3(0.83, 0.73, 0.56);
+#endif
+
+  vec3 col = vSide > 0.5 ? top : bottom;
+  if (vSide > -0.5 && vSide < 0.5) {
+    col = vec3(0.035, 0.08, 0.075);
+  }
+  col *= 1.0 + clamp(vLift * 6.0, -1.0, 1.0) * 0.22;
+  float rim = smoothstep(0.84, 1.02, length(vP * vec2(0.96, 0.90)));
+  col = mix(col, col * 0.58 + vec3(0.02, 0.05, 0.05), rim * 0.58);
+  col += vec3(0.035, 0.07, 0.07) * pow(clamp(1.0 - length(vP) * 0.42, 0.0, 1.0), 4.0);
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+<script id="jelly-vert" type="x-shader/x-vertex">
+varying vec3 vN;
+varying vec3 vView;
+varying vec3 vLocal;
+varying vec2 vUv;
+void main(){
+  vLocal = position;
+  vUv = uv;
+  vN = normalize(normalMatrix * normal);
+  vec4 world = modelMatrix * vec4(position, 1.0);
+  vView = normalize(cameraPosition - world.xyz);
+  gl_Position = projectionMatrix * viewMatrix * world;
+}
+</script>
+<script id="jelly-frag" type="x-shader/x-fragment">
+precision highp float;
+uniform float uRadius;
+uniform float uTime;
+varying vec3 vN;
+varying vec3 vView;
+varying vec3 vLocal;
+varying vec2 vUv;
+
+void main(){
+  vec2 p = vLocal.xz / max(uRadius, 0.001);
+  float r = length(p);
+  float ang = atan(p.y, p.x);
+  float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.0);
+
+#if SPECIES == 0
+  vec3 col = mix(vec3(0.32, 0.78, 0.80), vec3(0.88, 1.0, 0.95), fres * 1.28);
+  float horses = 0.0;
+  for (int i = 0; i < 4; i++){
+    float a = 0.785398 + float(i) * 1.570796;
+    vec2 c = vec2(cos(a), sin(a)) * 0.40;
+    float q = length(p - c);
+    float arc = smoothstep(0.105, 0.022, abs(q - 0.17));
+    float notch = smoothstep(0.22, 0.04, abs(p.x * c.y - p.y * c.x));
+    horses = max(horses, arc * (0.38 + 0.62 * notch));
+  }
+  col = mix(col, vec3(0.99, 0.34, 0.53), horses * 1.0);
+  float centerMouth = smoothstep(0.23, 0.04, r);
+  col = mix(col, vec3(0.94, 0.99, 0.91), centerMouth * 0.28);
+  float canal = smoothstep(0.055, 0.0, abs(sin(ang * 4.0))) * smoothstep(0.97, 0.2, r);
+  col = mix(col, vec3(0.83, 0.98, 0.95), canal * 0.38);
+  float fringe = smoothstep(0.80, 1.0, r) * (0.34 + 0.66 * step(0.0, sin(ang * 24.0)));
+  col = mix(col, vec3(0.92, 0.99, 0.96), fringe * 0.35);
+  float alpha = 0.30 + fres * 0.52 + fringe * 0.20 + horses * 0.34;
+#else
+  vec3 col = mix(vec3(0.80, 0.38, 0.10), vec3(1.0, 0.80, 0.38), fres * 0.94);
+  float stripe = pow(0.5 + 0.5 * sin(ang * 16.0 + r * 2.4), 7.0);
+  col = mix(col, vec3(0.72, 0.20, 0.12), stripe * 0.55);
+  float edge = smoothstep(0.80, 1.0, r);
+  col = mix(col, vec3(0.95, 0.59, 0.26), edge * 0.35);
+  float alpha = 0.34 + fres * 0.46 + stripe * 0.12;
+#endif
+
+  col *= 0.93 + 0.07 * sin(uTime * 0.7 + ang * 3.0);
+  if (!gl_FrontFacing) alpha *= 0.55;
+  gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.86));
+}
+</script>
+<script id="particle-vert" type="x-shader/x-vertex">
+attribute float aAlpha;
+attribute float aSize;
+attribute vec3 aColor;
+uniform float uPixelRatio;
+varying float vAlpha;
+varying vec3 vColor;
+void main(){
+  vAlpha = aAlpha;
+  vColor = aColor;
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_PointSize = aSize * uPixelRatio;
+  gl_Position = projectionMatrix * mv;
+}
+</script>
+<script id="particle-frag" type="x-shader/x-fragment">
+precision highp float;
+varying float vAlpha;
+varying vec3 vColor;
+void main(){
+  vec2 p = gl_PointCoord - 0.5;
+  float d = length(p);
+  if (d > 0.5) discard;
+  float a = smoothstep(0.5, 0.08, d) * vAlpha;
+  gl_FragColor = vec4(vColor, a);
+}
+</script>
+<script id="vortex-vert" type="x-shader/x-vertex">
+varying vec2 vUv;
+void main(){
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+</script>
+<script id="vortex-frag" type="x-shader/x-fragment">
+precision highp float;
+uniform float uTime;
+uniform float uOpacity;
+varying vec2 vUv;
+void main(){
+  vec2 p = (vUv - 0.5) * 2.0;
+  float r = length(p);
+  if (r > 1.0) discard;
+  float a = atan(p.y, p.x);
+  float spiral = 0.5 + 0.5 * sin(a * 2.0 + r * 11.0 - uTime * 3.4);
+  float lines = smoothstep(0.48, 0.96, spiral) * smoothstep(1.0, 0.18, r);
+  float halo = smoothstep(0.05, 0.0, abs(r - 0.76)) * 0.22;
+  float center = smoothstep(0.35, 0.02, r);
+  vec3 col = mix(vec3(0.60, 0.97, 0.90), vec3(0.96, 1.0, 0.94), lines);
+  col = mix(vec3(0.015, 0.13, 0.16), col, 0.28 + 0.72 * lines);
+  float alpha = (lines * 0.42 + halo * 0.42 + center * 0.20) * uOpacity;
+  gl_FragColor = vec4(col, alpha);
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE){document.write('<script src="./vendor/three.min.js"><\/script>')}</script>
+<script>
+(() => {
+"use strict";
+
+const T = window.THREE;
+const byId = (id) => document.getElementById(id);
+const canvas = byId("sea");
+const loading = byId("loading");
+const toastEl = byId("toast");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const narrowScreen = () => window.innerWidth < 900;
+
+if (!T) {
+  loading.innerHTML = '<div class="load-copy"><b>浅海</b><i>Three.js 未能载入，请检查网络后刷新</i></div>';
+  return;
+}
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const damp = (a, b, l, dt) => lerp(a, b, 1 - Math.exp(-l * dt));
+const TAU = Math.PI * 2;
+
+function mulberry32(a) {
+  return function () {
+    a |= 0;
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const random = mulberry32(0x5EA5A11);
+const rr = (a, b) => a + (b - a) * random();
+const pick = (list) => list[Math.floor(random() * list.length) % list.length];
+
+const state = {
+  time: 0,
+  rain: false,
+  whirl: false,
+  calm: false,
+  clear: false,
+  sound: false,
+  hidden: false,
+  dpr: Math.min(window.devicePixelRatio || 1, narrowScreen() ? 1.35 : 1.65),
+  dprCap: Math.min(window.devicePixelRatio || 1, narrowScreen() ? 1.35 : 1.65),
+  qualityNoticed: false,
+  ready: false,
+  lastRain: 0,
+  pool: new T.Vector3(5.5, 1.5, 3.3),
+};
+
+let renderer;
+try {
+  renderer = new T.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    alpha: false,
+    powerPreference: "high-performance",
+    stencil: false,
+  });
+} catch (error) {
+  loading.innerHTML = '<div class="load-copy"><b>浅海</b><i>这台设备暂时无法打开 WebGL 海面</i></div>';
+  return;
+}
+renderer.setPixelRatio(state.dpr);
+renderer.setSize(window.innerWidth, window.innerHeight, false);
+renderer.autoClear = false;
+renderer.sortObjects = true;
+renderer.setClearColor(0x073f4a, 1);
+renderer.outputEncoding = T.LinearEncoding;
+renderer.toneMapping = T.NoToneMapping;
+
+const CAM_TOP = 9;
+const CAM_BOTTOM = -9;
+const CAM_LEFT = -16;
+const topZ = -9;
+const bottomZ = 9;
+let viewWidth = Math.max(7.2, 18 * (window.innerWidth / window.innerHeight));
+let viewRight = CAM_LEFT + viewWidth;
+
+const camera = new T.OrthographicCamera(CAM_LEFT, viewRight, CAM_TOP, CAM_BOTTOM, 0.1, 120);
+camera.position.set(0, 32, 0);
+camera.up.set(0, 0, -1);
+camera.lookAt(0, 0, 0);
+
+const worldScene = new T.Scene();
+const overlayScene = new T.Scene();
+const waterScene = new T.Scene();
+const quadCamera = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const simCamera = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+worldScene.add(new T.AmbientLight(0xd9fff5, 0.92));
+const sunLight = new T.DirectionalLight(0xfff0ce, 1.22);
+sunLight.position.set(-8, 15, -9);
+worldScene.add(sunLight);
+overlayScene.add(new T.AmbientLight(0xe6fff8, 1));
+
+const sceneRT = new T.WebGLRenderTarget(2, 2, {
+  minFilter: T.LinearFilter,
+  magFilter: T.LinearFilter,
+  format: T.RGBAFormat,
+  depthBuffer: true,
+  stencilBuffer: false,
+});
+
+const SIM_SIZE = 256;
+function makeSimTarget(size) {
+  return new T.WebGLRenderTarget(size, size, {
+    minFilter: T.LinearFilter,
+    magFilter: T.LinearFilter,
+    format: T.RGBAFormat,
+    type: T.UnsignedByteType,
+    depthBuffer: false,
+    stencilBuffer: false,
+    wrapS: T.ClampToEdgeWrapping,
+    wrapT: T.ClampToEdgeWrapping,
+  });
+}
+let simA = makeSimTarget(SIM_SIZE);
+let simB = makeSimTarget(SIM_SIZE);
+renderer.setRenderTarget(simA);
+renderer.setClearColor(0x808080, 1);
+renderer.clear(true, false, false);
+renderer.setRenderTarget(simB);
+renderer.clear(true, false, false);
+renderer.setRenderTarget(null);
+renderer.setClearColor(0x073f4a, 1);
+
+function glsl(id) {
+  const node = byId(id);
+  return node ? node.textContent.trim() : "";
+}
+const NOISE = glsl("glsl-noise");
+const SHORE = glsl("glsl-shore");
+function fragmentShader(id, useNoise, useShore) {
+  let source = glsl(id);
+  let extra = "";
+  if (useNoise) extra += NOISE + "\n";
+  if (useShore) extra += SHORE + "\n";
+  if (extra && source.indexOf("precision highp float;") === 0) {
+    source = "precision highp float;\n" + extra + source.slice("precision highp float;".length);
+  } else {
+    source = "precision highp float;\n" + extra + source;
+  }
+  return source;
+}
+
+const shoreCenter = new T.Vector2(-14.85, -7.85);
+function shoreRadiusForWidth(width) {
+  return clamp(width * 0.19, 2.25, 5.45);
+}
+const shoreUniforms = {
+  uShoreCenter: { value: shoreCenter },
+  uShoreRadius: { value: shoreRadiusForWidth(viewWidth) },
+};
+
+/* GPU ripple simulation ------------------------------------------------ */
+const rippleSlots = [];
+for (let i = 0; i < 8; i++) rippleSlots.push(new T.Vector4(0, 0, -100, 0));
+let rippleCursor = 0;
+
+const simMaterial = new T.ShaderMaterial({
+  uniforms: {
+    tState: { value: simA.texture },
+    uTexel: { value: new T.Vector2(1 / SIM_SIZE, 1 / SIM_SIZE) },
+    uTime: { value: 0 },
+    uRipples: { value: rippleSlots },
+  },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: fragmentShader("sim-frag", false, false),
+  depthTest: false,
+  depthWrite: false,
+});
+const simScene = new T.Scene();
+const simMesh = new T.Mesh(new T.PlaneGeometry(2, 2), simMaterial);
+simMesh.frustumCulled = false;
+simScene.add(simMesh);
+
+function addRipple(u, v, strength) {
+  const slot = rippleSlots[rippleCursor % rippleSlots.length];
+  slot.set(clamp(u, 0.02, 0.98), clamp(v, 0.02, 0.98), state.time, strength);
+  rippleCursor++;
+}
+
+function updateRippleSim() {
+  simMaterial.uniforms.tState.value = simA.texture;
+  simMaterial.uniforms.uTime.value = state.time;
+  renderer.setRenderTarget(simB);
+  renderer.render(simScene, simCamera);
+  const temp = simA;
+  simA = simB;
+  simB = temp;
+  renderer.setRenderTarget(null);
+}
+
+/* Floor and beach ------------------------------------------------------ */
+const floorUniforms = {
+  uShoreCenter: shoreUniforms.uShoreCenter,
+  uShoreRadius: shoreUniforms.uShoreRadius,
+  uTime: { value: 0 },
+  uClear: { value: 0 },
+};
+const floorMaterial = new T.ShaderMaterial({
+  uniforms: floorUniforms,
+  vertexShader: 'varying vec3 vWorld; varying vec2 vUv; void main(){ vUv = uv; vec4 world = modelMatrix * vec4(position, 1.0); vWorld = world.xyz; gl_Position = projectionMatrix * viewMatrix * world; }',
+  fragmentShader: fragmentShader("floor-frag", true, true),
+});
+const floor = new T.Mesh(new T.PlaneGeometry(220, 130), floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+floor.position.set(20, -0.82, 0);
+worldScene.add(floor);
+
+/* Palm shadow ---------------------------------------------------------- */
+const palmCanvas = document.createElement("canvas");
+palmCanvas.width = 680;
+palmCanvas.height = 520;
+const palmCtx = palmCanvas.getContext("2d");
+const palmTexture = new T.CanvasTexture(palmCanvas);
+palmTexture.minFilter = T.LinearFilter;
+palmTexture.magFilter = T.LinearFilter;
+const palmMaterial = new T.MeshBasicMaterial({
+  map: palmTexture,
+  transparent: true,
+  opacity: 0.205,
+  color: 0x061f22,
+  depthWrite: false,
+  side: T.DoubleSide,
+});
+const palmShadow = new T.Mesh(new T.PlaneGeometry(10.6, 8.0), palmMaterial);
+palmShadow.rotation.x = -Math.PI / 2;
+palmShadow.position.set(-11.35, -0.54, -4.75);
+palmShadow.renderOrder = 2;
+worldScene.add(palmShadow);
+
+const frondAngles = [-2.92, -2.38, -1.82, -1.18, -0.44, 0.24, 0.88, 1.52, 2.12, 2.72];
+function drawPalmShadow(time) {
+  const w = palmCanvas.width;
+  const h = palmCanvas.height;
+  palmCtx.clearRect(0, 0, w, h);
+  palmCtx.save();
+  palmCtx.strokeStyle = "rgba(0,0,0,.78)";
+  palmCtx.fillStyle = "rgba(0,0,0,.78)";
+  palmCtx.shadowColor = "rgba(0,0,0,.72)";
+  palmCtx.shadowBlur = 11;
+  palmCtx.lineCap = "round";
+  const base = { x: 40, y: 72 };
+  const crown = { x: 342, y: 258 };
+  palmCtx.beginPath();
+  palmCtx.moveTo(base.x, base.y);
+  palmCtx.bezierCurveTo(120, 104, 214, 164, 288, 230);
+  palmCtx.quadraticCurveTo(320, 246, crown.x, crown.y);
+  palmCtx.lineWidth = 20;
+  palmCtx.stroke();
+  palmCtx.lineWidth = 10;
+  palmCtx.strokeStyle = "rgba(0,0,0,.4)";
+  palmCtx.stroke();
+  for (let i = 0; i < frondAngles.length; i++) {
+    const sway = Math.sin(time * 0.62 + i * 1.37) * 0.055 + Math.sin(time * 0.23 + i) * 0.025;
+    const a = frondAngles[i] + sway;
+    const len = 190 + ((i * 47) % 85);
+    const dx = Math.cos(a);
+    const dy = Math.sin(a) * 0.72;
+    const px = -dy;
+    const py = dx;
+    const c1x = crown.x + dx * len * 0.48 + px * (i % 2 ? -16 : 16);
+    const c1y = crown.y + dy * len * 0.48 + py * (i % 2 ? -16 : 16) + 34;
+    const tipx = crown.x + dx * len;
+    const tipy = crown.y + dy * len + 48 + (i % 2 ? 18 : 0);
+    palmCtx.beginPath();
+    palmCtx.moveTo(crown.x, crown.y);
+    palmCtx.bezierCurveTo(crown.x + dx * len * 0.22 + px * 11, crown.y + dy * len * 0.22 + py * 11, c1x + px * 17, c1y + py * 17, tipx, tipy);
+    palmCtx.bezierCurveTo(c1x - px * 14, c1y - py * 14, crown.x + dx * len * 0.24 - px * 8, crown.y + dy * len * 0.24 - py * 8, crown.x, crown.y);
+    palmCtx.fill();
+  }
+  palmCtx.globalCompositeOperation = "destination-out";
+  palmCtx.strokeStyle = "rgba(0,0,0,.34)";
+  palmCtx.lineWidth = 2.6;
+  palmCtx.shadowBlur = 0;
+  for (let i = 0; i < frondAngles.length; i++) {
+    const a = frondAngles[i] + Math.sin(time * 0.62 + i * 1.37) * 0.055;
+    const len = 180 + ((i * 47) % 80);
+    for (let j = 1; j < 8; j++) {
+      const t = j / 8;
+      const x = crown.x + Math.cos(a) * len * t;
+      const y = crown.y + Math.sin(a) * len * t * 0.72 + 30 * t;
+      const nx = -Math.sin(a) * (10 - t * 7);
+      const ny = Math.cos(a) * (8 - t * 5);
+      palmCtx.beginPath();
+      palmCtx.moveTo(x, y);
+      palmCtx.lineTo(x + nx, y + ny);
+      palmCtx.stroke();
+    }
+  }
+  palmCtx.globalCompositeOperation = "source-over";
+  palmCtx.beginPath();
+  palmCtx.arc(crown.x + 3, crown.y + 7, 12, 0, TAU);
+  palmCtx.arc(crown.x - 11, crown.y + 17, 8, 0, TAU);
+  palmCtx.fillStyle = "rgba(0,0,0,.55)";
+  palmCtx.fill();
+  palmCtx.restore();
+  palmTexture.needsUpdate = true;
+}
+drawPalmShadow(0);
+
+/* Water composite ------------------------------------------------------ */
+const waterUniforms = {
+  uShoreCenter: shoreUniforms.uShoreCenter,
+  uShoreRadius: shoreUniforms.uShoreRadius,
+  tScene: { value: null },
+  tRipple: { value: null },
+  uTime: { value: 0 },
+  uResolution: { value: new T.Vector2(1, 1) },
+  uView: { value: new T.Vector4(CAM_LEFT, viewRight, topZ, bottomZ) },
+  uRain: { value: 0 },
+  uCalm: { value: 0 },
+  uClear: { value: 0 },
+  uPool: { value: new T.Vector4(state.pool.x, state.pool.z, 3.3, 0) },
+  uSimTexel: { value: new T.Vector2(1 / SIM_SIZE, 1 / SIM_SIZE) },
+};
+const waterMaterial = new T.ShaderMaterial({
+  uniforms: waterUniforms,
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: fragmentShader("water-frag", true, true),
+  depthTest: false,
+  depthWrite: false,
+});
+const waterMesh = new T.Mesh(new T.PlaneGeometry(2, 2), waterMaterial);
+waterMesh.frustumCulled = false;
+waterScene.add(waterMesh);
+
+
+/* ------------------------------------------------------------------ *
+ * Small helpers and shared textures
+ * ------------------------------------------------------------------ */
+
+function makeShadowTexture() {
+  const c = document.createElement("canvas");
+  c.width = 128;
+  c.height = 128;
+  const g = c.getContext("2d");
+  const grad = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+  grad.addColorStop(0, "rgba(0,0,0,.78)");
+  grad.addColorStop(0.45, "rgba(0,0,0,.42)");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = grad;
+  g.beginPath();
+  g.arc(64, 64, 62, 0, TAU);
+  g.fill();
+  const tex = new T.CanvasTexture(c);
+  tex.minFilter = T.LinearFilter;
+  tex.magFilter = T.LinearFilter;
+  return tex;
+}
+const shadowTexture = makeShadowTexture();
+
+function makeBrainTexture() {
+  const c = document.createElement("canvas");
+  c.width = 256;
+  c.height = 256;
+  const g = c.getContext("2d");
+  g.fillStyle = "#ead8bd";
+  g.fillRect(0, 0, 256, 256);
+  g.lineCap = "round";
+  g.strokeStyle = "rgba(55,38,28,.68)";
+  for (let row = 0; row < 18; row++) {
+    g.lineWidth = 1.5 + (row % 3) * 0.7;
+    g.beginPath();
+    for (let x = -10; x <= 266; x += 4) {
+      const y = row * 15 + Math.sin(x * 0.065 + row * 0.9) * 5 + Math.sin(x * 0.021 + row * 2.2) * 4;
+      if (x === -10) g.moveTo(x, y); else g.lineTo(x, y);
+    }
+    g.stroke();
+  }
+  g.strokeStyle = "rgba(72,48,32,.5)";
+  for (let col = 0; col < 15; col++) {
+    g.lineWidth = 1.2;
+    g.beginPath();
+    for (let y = -10; y <= 266; y += 4) {
+      const x = col * 19 + Math.sin(y * 0.055 + col * 1.1) * 5;
+      if (y === -10) g.moveTo(x, y); else g.lineTo(x, y);
+    }
+    g.stroke();
+  }
+  const tex = new T.CanvasTexture(c);
+  tex.wrapS = T.RepeatWrapping;
+  tex.wrapT = T.RepeatWrapping;
+  tex.minFilter = T.LinearFilter;
+  tex.magFilter = T.LinearFilter;
+  return tex;
+}
+const brainTexture = makeBrainTexture();
+
+function addContactShadow(x, z, sx, sz, opacity, parent) {
+  const mat = new T.MeshBasicMaterial({
+    map: shadowTexture,
+    transparent: true,
+    opacity: opacity == null ? 0.36 : opacity,
+    color: 0x001d20,
+    depthWrite: false,
+  });
+  const mesh = new T.Mesh(new T.PlaneGeometry(sx, sz), mat);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(x, -0.695, z);
+  mesh.renderOrder = 1;
+  (parent || worldScene).add(mesh);
+  return mesh;
+}
+
+function screenToWorld(px, py) {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  return {
+    x: CAM_LEFT + (px / w) * viewWidth,
+    z: topZ + (py / h) * (bottomZ - topZ),
+  };
+}
+function worldToScreen(x, z) {
+  return {
+    x: ((x - CAM_LEFT) / viewWidth) * window.innerWidth,
+    y: ((z - topZ) / (bottomZ - topZ)) * window.innerHeight,
+  };
+}
+function shoreDistance(x, z) {
+  const dx = x - shoreCenter.x;
+  const dz = z - shoreCenter.y;
+  const ang = Math.atan2(dz, dx);
+  const r = Math.hypot(dx, dz * 0.94);
+  const radius = shoreUniforms.uShoreRadius.value;
+  const wobble = 0.22 * Math.sin(ang * 5 + 0.8) + 0.12 * Math.sin(ang * 9 - 1.3) + 0.06 * Math.sin(ang * 15 + 2.2);
+  return r - (radius + wobble);
+}
+function isWater(x, z) {
+  return shoreDistance(x, z) > 0.3;
+}
+function randomWaterPoint(margin, zMin, zMax) {
+  const lo = CAM_LEFT + (margin == null ? 1.6 : margin);
+  const hi = viewRight - (margin == null ? 1.6 : margin);
+  const a = zMin == null ? -7.6 : zMin;
+  const b = zMax == null ? 7.8 : zMax;
+  for (let i = 0; i < 120; i++) {
+    const x = rr(lo, hi);
+    const z = rr(a, b);
+    if (shoreDistance(x, z) > 2.1) return { x: x, z: z };
+  }
+  return { x: 2.5, z: 2.5 };
+}
+function nearestWater(x, z) {
+  if (shoreDistance(x, z) > 0.8) return { x: x, z: z };
+  const dx = x - shoreCenter.x;
+  const dz = z - shoreCenter.y;
+  const len = Math.hypot(dx, dz) || 1;
+  let px = x;
+  let pz = z;
+  for (let i = 0; i < 30; i++) {
+    px += (dx / len) * 0.35;
+    pz += (dz / len) * 0.35;
+    if (shoreDistance(px, pz) > 0.9) break;
+  }
+  return { x: px, z: pz };
+}
+
+/* ------------------------------------------------------------------ *
+ * Baked seabed: grass, coral heads, rubble, small reef life
+ * ------------------------------------------------------------------ */
+
+function makeSeagrassGeometry() {
+  const positions = [];
+  const colors = [];
+  const indices = [];
+  let base = 0;
+  const blades = 11;
+  for (let b = 0; b < blades; b++) {
+    const angle = (b / blades) * TAU + rr(-0.45, 0.45);
+    const length = rr(0.16, 0.43);
+    const bend = rr(-0.2, 0.25);
+    const segs = 5;
+    const width = rr(0.012, 0.030);
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs;
+      const r = t * length;
+      const x = Math.cos(angle) * r + Math.sin(t * 3.2 + b) * 0.035 * t;
+      const z = Math.sin(angle) * r + Math.cos(t * 2.4 + b) * 0.025 * t;
+      const y = 0.012 + Math.sin(t * Math.PI) * 0.12 + t * 0.06;
+      const px = -Math.sin(angle) * width * (1 - t * 0.82);
+      const pz = Math.cos(angle) * width * (1 - t * 0.82);
+      positions.push(x + px, y, z + pz);
+      positions.push(x - px, y, z - pz);
+      const dark = [0.09, 0.18, 0.11];
+      const light = [0.31, 0.48, 0.23];
+      for (let side = 0; side < 2; side++) {
+        colors.push(
+          lerp(dark[0], light[0], t),
+          lerp(dark[1], light[1], t),
+          lerp(dark[2], light[2], t)
+        );
+      }
+    }
+    for (let i = 0; i < segs; i++) {
+      const a = base + i * 2;
+      indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+    base += (segs + 1) * 2;
+  }
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+  geo.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
+  geo.setIndex(indices);
+  return geo;
+}
+
+const grassGeo = makeSeagrassGeometry();
+const grassMat = new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide });
+const grassCount = narrowScreen() ? 46 : 72;
+const grass = new T.InstancedMesh(grassGeo, grassMat, grassCount);
+grass.frustumCulled = false;
+grass.renderOrder = 2;
+worldScene.add(grass);
+{
+  const dummy = new T.Object3D();
+  let placed = 0;
+  const patchCenters = [];
+  for (let i = 0; i < 9; i++) {
+    const q = randomWaterPoint(2.4, -8.2, 8.5);
+    patchCenters.push(q);
+  }
+  for (let i = 0; i < grassCount; i++) {
+    const c = patchCenters[i % patchCenters.length];
+    let x = c.x + rr(-2.0, 2.0);
+    let z = c.z + rr(-1.7, 1.7);
+    if (shoreDistance(x, z) < 1.3) {
+      x = 2 + rr(-8, 9);
+      z = rr(-6, 7);
+    }
+    dummy.position.set(x, -0.79, z);
+    dummy.rotation.y = rr(0, TAU);
+    const s = rr(0.5, 1.05);
+    dummy.scale.set(s, s, s);
+    dummy.updateMatrix();
+    grass.setMatrixAt(i, dummy.matrix);
+    placed++;
+  }
+  grass.count = placed;
+}
+
+function standardMaterial(color, roughness, metalness) {
+  return new T.MeshStandardMaterial({
+    color: color,
+    roughness: roughness == null ? 0.78 : roughness,
+    metalness: metalness == null ? 0 : metalness,
+    flatShading: true,
+  });
+}
+
+function addBranchCoral(x, z, scale, color) {
+  const group = new T.Group();
+  const mat = standardMaterial(color, 0.75);
+  const n = 8;
+  for (let i = 0; i < n; i++) {
+    const length = rr(0.26, 0.68) * scale;
+    const radius = rr(0.034, 0.062) * scale;
+    const geo = new T.CylinderGeometry(radius * 0.48, radius, length, 5, 1);
+    const mesh = new T.Mesh(geo, mat);
+    const a = (i / n) * TAU + rr(-0.3, 0.3);
+    const tilt = rr(0.35, 1.0);
+    mesh.position.set(Math.cos(a) * 0.11 * scale, length * 0.42, Math.sin(a) * 0.11 * scale);
+    mesh.rotation.z = Math.cos(a) * tilt;
+    mesh.rotation.x = Math.sin(a) * tilt;
+    group.add(mesh);
+    const tip = new T.Mesh(new T.SphereGeometry(radius * 0.8, 5, 3), mat);
+    tip.position.set(
+      Math.cos(a) * length * 0.54 * Math.sin(tilt) * 0.6,
+      length * 0.82,
+      Math.sin(a) * length * 0.54 * Math.sin(tilt) * 0.6
+    );
+    group.add(tip);
+  }
+  group.position.set(x, -0.78, z);
+  worldScene.add(group);
+  addContactShadow(x, z, scale * 1.4, scale * 1.2, 0.24);
+  return group;
+}
+
+function makeBrainDomeGeometry(radius, height) {
+  const rings = 9;
+  const segs = 44;
+  const positions = [0, height, 0];
+  const uvs = [0.5, 0.5];
+  const indices = [];
+  for (let r = 1; r <= rings; r++) {
+    const t = r / rings;
+    for (let j = 0; j < segs; j++) {
+      const a = (j / segs) * TAU;
+      const ripple = Math.sin(a * 7 + t * 9) * 0.014 * t * (1 - t);
+      const rad = radius * t;
+      positions.push(Math.cos(a) * rad, height * (1 - t * t) + ripple, Math.sin(a) * rad);
+      uvs.push(Math.cos(a) * t * 0.5 + 0.5, Math.sin(a) * t * 0.5 + 0.5);
+    }
+  }
+  for (let j = 0; j < segs; j++) {
+    const current = 1 + j;
+    const next = 1 + ((j + 1) % segs);
+    indices.push(0, current, next);
+  }
+  for (let r = 1; r < rings; r++) {
+    const a0 = 1 + (r - 1) * segs;
+    const b0 = 1 + r * segs;
+    for (let j = 0; j < segs; j++) {
+      const jn = (j + 1) % segs;
+      indices.push(a0 + j, b0 + j, a0 + jn);
+      indices.push(a0 + jn, b0 + j, b0 + jn);
+    }
+  }
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+  geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function addBrainCoral(x, z, scale, color) {
+  const baseColor = new T.Color(color);
+  const brainMaterial = new T.MeshBasicMaterial({
+    color: baseColor,
+    map: brainTexture,
+    side: T.DoubleSide,
+    transparent: false,
+  });
+  const mesh = new T.Mesh(makeBrainDomeGeometry(0.5 * scale, 0.19 * scale), brainMaterial);
+  mesh.position.set(x, -0.76, z);
+  mesh.rotation.y = rr(0, TAU);
+  worldScene.add(mesh);
+  const crown = new T.Mesh(makeBrainDomeGeometry(0.26 * scale, 0.12 * scale), brainMaterial);
+  crown.position.set(x + rr(-0.3, 0.3) * scale, -0.74, z + rr(-0.2, 0.2) * scale);
+  worldScene.add(crown);
+  for (let lobe = 0; lobe < 3; lobe++) {
+    const a = rr(0, TAU);
+    const lobeMesh = new T.Mesh(makeBrainDomeGeometry(0.15 * scale, 0.085 * scale), brainMaterial);
+    lobeMesh.position.set(
+      x + Math.cos(a) * rr(0.28, 0.46) * scale,
+      -0.755,
+      z + Math.sin(a) * rr(0.28, 0.46) * scale
+    );
+    worldScene.add(lobeMesh);
+  }
+  addContactShadow(x, z, scale * 1.62, scale * 1.38, 0.3);
+  return mesh;
+}
+
+function addBoulder(x, z, scale, color) {
+  const geo = new T.DodecahedronGeometry(0.54 * scale, 0);
+  const mesh = new T.Mesh(geo, standardMaterial(color, 0.96));
+  mesh.scale.set(1.05, 0.52, 0.84);
+  mesh.rotation.set(rr(0, 0.5), rr(0, TAU), rr(0, 0.4));
+  mesh.position.set(x, -0.69, z);
+  worldScene.add(mesh);
+  addContactShadow(x, z, scale * 1.55, scale * 1.1, 0.35);
+  return mesh;
+}
+
+const coralPalette = [0xc88063, 0xe0a16b, 0xb56b76, 0xdb9a8c, 0x9e7b9c, 0xc7a06c];
+const boulderPalette = [0x4a554d, 0x596054, 0x3d4b49, 0x6b6553];
+
+for (let i = 0; i < 10; i++) {
+  const q = randomWaterPoint(2.5, -8.1, 8.2);
+  if (i < 4) addBrainCoral(q.x, q.z, rr(0.75, 1.35), pick(coralPalette));
+  else if (i < 8) addBranchCoral(q.x, q.z, rr(0.75, 1.25), pick(coralPalette));
+  else addBoulder(q.x, q.z, rr(0.8, 1.45), pick(boulderPalette));
+}
+for (let i = 0; i < 4; i++) {
+  const q = randomWaterPoint(3, -8, 8);
+  addBoulder(q.x, q.z, rr(0.5, 1.0), pick(boulderPalette));
+}
+
+/* Coral rubble */
+{
+  const rubbleGeo = new T.DodecahedronGeometry(1, 0);
+  const rubbleMat = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.92, flatShading: true });
+  const count = narrowScreen() ? 70 : 125;
+  const rubble = new T.InstancedMesh(rubbleGeo, rubbleMat, count);
+  rubble.frustumCulled = false;
+  const dummy = new T.Object3D();
+  const palette = [0x9d7c63, 0xc09b7c, 0x78645a, 0xb2776b, 0x7f8b7b, 0xd1b68e];
+  for (let i = 0; i < count; i++) {
+    const q = randomWaterPoint(2.1, -8.4, 8.5);
+    dummy.position.set(q.x, -0.79, q.z);
+    dummy.rotation.set(rr(0, TAU), rr(0, TAU), rr(0, TAU));
+    const s = rr(0.025, 0.09);
+    dummy.scale.set(s, s * rr(0.4, 0.8), s);
+    dummy.updateMatrix();
+    rubble.setMatrixAt(i, dummy.matrix);
+    rubble.setColorAt(i, new T.Color(pick(palette)));
+  }
+  rubble.instanceColor.needsUpdate = true;
+  rubble.renderOrder = 2;
+  worldScene.add(rubble);
+}
+
+/* Starfish */
+function makeStarGeometry(radius, inner, points) {
+  const shape = new T.Shape();
+  for (let i = 0; i < points * 2; i++) {
+    const a = (i / (points * 2)) * TAU + Math.PI / 2;
+    const r = i % 2 === 0 ? radius : inner;
+    const x = Math.cos(a) * r;
+    const y = Math.sin(a) * r;
+    if (i === 0) shape.moveTo(x, y);
+    else shape.lineTo(x, y);
+  }
+  shape.closePath();
+  return new T.ShapeGeometry(shape, 8);
+}
+for (let i = 0; i < 4; i++) {
+  const q = randomWaterPoint(3, -7.5, 7.5);
+  const mesh = new T.Mesh(makeStarGeometry(0.27, 0.095, 5), standardMaterial(i % 2 ? 0xd97754 : 0xcf8a42, 0.85));
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.rotation.z = rr(0, TAU);
+  mesh.position.set(q.x, -0.785, q.z);
+  mesh.scale.setScalar(rr(0.75, 1.3));
+  worldScene.add(mesh);
+  addContactShadow(q.x, q.z, 0.7, 0.55, 0.18);
+}
+
+/* Shells */
+for (let i = 0; i < 6; i++) {
+  const q = randomWaterPoint(2.5, -8, 8);
+  const geo = new T.CircleGeometry(0.15, 14, 0, Math.PI);
+  const mesh = new T.Mesh(geo, standardMaterial(i % 2 ? 0xe6d6b8 : 0xd8b9a0, 0.62));
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.rotation.z = rr(0, TAU);
+  mesh.position.set(q.x, -0.78, q.z);
+  mesh.scale.set(rr(0.7, 1.25), rr(0.7, 1.1), 1);
+  worldScene.add(mesh);
+}
+
+/* Sea urchins, a little spiky silhouette */
+function makeUrchinGeometry() {
+  const geo = new T.IcosahedronGeometry(0.105, 1);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    const len = Math.hypot(x, y, z) || 1;
+    const s = 0.065 + ((i * 37) % 11) / 11 * 0.135;
+    pos.setXYZ(i, (x / len) * s, (y / len) * s, (z / len) * s);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+for (let i = 0; i < 4; i++) {
+  const q = randomWaterPoint(3, -7, 7);
+  const mesh = new T.Mesh(makeUrchinGeometry(), standardMaterial(0x3a2c46, 0.88));
+  mesh.position.set(q.x, -0.74, q.z);
+  mesh.scale.setScalar(rr(0.75, 1.3));
+  worldScene.add(mesh);
+}
+
+/* ------------------------------------------------------------------ *
+ * Ray geometry, patterns, tails and behaviour
+ * ------------------------------------------------------------------ */
+
+const speciesDefs = [
+  {
+    id: "manta",
+    name: "蝠鲼",
+    latin: "Manta birostris",
+    tag: "MANTA",
+    kind: "ray",
+    index: 0,
+    span: 1.16,
+    len: 0.66,
+    flap: 0.105,
+    mode: 0,
+    tail: 1.3,
+    bodyScale: 1.0,
+  },
+  {
+    id: "eagle",
+    name: "斑点鹞鲼",
+    latin: "Aetobatus narinari",
+    tag: "EAGLE RAY",
+    kind: "ray",
+    index: 1,
+    span: 1.0,
+    len: 0.72,
+    flap: 0.075,
+    mode: 0,
+    tail: 2.15,
+    bodyScale: 0.96,
+  },
+  {
+    id: "stingray",
+    name: "蓝斑条尾魟",
+    latin: "Taeniura lymma",
+    tag: "STINGRAY",
+    kind: "ray",
+    index: 2,
+    span: 0.78,
+    len: 0.67,
+    flap: 0.036,
+    mode: 1,
+    tail: 1.4,
+    bodyScale: 1.12,
+  },
+  {
+    id: "moon",
+    name: "海月水母",
+    latin: "Aurelia aurita",
+    tag: "MOON JELLY",
+    kind: "jelly",
+    index: 0,
+    radius: 0.52,
+    height: 0.34,
+    tentacles: 18,
+    segments: 7,
+    tentacleLength: 0.4,
+    tentacleWidth: 0.024,
+    oral: 0,
+    tail: 0,
+    bodyScale: 1.0,
+  },
+  {
+    id: "nettle",
+    name: "海荨麻水母",
+    latin: "Chrysaora fuscescens",
+    tag: "SEA NETTLE",
+    kind: "jelly",
+    index: 1,
+    radius: 0.60,
+    height: 0.48,
+    tentacles: 14,
+    segments: 11,
+    tentacleLength: 1.55,
+    tentacleWidth: 0.023,
+    oral: 4,
+    tail: 0,
+    bodyScale: 1.0,
+  },
+];
+const speciesById = {};
+speciesDefs.forEach((def) => { speciesById[def.id] = def; });
+
+const rayOutlines = [
+  [
+    [0, -0.62], [-0.2, -0.58], [-0.46, -0.46], [-0.76, -0.27], [-1.06, -0.06], [-1.15, 0.05],
+    [-1.08, 0.16], [-0.77, 0.22], [-0.4, 0.31], [-0.16, 0.42], [0, 0.54],
+    [0.16, 0.42], [0.4, 0.31], [0.77, 0.22], [1.08, 0.16], [1.15, 0.05], [1.06, -0.06],
+    [0.76, -0.27], [0.46, -0.46], [0.2, -0.58]
+  ],
+  [
+    [0, -0.72], [-0.16, -0.65], [-0.43, -0.49], [-0.77, -0.23], [-0.98, 0.0], [-0.98, 0.13],
+    [-0.75, 0.2], [-0.42, 0.28], [-0.16, 0.42], [0, 0.64],
+    [0.16, 0.42], [0.42, 0.28], [0.75, 0.2], [0.98, 0.13], [0.98, 0.0], [0.77, -0.23],
+    [0.43, -0.49], [0.16, -0.65]
+  ],
+  [
+    [0, -0.62], [-0.22, -0.59], [-0.45, -0.45], [-0.63, -0.2], [-0.68, 0.05], [-0.6, 0.24],
+    [-0.36, 0.39], [-0.16, 0.44], [0, 0.5],
+    [0.16, 0.44], [0.36, 0.39], [0.6, 0.24], [0.68, 0.05], [0.63, -0.2], [0.45, -0.45], [0.22, -0.59]
+  ]
+];
+
+function createRayGeometry(def, shape) {
+  const curve = new T.CatmullRomCurve3(shape.map((v) => new T.Vector3(v[0], 0, v[1])), true, "catmullrom", 0.3);
+  const outline = curve.getPoints(72);
+  outline.pop();
+  const N = outline.length;
+  const levels = [0.12, 0.28, 0.47, 0.66, 0.83, 0.94, 1.0];
+  const positions = [];
+  const uvs = [];
+  const sides = [];
+  const indices = [];
+
+  for (let sheet = 0; sheet < 2; sheet++) {
+    const y = sheet === 0 ? 0.022 : -0.022;
+    const side = sheet === 0 ? 1 : -1;
+    const base = positions.length / 3;
+    positions.push(0, y, 0);
+    uvs.push(0.5, 0.5);
+    sides.push(side);
+    for (let r = 0; r < levels.length; r++) {
+      for (let i = 0; i < N; i++) {
+        const p = outline[i];
+        positions.push(p.x * levels[r] * def.span, y, p.z * levels[r] * def.len);
+        uvs.push(0.5 + (p.x * levels[r]) * 0.5, 0.5 + (p.z * levels[r]) * 0.5);
+        sides.push(side);
+      }
+    }
+    for (let i = 0; i < N; i++) {
+      const a = base + 1 + i;
+      const b = base + 1 + ((i + 1) % N);
+      indices.push(base, a, b);
+    }
+    for (let r = 0; r < levels.length - 1; r++) {
+      for (let i = 0; i < N; i++) {
+        const a = base + 1 + r * N + i;
+        const b = base + 1 + r * N + ((i + 1) % N);
+        const c = base + 1 + (r + 1) * N + i;
+        const d = base + 1 + (r + 1) * N + ((i + 1) % N);
+        indices.push(a, c, b, b, c, d);
+      }
+    }
+  }
+
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+  geo.setAttribute("uv", new T.Float32BufferAttribute(uvs, 2));
+  geo.setAttribute("aSide", new T.Float32BufferAttribute(sides, 1));
+  geo.setIndex(indices);
+  return geo;
+}
+
+function createRayMaterial(def, phase) {
+  return new T.ShaderMaterial({
+    uniforms: {
+      uSpan: { value: def.span },
+      uLen: { value: def.len },
+      uTime: { value: 0 },
+      uPhase: { value: phase },
+      uFlap: { value: def.flap },
+      uMode: { value: def.mode },
+    },
+    vertexShader: glsl("ray-vert"),
+    fragmentShader: fragmentShader("ray-frag", true, false),
+    defines: { SPECIES: def.index },
+    side: T.DoubleSide,
+  });
+}
+
+function createTail(def, phase) {
+  const segs = 15;
+  const length = def.tail;
+  const positions = new Float32Array((segs + 1) * 2 * 3);
+  const colors = new Float32Array((segs + 1) * 2 * 3);
+  const indices = [];
+  for (let i = 0; i <= segs; i++) {
+    const t = i / segs;
+    const w = 0.034 * (1 - t * 0.9) + 0.003;
+    positions[i * 6] = -w;
+    positions[i * 6 + 1] = 0.022;
+    positions[i * 6 + 2] = 0.44 + t * length;
+    positions[i * 6 + 3] = w;
+    positions[i * 6 + 4] = 0.022;
+    positions[i * 6 + 5] = 0.44 + t * length;
+    let c;
+    if (def.index === 2) {
+      c = Math.floor(t * 17) % 2 === 0 ? [0.09, 0.12, 0.12] : [0.82, 0.72, 0.52];
+    } else if (def.index === 1) {
+      c = [0.035, 0.055, 0.052];
+    } else {
+      c = [0.02, 0.035, 0.04];
+    }
+    for (let side = 0; side < 2; side++) {
+      colors[i * 6 + side * 3] = c[0];
+      colors[i * 6 + side * 3 + 1] = c[1];
+      colors[i * 6 + side * 3 + 2] = c[2];
+    }
+    if (i < segs) {
+      const a = i * 2;
+      indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+  }
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.BufferAttribute(positions, 3));
+  geo.setAttribute("color", new T.BufferAttribute(colors, 3));
+  geo.setIndex(indices);
+  const mat = new T.MeshBasicMaterial({ vertexColors: true, side: T.DoubleSide });
+  const mesh = new T.Mesh(geo, mat);
+  mesh.userData.phase = phase;
+  mesh.userData.length = length;
+  mesh.userData.segs = segs;
+  return mesh;
+}
+
+function updateTail(mesh, time, speed, phase) {
+  const segs = mesh.userData.segs;
+  const length = mesh.userData.length;
+  const pos = mesh.geometry.attributes.position;
+  for (let i = 0; i <= segs; i++) {
+    const t = i / segs;
+    const sway = Math.sin(time * (2.4 + speed * 0.8) - i * 0.56 + phase) * 0.065 * t * (1 + speed * 0.4);
+    const z = 0.44 + t * length;
+    const w = 0.034 * (1 - t * 0.9) + 0.003;
+    pos.setXYZ(i * 2, sway - w, 0.02, z);
+    pos.setXYZ(i * 2 + 1, sway + w, 0.02, z);
+  }
+  pos.needsUpdate = true;
+  mesh.geometry.computeBoundingSphere();
+}
+
+const rayGeometryCache = {};
+function createRayVisual(def, phase, preview) {
+  const root = new T.Group();
+  const bank = new T.Group();
+  root.add(bank);
+  const geo = rayGeometryCache[def.index] || (rayGeometryCache[def.index] = createRayGeometry(def, rayOutlines[def.index]));
+  const material = createRayMaterial(def, phase);
+  const body = new T.Mesh(geo, material);
+  bank.add(body);
+  const tail = createTail(def, phase);
+  bank.add(tail);
+  if (def.index === 0) {
+    const finGeo = new T.ConeGeometry(0.052, 0.3, 6);
+    finGeo.rotateX(-Math.PI / 2);
+    const finMat = new T.MeshBasicMaterial({ color: 0x071315 });
+    for (let side = -1; side <= 1; side += 2) {
+      const fin = new T.Mesh(finGeo, finMat);
+      fin.position.set(side * 0.2, 0.025, -0.62);
+      fin.rotation.z = side * -0.28;
+      bank.add(fin);
+    }
+  }
+  root.scale.setScalar(def.bodyScale);
+  return { root: root, bank: bank, body: body, tail: tail, material: material };
+}
+
+const rays = [];
+const jellies = [];
+let heldModel = null;
+let heldSpecies = null;
+let ringPool = null;
+let wakeTimer = 0;
+
+function createRay(def, x, z, options) {
+  const opts = options || {};
+  const phase = rr(0, TAU);
+  const visual = createRayVisual(def, phase, false);
+  const shadow = addContactShadow(x, z, 2.2 * def.span, 1.7 * def.len, 0.28);
+  worldScene.add(visual.root);
+  const ray = {
+    kind: "ray",
+    def: def,
+    root: visual.root,
+    bank: visual.bank,
+    body: visual.body,
+    tail: visual.tail,
+    material: visual.material,
+    shadow: shadow,
+    x: x,
+    z: z,
+    y: -0.42,
+    heading: rr(0, TAU),
+    target: null,
+    speed: rr(0.32, 0.55),
+    cruise: rr(0.3, 0.5),
+    turn: 0,
+    bankAngle: 0,
+    phase: phase,
+    flee: 0,
+    breach: null,
+    resting: def.index === 2 && opts.resting !== false,
+    spawn: opts.spawn === false ? 1 : 0.01,
+    age: 0,
+    wakeTimer: rr(0, 0.5),
+    wanderTimer: rr(0, 4),
+    scale: 1,
+    idlePulse: rr(0, TAU),
+  };
+  ray.target = randomWaterPoint(2, -7.5, 7.4);
+  rays.push(ray);
+  return ray;
+}
+
+function createJelly(def, x, z, options) {
+  const opts = options || {};
+  const root = new T.Group();
+  const bell = new T.Mesh(createBellGeometry(def), createJellyMaterial(def));
+  bell.renderOrder = 3;
+  root.add(bell);
+  const tentacles = createTentacleMesh(def);
+  tentacles.renderOrder = 2;
+  root.add(tentacles);
+  worldScene.add(root);
+  const shadow = addContactShadow(x, z, 1.2, 1.0, 0.18);
+  const jelly = {
+    kind: "jelly",
+    def: def,
+    root: root,
+    bell: bell,
+    tentacles: tentacles,
+    shadow: shadow,
+    x: x,
+    z: z,
+    y: 0.9,
+    heading: rr(0, TAU),
+    vx: 0,
+    vz: 0,
+    phase: rr(0, TAU),
+    spawn: opts.spawn === false ? 1 : 0.01,
+    age: 0,
+    scale: 1,
+    pulse: rr(0, 1),
+    startle: 0,
+    mouth: 0,
+  };
+  jellies.push(jelly);
+  return jelly;
+}
+
+
+/* ------------------------------------------------------------------ *
+ * Jellyfish: translucent bell, pulsing, mouth arms and trailing ribbons
+ * ------------------------------------------------------------------ */
+
+const bellGeometryCache = {};
+function createBellGeometry(def) {
+  if (bellGeometryCache[def.id]) return bellGeometryCache[def.id];
+  const points = [];
+  const r = def.radius;
+  const h = def.height;
+  for (let i = 0; i <= 18; i++) {
+    const t = i / 18;
+    const radius = Math.pow(Math.sin((t * Math.PI) / 2), 0.86) * r * (1 + 0.052 * Math.sin(t * Math.PI));
+    const y = Math.cos((t * Math.PI) / 2) * h;
+    points.push(new T.Vector2(Math.max(0.003, radius), y));
+  }
+  points.push(new T.Vector2(r * 1.015, -0.022));
+  const geometry = new T.LatheGeometry(points, 48);
+  bellGeometryCache[def.id] = geometry;
+  return geometry;
+}
+
+function createJellyMaterial(def) {
+  return new T.ShaderMaterial({
+    uniforms: {
+      uRadius: { value: def.radius },
+      uTime: { value: 0 },
+    },
+    vertexShader: glsl("jelly-vert"),
+    fragmentShader: fragmentShader("jelly-frag", false, false),
+    defines: { SPECIES: def.index },
+    transparent: true,
+    depthWrite: false,
+    side: T.DoubleSide,
+    blending: T.NormalBlending,
+  });
+}
+
+function createTentacleMesh(def) {
+  const parts = [];
+  const positions = [];
+  const colors = [];
+  const indices = [];
+  let base = 0;
+  const tentacleColorA = def.index === 0 ? [0.47, 0.80, 0.80] : [0.48, 0.22, 0.15];
+  const tentacleColorB = def.index === 0 ? [0.90, 0.99, 0.94] : [0.80, 0.51, 0.28];
+  const oralColorA = [0.88, 0.72, 0.49];
+  const oralColorB = [0.99, 0.92, 0.73];
+
+  for (let i = 0; i < def.tentacles; i++) {
+    const angle = (i / def.tentacles) * TAU + (def.index === 0 ? 0.08 : 0.2);
+    const length = def.tentacleLength * (def.index === 0 ? rr(0.75, 1.2) : rr(0.72, 1.12));
+    const segs = def.segments;
+    const width = def.tentacleWidth * (def.index === 0 ? rr(0.8, 1.2) : rr(0.7, 1.3));
+    const part = {
+      angle: angle, radius: def.radius * 0.94, length: length, segs: segs,
+      width: width, oral: false, base: base, phase: rr(0, TAU), drop: def.index === 0 ? 0.22 : 0.64,
+    };
+    parts.push(part);
+    for (let k = 0; k <= segs; k++) {
+      const t = k / segs;
+      for (let s = 0; s < 2; s++) {
+        positions.push(0, 0, 0);
+        colors.push(
+          lerp(tentacleColorA[0], tentacleColorB[0], t),
+          lerp(tentacleColorA[1], tentacleColorB[1], t),
+          lerp(tentacleColorA[2], tentacleColorB[2], t)
+        );
+      }
+      if (k < segs) {
+        const a = base + k * 2;
+        indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      }
+    }
+    base += (segs + 1) * 2;
+  }
+
+  for (let i = 0; i < def.oral; i++) {
+    const angle = (i / def.oral) * TAU + Math.PI / 4;
+    const length = rr(0.75, 1.04);
+    const segs = 10;
+    const width = rr(0.075, 0.12);
+    const part = {
+      angle: angle, radius: def.radius * 0.50, length: length, segs: segs,
+      width: width, oral: true, base: base, phase: rr(0, TAU), drop: 0.38,
+    };
+    parts.push(part);
+    for (let k = 0; k <= segs; k++) {
+      const t = k / segs;
+      for (let s = 0; s < 2; s++) {
+        positions.push(0, 0, 0);
+        colors.push(
+          lerp(oralColorA[0], oralColorB[0], t),
+          lerp(oralColorA[1], oralColorB[1], t),
+          lerp(oralColorA[2], oralColorB[2], t)
+        );
+      }
+      if (k < segs) {
+        const a = base + k * 2;
+        indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      }
+    }
+    base += (segs + 1) * 2;
+  }
+
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+  geo.setAttribute("color", new T.Float32BufferAttribute(colors, 3));
+  geo.setIndex(indices);
+  const mat = new T.MeshBasicMaterial({
+    vertexColors: true,
+    transparent: true,
+    opacity: def.index === 0 ? 0.68 : 0.64,
+    depthWrite: false,
+    side: T.DoubleSide,
+    blending: T.NormalBlending,
+  });
+  const mesh = new T.Mesh(geo, mat);
+  mesh.frustumCulled = false;
+  mesh.userData.parts = parts;
+  return mesh;
+}
+
+function updateTentacles(jelly, time, held) {
+  const mesh = jelly.tentacles;
+  const parts = mesh.userData.parts;
+  const pos = mesh.geometry.attributes.position;
+  const speed = Math.hypot(jelly.vx || 0, jelly.vz || 0);
+  const trailX = -(jelly.vx || 0) * 0.22;
+  const trailZ = -(jelly.vz || 0) * 0.22;
+
+  for (let p = 0; p < parts.length; p++) {
+    const part = parts[p];
+    const radius = part.radius;
+    const baseAngle = part.angle + Math.sin(time * 0.37 + part.phase) * 0.05;
+    const bx = Math.cos(baseAngle) * radius;
+    const bz = Math.sin(baseAngle) * radius;
+    let dx = Math.cos(baseAngle) + trailX;
+    let dz = Math.sin(baseAngle) + trailZ;
+    const len = Math.hypot(dx, dz) || 1;
+    dx /= len;
+    dz /= len;
+    const px = -dz;
+    const pz = dx;
+    const segs = part.segs;
+    const length = part.length * (held ? 1.15 : 1);
+    for (let k = 0; k <= segs; k++) {
+      const t = k / segs;
+      const wave = Math.sin(time * (part.oral ? 1.6 : 2.2) + t * 4.4 + part.phase + part.angle) * (0.035 + t * 0.12) * (part.oral ? 1.9 : 1);
+      const wave2 = Math.cos(time * 1.4 + t * 7.0 + part.phase) * (part.oral ? 0.03 : 0.018);
+      let x = bx + dx * length * t + px * (wave + wave2);
+      let z = bz + dz * length * t + pz * (wave + wave2);
+      let y = -0.018 - t * part.drop;
+      if (held) {
+        x = bx * (1 - t * 0.58) + px * wave * 0.8;
+        z = bz * (1 - t * 0.58) + pz * wave * 0.8;
+        y = -t * (part.oral ? 1.2 : 1.7) + Math.sin(time * 2 + t * 5 + part.phase) * 0.03;
+      }
+      const w = part.width * (1 - t * 0.68) * (part.oral ? 1 + 0.5 * Math.sin(t * 9 + time) : 1);
+      const idx = (part.base + k * 2) * 3;
+      pos.array[idx] = x;
+      pos.array[idx + 1] = y;
+      pos.array[idx + 2] = z;
+      pos.array[idx + 3] = x + px * w * 2;
+      pos.array[idx + 4] = y;
+      pos.array[idx + 5] = z + pz * w * 2;
+    }
+  }
+  pos.needsUpdate = true;
+}
+
+/* ------------------------------------------------------------------ *
+ * Particles, splash rings and surface effects
+ * ------------------------------------------------------------------ */
+
+function makeParticleField(scene, count, blending) {
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  const alpha = new Float32Array(count);
+  const size = new Float32Array(count);
+  const velocities = new Float32Array(count * 3);
+  const life = new Float32Array(count);
+  const maxLife = new Float32Array(count);
+  const active = new Uint8Array(count);
+  for (let i = 0; i < count; i++) {
+    positions[i * 3 + 1] = -999;
+    colors[i * 3] = 1;
+    colors[i * 3 + 1] = 1;
+    colors[i * 3 + 2] = 1;
+    size[i] = 3;
+  }
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.BufferAttribute(positions, 3));
+  geo.setAttribute("aColor", new T.BufferAttribute(colors, 3));
+  geo.setAttribute("aAlpha", new T.BufferAttribute(alpha, 1));
+  geo.setAttribute("aSize", new T.BufferAttribute(size, 1));
+  const mat = new T.ShaderMaterial({
+    uniforms: { uPixelRatio: { value: state.dpr } },
+    vertexShader: glsl("particle-vert"),
+    fragmentShader: fragmentShader("particle-frag", false, false),
+    transparent: true,
+    depthWrite: false,
+    depthTest: true,
+    blending: blending == null ? T.NormalBlending : blending,
+  });
+  const mesh = new T.Points(geo, mat);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 8;
+  scene.add(mesh);
+  const field = {
+    mesh: mesh, geo: geo, mat: mat, count: count, cursor: 0,
+    positions: positions, colors: colors, alpha: alpha, size: size,
+    velocities: velocities, life: life, maxLife: maxLife, active: active,
+    gravity: 5.8, drag: 0.6,
+    spawn: function (x, y, z, opts) {
+      const i = this.cursor % this.count;
+      this.cursor++;
+      const o = opts || {};
+      const p3 = i * 3;
+      this.positions[p3] = x;
+      this.positions[p3 + 1] = y;
+      this.positions[p3 + 2] = z;
+      this.velocities[p3] = o.vx == null ? rr(-1, 1) : o.vx;
+      this.velocities[p3 + 1] = o.vy == null ? rr(1, 3) : o.vy;
+      this.velocities[p3 + 2] = o.vz == null ? rr(-1, 1) : o.vz;
+      this.life[i] = o.life == null ? rr(0.6, 1.2) : o.life;
+      this.maxLife[i] = this.life[i];
+      this.size[i] = o.size == null ? rr(2, 5) : o.size;
+      this.active[i] = 1;
+      const c = o.color || [0.88, 0.99, 0.95];
+      this.colors[p3] = c[0];
+      this.colors[p3 + 1] = c[1];
+      this.colors[p3 + 2] = c[2];
+      this.alpha[i] = o.alpha == null ? 1 : o.alpha;
+    },
+    update: function (dt) {
+      for (let i = 0; i < this.count; i++) {
+        if (!this.active[i]) continue;
+        this.life[i] -= dt;
+        if (this.life[i] <= 0) {
+          this.active[i] = 0;
+          this.alpha[i] = 0;
+          this.positions[i * 3 + 1] = -999;
+          continue;
+        }
+        const p3 = i * 3;
+        this.velocities[p3 + 1] -= this.gravity * dt;
+        this.velocities[p3] *= Math.exp(-this.drag * dt);
+        this.velocities[p3 + 2] *= Math.exp(-this.drag * dt);
+        this.positions[p3] += this.velocities[p3] * dt;
+        this.positions[p3 + 1] += this.velocities[p3 + 1] * dt;
+        this.positions[p3 + 2] += this.velocities[p3 + 2] * dt;
+        this.alpha[i] = clamp(this.life[i] / Math.max(this.maxLife[i], 0.001), 0, 1);
+        if (this.positions[p3 + 1] < -1.0) {
+          this.active[i] = 0;
+          this.alpha[i] = 0;
+          this.positions[p3 + 1] = -999;
+        }
+      }
+      this.geo.attributes.position.needsUpdate = true;
+      this.geo.attributes.aAlpha.needsUpdate = true;
+      this.geo.attributes.aColor.needsUpdate = true;
+      this.geo.attributes.aSize.needsUpdate = true;
+    },
+  };
+  return field;
+}
+
+const splashParticles = makeParticleField(overlayScene, 520, T.NormalBlending);
+const siltParticles = makeParticleField(worldScene, 180, T.NormalBlending);
+splashParticles.gravity = 5.2;
+splashParticles.drag = 0.4;
+siltParticles.gravity = 0.4;
+siltParticles.drag = 1.4;
+
+function spawnSplash(x, z, strength) {
+  const s = strength == null ? 1 : strength;
+  const count = Math.round(24 + 48 * s);
+  for (let i = 0; i < count; i++) {
+    const a = rr(0, TAU);
+    const speed = rr(0.35, 2.1) * s;
+    splashParticles.spawn(x, 0.03, z, {
+      vx: Math.cos(a) * speed,
+      vz: Math.sin(a) * speed,
+      vy: rr(1.2, 4.4) * s,
+      size: rr(1.4, 4.2) * (0.7 + s * 0.4),
+      life: rr(0.5, 1.25),
+      color: i % 5 === 0 ? [0.66, 0.94, 0.91] : [0.96, 1.0, 0.94],
+    });
+  }
+  spawnRing(x, z, 1.35 + s * 1.15, 0.84, 0, 0xd9fff2);
+  spawnRing(x, z, 1.95 + s * 1.6, 0.38, 0.08, 0xc7fff0);
+}
+
+function spawnSilt(x, z) {
+  for (let i = 0; i < 26; i++) {
+    const a = rr(0, TAU);
+    const r = rr(0.05, 0.5);
+    siltParticles.spawn(x + Math.cos(a) * r, -0.62, z + Math.sin(a) * r, {
+      vx: Math.cos(a) * rr(0.12, 0.58),
+      vz: Math.sin(a) * rr(0.12, 0.58),
+      vy: rr(0.2, 0.75),
+      size: rr(2.2, 5.5),
+      life: rr(1.0, 2.4),
+      color: [0.54, 0.46, 0.31],
+      alpha: 0.48,
+    });
+  }
+}
+
+const rings = [];
+function initRingPool() {
+  const geo = new T.RingGeometry(0.82, 1.0, 56);
+  for (let i = 0; i < 52; i++) {
+    const mat = new T.MeshBasicMaterial({
+      color: 0xd9fff2, transparent: true, opacity: 0, depthWrite: false,
+      blending: T.AdditiveBlending, side: T.DoubleSide,
+    });
+    const mesh = new T.Mesh(geo, mat);
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.y = 0.055;
+    mesh.visible = false;
+    mesh.renderOrder = 6;
+    overlayScene.add(mesh);
+    rings.push({ mesh: mesh, life: 0, maxLife: 1, size: 1, delay: 0, waiting: false, opacity: 1 });
+  }
+}
+initRingPool();
+function spawnRing(x, z, size, opacity, delay, color) {
+  let free = null;
+  for (let i = 0; i < rings.length; i++) {
+    if (!rings[i].mesh.visible) { free = rings[i]; break; }
+  }
+  if (!free) free = rings[0];
+  free.mesh.position.set(x, 0.055, z);
+  free.mesh.visible = false;
+  free.mesh.scale.setScalar(0.22);
+  free.mesh.material.opacity = 0;
+  free.mesh.material.color.setHex(color == null ? 0xd9fff2 : color);
+  free.size = size;
+  free.opacity = opacity;
+  free.delay = delay;
+  free.life = 0;
+  free.maxLife = 1.25;
+  free.waiting = delay > 0;
+}
+function updateRings(dt) {
+  for (let i = 0; i < rings.length; i++) {
+    const r = rings[i];
+    if (r.waiting) {
+      r.delay -= dt;
+      if (r.delay <= 0) {
+        r.waiting = false;
+        r.mesh.visible = true;
+      } else continue;
+    }
+    if (!r.mesh.visible) continue;
+    r.life += dt;
+    const t = clamp(r.life / r.maxLife, 0, 1);
+    const scale = 0.16 + t * 1.9;
+    r.mesh.scale.setScalar(scale * r.size);
+    r.mesh.material.opacity = Math.pow(1 - t, 1.5) * r.opacity;
+    if (t >= 1) {
+      r.mesh.visible = false;
+      r.mesh.material.opacity = 0;
+    }
+  }
+}
+
+/* Whirlpool overlay ---------------------------------------------------- */
+const vortexUniforms = { uTime: { value: 0 }, uOpacity: { value: 0 } };
+const vortexMaterial = new T.ShaderMaterial({
+  uniforms: vortexUniforms,
+  vertexShader: glsl("vortex-vert"),
+  fragmentShader: fragmentShader("vortex-frag", false, false),
+  transparent: true,
+  depthWrite: false,
+  depthTest: false,
+  blending: T.NormalBlending,
+  side: T.DoubleSide,
+});
+const vortexMesh = new T.Mesh(new T.PlaneGeometry(2, 2), vortexMaterial);
+vortexMesh.rotation.x = -Math.PI / 2;
+vortexMesh.position.set(state.pool.x, 0.09, state.pool.z);
+vortexMesh.scale.setScalar(3.0);
+vortexMesh.visible = false;
+vortexMesh.renderOrder = 9;
+overlayScene.add(vortexMesh);
+
+/* ------------------------------------------------------------------ *
+ * Synthesized surf, splashes and plinks
+ * ------------------------------------------------------------------ */
+const audio = {
+  ctx: null,
+  master: null,
+  surf: null,
+  surfGain: null,
+  surfFilter: null,
+  enabled: false,
+  failed: false,
+  init: function () {
+    if (this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { this.failed = true; return; }
+    const ctx = new AC();
+    this.ctx = ctx;
+    const master = ctx.createGain();
+    master.gain.value = 0.62;
+    master.connect(ctx.destination);
+    this.master = master;
+    const buffer = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < data.length; i++) {
+      last = last * 0.985 + (Math.random() * 2 - 1) * 0.12;
+      data[i] = last;
+    }
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 620;
+    filter.Q.value = 0.62;
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    source.start();
+    this.surf = source;
+    this.surfGain = gain;
+    this.surfFilter = filter;
+  },
+  setEnabled: function (on) {
+    if (on) this.init();
+    this.enabled = on && !this.failed;
+    if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+  },
+  update: function (swash, calm, rain) {
+    if (!this.ctx || !this.surfGain) return;
+    const now = this.ctx.currentTime;
+    const target = this.enabled ? 0.055 + swash * 0.105 + rain * 0.012 : 0;
+    this.surfGain.gain.setTargetAtTime(target, now, 0.18);
+    this.surfFilter.frequency.setTargetAtTime(this.enabled ? 460 + swash * 740 - calm * 90 : 300, now, 0.25);
+  },
+  burst: function (intensity) {
+    if (!this.enabled || !this.ctx) return;
+    const ctx = this.ctx;
+    const s = intensity == null ? 1 : intensity;
+    const buffer = ctx.createBuffer(1, ctx.sampleRate * 0.8, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < data.length; i++) {
+      last = last * 0.92 + (Math.random() * 2 - 1) * 0.42;
+      data[i] = last * Math.exp(-i / (ctx.sampleRate * 0.22));
+    }
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 620 + s * 300;
+    filter.Q.value = 0.8;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.0;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.master);
+    const t = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.26 * s, t + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.55 + s * 0.25);
+    source.start(t);
+    source.stop(t + 0.9 + s * 0.25);
+  },
+  plink: function (pitch) {
+    if (!this.enabled || !this.ctx) return;
+    const ctx = this.ctx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    const t = ctx.currentTime;
+    const f = pitch == null ? 980 : pitch;
+    osc.frequency.setValueAtTime(f, t);
+    osc.frequency.exponentialRampToValueAtTime(f * 0.55, t + 0.16);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.026, t + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    osc.connect(gain);
+    gain.connect(this.master);
+    osc.start(t);
+    osc.stop(t + 0.24);
+  },
+  drip: function () {
+    if (!this.enabled || !this.ctx) return;
+    const ctx = this.ctx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    const t = ctx.currentTime;
+    osc.frequency.setValueAtTime(1450, t);
+    osc.frequency.exponentialRampToValueAtTime(720, t + 0.09);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.012, t + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+    osc.connect(gain);
+    gain.connect(this.master);
+    osc.start(t);
+    osc.stop(t + 0.12);
+  },
+};
+
+
+/* ------------------------------------------------------------------ *
+ * Cards: thumbnails rendered from the actual procedural 3D models
+ * ------------------------------------------------------------------ */
+
+const cardsRoot = byId("cards");
+const previewScene = new T.Scene();
+previewScene.add(new T.AmbientLight(0xdcfff7, 1.25));
+const previewLight = new T.DirectionalLight(0xffeccb, 1.1);
+previewLight.position.set(-3, 7, 4);
+previewScene.add(previewLight);
+const previewCamera = new T.PerspectiveCamera(30, 360 / 220, 0.1, 40);
+previewCamera.position.set(0, 3.65, 3.15);
+previewCamera.lookAt(0, -0.08, 0);
+const previewRT = new T.WebGLRenderTarget(360, 220, {
+  minFilter: T.LinearFilter,
+  magFilter: T.LinearFilter,
+  format: T.RGBAFormat,
+  depthBuffer: true,
+  stencilBuffer: false,
+});
+
+function createDisplayVisual(def) {
+  if (def.kind === "ray") {
+    const visual = createRayVisual(def, rr(0, TAU), true);
+    visual.root.scale.setScalar(def.bodyScale * 0.95);
+    visual.root.visible = false;
+    visual.root.renderOrder = 5;
+    overlayScene.add(visual.root);
+    return { root: visual.root, def: def, ray: visual, bell: null, tentacles: null, busy: false, kind: "ray" };
+  }
+  const root = new T.Group();
+  const bell = new T.Mesh(createBellGeometry(def), createJellyMaterial(def));
+  bell.renderOrder = 3;
+  const tentacles = createTentacleMesh(def);
+  tentacles.renderOrder = 2;
+  root.add(bell);
+  root.add(tentacles);
+  root.visible = false;
+  root.renderOrder = 5;
+  overlayScene.add(root);
+  return {
+    root: root, def: def, ray: null, bell: bell, tentacles: tentacles, busy: false, kind: "jelly",
+    jelly: { tentacles: tentacles, vx: 0, vz: 0, phase: rr(0, TAU) },
+  };
+}
+
+const displayPool = {};
+function acquireDisplay(def) {
+  if (!displayPool[def.id]) displayPool[def.id] = [];
+  const list = displayPool[def.id];
+  for (let i = 0; i < list.length; i++) {
+    if (!list[i].busy) {
+      list[i].busy = true;
+      list[i].root.visible = true;
+      return list[i];
+    }
+  }
+  const display = createDisplayVisual(def);
+  display.busy = true;
+  display.root.visible = true;
+  list.push(display);
+  return display;
+}
+function releaseDisplay(display) {
+  if (!display) return;
+  display.busy = false;
+  display.root.visible = false;
+}
+
+function animateDisplay(display, time, dt, held) {
+  if (!display) return;
+  const def = display.def;
+  if (display.kind === "ray") {
+    const ray = display.ray;
+    ray.material.uniforms.uTime.value = time;
+    updateTail(ray.tail, time, 0.8, ray.material.uniforms.uPhase.value);
+  } else {
+    const contract = 1 + 0.12 * Math.sin(time * 2.2 + display.jelly.phase);
+    display.bell.scale.set(1 - 0.08 * contract, 1 + 0.08 * contract, 1 - 0.08 * contract);
+    display.bell.material.uniforms.uTime.value = time;
+    display.jelly.vx = Math.sin(time * 0.7) * 0.15;
+    display.jelly.vz = Math.cos(time * 0.6) * 0.15;
+    updateTentacles(display.jelly, time, held);
+  }
+}
+
+function renderThumbnail(def, targetCanvas) {
+  const group = new T.Group();
+  previewScene.add(group);
+  if (def.kind === "ray") {
+    const visual = createRayVisual(def, 1.1, true);
+    visual.material.uniforms.uTime.value = 0.7;
+    visual.root.scale.setScalar(1.08);
+    visual.root.rotation.y = 0.24;
+    visual.root.rotation.x = -0.12;
+    group.add(visual.root);
+    updateTail(visual.tail, 0.7, 0.6, 1.1);
+  } else {
+    const root = new T.Group();
+    const bell = new T.Mesh(createBellGeometry(def), createJellyMaterial(def));
+    bell.material.uniforms.uTime.value = 0.9;
+    const tentacles = createTentacleMesh(def);
+    root.add(bell);
+    root.add(tentacles);
+    root.position.y = 0.2;
+    root.scale.setScalar(1.06);
+    group.add(root);
+    const fake = { tentacles: tentacles, vx: 0.22, vz: 0.12, phase: 0.8 };
+    updateTentacles(fake, 0.9, false);
+  }
+
+  renderer.setRenderTarget(previewRT);
+  renderer.setClearColor(0x000000, 0);
+  renderer.clear(true, true, false);
+  renderer.render(previewScene, previewCamera);
+
+  const width = 360;
+  const height = 220;
+  const pixels = new Uint8Array(width * height * 4);
+  try {
+    renderer.readRenderTargetPixels(previewRT, 0, 0, width, height, pixels);
+    const image = new ImageData(width, height);
+    for (let y = 0; y < height; y++) {
+      const src = (height - 1 - y) * width * 4;
+      const dst = y * width * 4;
+      image.data.set(pixels.subarray(src, src + width * 4), dst);
+    }
+    const ctx = targetCanvas.getContext("2d");
+    ctx.clearRect(0, 0, width, height);
+    const glow = ctx.createRadialGradient(width * 0.5, height * 0.56, 4, width * 0.5, height * 0.56, width * 0.42);
+    glow.addColorStop(0, "rgba(132,245,222,.20)");
+    glow.addColorStop(0.55, "rgba(58,180,174,.08)");
+    glow.addColorStop(1, "rgba(0,40,50,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+    const art = document.createElement("canvas");
+    art.width = width;
+    art.height = height;
+    art.getContext("2d").putImageData(image, 0, 0);
+    ctx.drawImage(art, 0, 0);
+  } catch (error) {
+    const ctx = targetCanvas.getContext("2d");
+    const grad = ctx.createLinearGradient(0, 0, width, height);
+    grad.addColorStop(0, "rgba(166,239,218,.25)");
+    grad.addColorStop(1, "rgba(3,44,57,0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+  }
+  previewScene.remove(group);
+  renderer.setRenderTarget(null);
+  renderer.setClearColor(0x073f4a, 1);
+}
+
+const cardElements = [];
+function buildCards() {
+  speciesDefs.forEach((def, index) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "card";
+    card.setAttribute("aria-label", "放生" + def.name + "，点击抛入海中，或拖动放置");
+    card.dataset.species = def.id;
+    card.title = def.name + " · 点按抛入 / 拖动放置";
+    const cv = document.createElement("canvas");
+    cv.width = 360;
+    cv.height = 220;
+    cv.setAttribute("aria-hidden", "true");
+    const num = document.createElement("span");
+    num.className = "num";
+    num.textContent = "0" + (index + 1);
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = def.tag;
+    const copy = document.createElement("span");
+    copy.className = "copy";
+    const name = document.createElement("b");
+    name.textContent = def.name;
+    const latin = document.createElement("small");
+    latin.textContent = def.latin;
+    copy.appendChild(name);
+    copy.appendChild(latin);
+    card.appendChild(cv);
+    card.appendChild(num);
+    card.appendChild(tag);
+    card.appendChild(copy);
+    cardsRoot.appendChild(card);
+    cardElements.push(card);
+    card.addEventListener("pointerdown", (event) => onCardDown(event, def, card));
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        throwFromCard(def, card);
+      }
+    });
+    card.addEventListener("dragstart", (event) => event.preventDefault());
+    renderThumbnail(def, cv);
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * Holding and throwing
+ * ------------------------------------------------------------------ */
+
+let held = null;
+let cardDrag = null;
+const flights = [];
+let drips = 0;
+
+function totalResidents() {
+  return rays.length + jellies.length;
+}
+function updateCounts() {
+  byId("ray-count").textContent = String(rays.length);
+  byId("jelly-count").textContent = String(jellies.length);
+  byId("creature-total").textContent = String(totalResidents());
+  byId("cap-line").textContent = "当前 " + totalResidents() + " 位 · 上限 48 位";
+}
+let toastTimer = 0;
+function toast(message, duration) {
+  toastEl.textContent = message;
+  toastEl.classList.add("show");
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => toastEl.classList.remove("show"), duration || 2600);
+}
+
+function beginHeld(def, clientX, clientY) {
+  if (totalResidents() >= 48) {
+    toast("浅海已经住满 48 位居民。先让一些生物游回深海吧。");
+    return null;
+  }
+  const p = screenToWorld(clientX, clientY);
+  const display = acquireDisplay(def);
+  display.root.position.set(p.x, 2.8, p.z);
+  held = { def: def, display: display, x: p.x, z: p.z, y: 2.8 };
+  drips = 0;
+  audio.plink(620);
+  return held;
+}
+
+function updateHeld(clientX, clientY) {
+  if (!held) return;
+  const p = screenToWorld(clientX, clientY);
+  held.x = clamp(p.x, CAM_LEFT + 0.8, viewRight - 0.8);
+  held.z = clamp(p.z, topZ + 0.8, bottomZ - 0.8);
+}
+
+function updateHeldVisual(dt) {
+  if (!held) return;
+  const display = held.display;
+  const bob = Math.sin(state.time * 2.4) * 0.06;
+  display.root.position.set(held.x, held.y + bob, held.z);
+  display.root.rotation.y = Math.sin(state.time * 0.75) * 0.45;
+  animateDisplay(display, state.time, dt, true);
+  drips += dt;
+  if (drips > 0.34) {
+    drips = 0;
+    const tipY = display.kind === "jelly" ? held.y - 1.15 : held.y - 0.2;
+    splashParticles.spawn(held.x + rr(-0.22, 0.22), Math.max(0.12, tipY), held.z + rr(-0.2, 0.2), {
+      vx: rr(-0.12, 0.12), vz: rr(-0.12, 0.12), vy: -0.2,
+      size: rr(1.2, 2.6), life: rr(0.7, 1.25), color: [0.79, 0.98, 0.94], alpha: 0.45,
+    });
+    if (audio.enabled && random() < 0.42) audio.drip();
+  }
+}
+
+function launchFlight(def, start, end, opts) {
+  const options = opts || {};
+  const display = options.display || acquireDisplay(def);
+  const dx = end.x - start.x;
+  const dz = end.z - start.z;
+  const distance = Math.hypot(dx, dz);
+  const flight = {
+    def: def, display: display,
+    sx: start.x, sz: start.z, sy: start.y == null ? 2.8 : start.y,
+    ex: end.x, ez: end.z,
+    t: 0, dur: options.duration || clamp(0.78 + distance * 0.045, 0.82, 1.5),
+    arc: options.arc == null ? 1.65 + distance * 0.10 : options.arc,
+    spin: rr(-1, 1) > 0 ? 1 : -1, trail: 0,
+  };
+  display.root.visible = true;
+  display.root.position.set(start.x, flight.sy, start.z);
+  flights.push(flight);
+  audio.plink(options.drop ? 760 : 690);
+  return flight;
+}
+
+function updateFlights(dt) {
+  for (let i = flights.length - 1; i >= 0; i--) {
+    const f = flights[i];
+    f.t += dt / f.dur;
+    const u = clamp(f.t, 0, 1);
+    const ease = u * u * (3 - 2 * u);
+    f.display.root.position.x = lerp(f.sx, f.ex, ease);
+    f.display.root.position.z = lerp(f.sz, f.ez, ease);
+    f.display.root.position.y = lerp(f.sy, 0.02, u) + Math.sin(u * Math.PI) * f.arc;
+    f.display.root.rotation.y += dt * 2.8 * f.spin;
+    if (f.display.kind === "ray") {
+      f.display.ray.bank.rotation.z = Math.sin(u * Math.PI) * 0.55 * f.spin;
+    }
+    animateDisplay(f.display, state.time, dt, false);
+    f.trail += dt;
+    if (f.trail > 0.08) {
+      f.trail = 0;
+      splashParticles.spawn(f.display.root.position.x, f.display.root.position.y - 0.15, f.display.root.position.z, {
+        vx: rr(-0.18, 0.18), vz: rr(-0.18, 0.18), vy: -0.25,
+        size: rr(1.0, 2.4), life: rr(0.4, 0.85), color: [0.83, 1.0, 0.95], alpha: 0.55,
+      });
+    }
+    if (u >= 1) {
+      const def = f.def;
+      const landing = nearestWater(f.ex, f.ez);
+      releaseDisplay(f.display);
+      spawnSplash(landing.x, landing.z, 1.15);
+      addRipple((landing.x - CAM_LEFT) / viewWidth, (9 - landing.z) / 18, 0.9);
+      audio.burst(0.85);
+      audio.plink(1120);
+      addCreature(def, landing.x, landing.z, { spawn: true });
+      flights.splice(i, 1);
+    }
+  }
+}
+
+function dropHeld() {
+  if (!held) return;
+  const def = held.def;
+  const start = { x: held.x, z: held.z, y: held.y };
+  const p = screenToWorld(lastPointer.x, lastPointer.y);
+  const q = nearestWater(p.x, p.z);
+  const end = {
+    x: clamp(q.x, CAM_LEFT + 1.0, viewRight - 1.0),
+    z: clamp(q.z, topZ + 1.0, bottomZ - 1.0),
+  };
+  const display = held.display;
+  held = null;
+  launchFlight(def, start, end, { display: display, duration: 0.62, arc: 0.62, drop: true });
+  toast("松手 · 它落进了浅海");
+}
+
+function throwFromCard(def, card) {
+  if (totalResidents() >= 48) {
+    toast("浅海已经住满 48 位居民。先让一些生物游回深海吧。");
+    card.classList.remove("is-spawning");
+    void card.offsetWidth;
+    card.classList.add("is-spawning");
+    return;
+  }
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const rect = card.getBoundingClientRect();
+  const start = screenToWorld(w * 0.5, h - (narrowScreen() ? 156 : 206));
+  const target = randomWaterPoint(3.2, -5.6, 4.8);
+  start.y = 2.8;
+  launchFlight(def, start, target, {});
+  toast("抛出去了 · 看它划一道弧");
+  card.classList.remove("is-spawning");
+  void card.offsetWidth;
+  card.classList.add("is-spawning");
+}
+
+let lastPointer = { x: window.innerWidth * 0.5, y: window.innerHeight * 0.5 };
+function onCardDown(event, def, card) {
+  if (event.button != null && event.button !== 0) return;
+  event.preventDefault();
+  if (held) return;
+  lastPointer = { x: event.clientX, y: event.clientY };
+  cardDrag = {
+    def: def, card: card, id: event.pointerId,
+    startX: event.clientX, startY: event.clientY,
+    moved: false,
+  };
+  card.classList.add("is-spawning");
+}
+window.addEventListener("pointermove", (event) => {
+  lastPointer = { x: event.clientX, y: event.clientY };
+  if (!cardDrag) return;
+  const dx = event.clientX - cardDrag.startX;
+  const dy = event.clientY - cardDrag.startY;
+  if (!cardDrag.moved && Math.hypot(dx, dy) > 8) {
+    cardDrag.moved = true;
+    if (beginHeld(cardDrag.def, event.clientX, event.clientY) === null) {
+      cardDrag = null;
+      return;
+    }
+  }
+  if (cardDrag && cardDrag.moved && held) updateHeld(event.clientX, event.clientY);
+}, { passive: true });
+window.addEventListener("pointerup", (event) => {
+  if (!cardDrag || event.pointerId !== cardDrag.id) return;
+  const drag = cardDrag;
+  cardDrag = null;
+  drag.card.classList.remove("is-spawning");
+  if (drag.moved && held) dropHeld();
+  else throwFromCard(drag.def, drag.card);
+});
+window.addEventListener("pointercancel", (event) => {
+  if (cardDrag && event.pointerId === cardDrag.id) {
+    cardDrag.card.classList.remove("is-spawning");
+    cardDrag = null;
+  }
+});
+
+function addCreature(def, x, z, opts) {
+  if (totalResidents() >= 48) {
+    toast("浅海已经住满 48 位居民。先让一些生物游回深海吧。");
+    return null;
+  }
+  const q = nearestWater(x, z);
+  let creature;
+  if (def.kind === "ray") {
+    creature = createRay(def, q.x, q.z, { spawn: opts && opts.spawn });
+  } else {
+    creature = createJelly(def, q.x, q.z, { spawn: opts && opts.spawn });
+  }
+  updateCounts();
+  const message = "放生了一只" + def.name;
+  toast(message);
+  const card = cardElements[speciesDefs.indexOf(def)];
+  if (card) {
+    card.classList.remove("is-spawning");
+    void card.offsetWidth;
+    card.classList.add("is-spawning");
+  }
+  return creature;
+}
+
+
+/* ------------------------------------------------------------------ *
+ * Creature behaviour
+ * ------------------------------------------------------------------ */
+
+function angleDelta(a, b) {
+  return Math.atan2(Math.sin(a - b), Math.cos(a - b));
+}
+function easeOutBack(t) {
+  const c = 1.70158;
+  const x = t - 1;
+  return 1 + (c + 1) * x * x * x + c * x * x;
+}
+function keepInViewX(x) {
+  return clamp(x, CAM_LEFT + 1.0, viewRight - 1.0);
+}
+
+function updateRay(ray, dt) {
+  const def = ray.def;
+  ray.age += dt;
+  ray.spawn = Math.min(1, ray.spawn + dt * 1.7);
+  const grow = ray.spawn < 1 ? Math.max(0.02, easeOutBack(clamp(ray.spawn, 0, 1))) : 1;
+  ray.root.scale.setScalar(def.bodyScale * grow);
+
+  if (ray.breachTimer == null) ray.breachTimer = rr(12, 27);
+  if (ray.flee > 0) {
+    ray.flee -= dt;
+    if (ray.flee <= 0) {
+      ray.target = randomWaterPoint(2.5, -7.4, 7.2);
+    }
+  }
+
+  if (ray.resting && ray.flee > 0) {
+    ray.resting = false;
+    ray.restTimer = 8.5;
+  }
+  if (!ray.resting && def.index === 2) {
+    ray.restTimer = (ray.restTimer == null ? 8 : ray.restTimer) - dt;
+    if (ray.restTimer <= 0 && ray.speed < 0.24) {
+      ray.resting = true;
+      ray.speed = 0.02;
+    }
+  }
+
+  if (ray.breach) {
+    const b = ray.breach;
+    b.t += dt / b.dur;
+    const u = clamp(b.t, 0, 1);
+    ray.root.position.x += -Math.sin(ray.heading) * 1.25 * dt;
+    ray.root.position.z += -Math.cos(ray.heading) * 1.25 * dt;
+    ray.root.position.y = -0.43 + Math.sin(u * Math.PI) * 2.05;
+    ray.bank.rotation.x = -Math.PI * Math.sin(u * Math.PI);
+    ray.bank.rotation.z = Math.sin(u * Math.PI * 2) * 0.34;
+    ray.material.uniforms.uTime.value = state.time;
+    if (u > 0.10 && ray.root.parent !== overlayScene) overlayScene.add(ray.root);
+    if (u > 0.90 && ray.root.parent !== worldScene) worldScene.add(ray.root);
+    updateTail(ray.tail, state.time, 1.2, ray.phase);
+    ray.shadow.position.set(ray.root.position.x + 0.55, -0.695, ray.root.position.z + 0.62);
+    ray.shadow.scale.setScalar(1.15 + Math.sin(u * Math.PI) * 0.5);
+    ray.shadow.material.opacity = 0.10 + 0.12 * (1 - Math.sin(u * Math.PI));
+    if (u >= 1) {
+      ray.breach = null;
+      ray.root.position.y = -0.43;
+      ray.bank.rotation.x = 0;
+      worldScene.add(ray.root);
+      spawnSplash(ray.root.position.x, ray.root.position.z, 1.2);
+      audio.burst(0.9);
+      ray.breachTimer = rr(18, 34);
+    }
+    return;
+  }
+
+  if (!ray.resting) {
+    ray.wanderTimer -= dt;
+    if (ray.wanderTimer <= 0 && ray.flee <= 0) {
+      ray.target = randomWaterPoint(2.5, -7.4, 7.3);
+      ray.wanderTimer = rr(4, 9);
+    }
+    if (ray.flee > 0 && !ray.fleeTarget) {
+      ray.fleeTarget = randomWaterPoint(2.5, -7.4, 7.3);
+    }
+    const target = ray.flee > 0 ? ray.fleeTarget : ray.target;
+    if (target) {
+      const dx = target.x - ray.x;
+      const dz = target.z - ray.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist < 0.7 && ray.flee <= 0) {
+        ray.target = randomWaterPoint(2.5, -7.4, 7.3);
+      }
+      const desired = Math.atan2(-dx, -dz);
+      const diff = angleDelta(desired, ray.heading);
+      const maxTurn = (ray.flee > 0 ? 2.7 : 1.45) * dt;
+      ray.heading += clamp(diff, -maxTurn, maxTurn);
+      ray.turn = diff;
+      ray.bankAngle = damp(ray.bankAngle, clamp(-diff * 1.5, -0.64, 0.64), 3.2, dt);
+    }
+    const targetSpeed = ray.flee > 0 ? 1.85 : ray.cruise;
+    ray.speed = damp(ray.speed, targetSpeed, ray.flee > 0 ? 3.2 : 1.0, dt);
+    const step = ray.speed * dt;
+    ray.x += -Math.sin(ray.heading) * step;
+    ray.z += -Math.cos(ray.heading) * step;
+  } else {
+    ray.speed = damp(ray.speed, 0.02, 2, dt);
+    ray.bankAngle = damp(ray.bankAngle, 0, 2, dt);
+    ray.wanderTimer = 1.4;
+    if (random() < dt * 0.18) {
+      ray.target = randomWaterPoint(2.5, -6.5, 6.5);
+      ray.wanderTimer = 1.2;
+    }
+  }
+
+  if (!isWater(ray.x, ray.z)) {
+    const q = nearestWater(keepInViewX(ray.x), clamp(ray.z, topZ + 1.0, bottomZ - 1.0));
+    ray.x = q.x;
+    ray.z = q.z;
+    ray.heading = Math.atan2(-(ray.target.x - ray.x), -(ray.target.z - ray.z));
+    ray.bankAngle = damp(ray.bankAngle, 0, 4, dt);
+  } else if (ray.x < CAM_LEFT + 1.0 || ray.x > viewRight - 1.0 || ray.z < topZ + 1.0 || ray.z > bottomZ - 1.0) {
+    ray.target = randomWaterPoint(2.6, -7.2, 7.1);
+    ray.heading = Math.atan2(-(ray.target.x - ray.x), -(ray.target.z - ray.z));
+    ray.bankAngle = damp(ray.bankAngle, 0, 4, dt);
+  }
+
+  const bob = Math.sin(state.time * 0.66 + ray.phase) * 0.035;
+  ray.y = ray.resting ? -0.565 + bob * 0.15 : -0.43 + bob;
+  ray.root.position.set(ray.x, ray.y, ray.z);
+  ray.root.rotation.y = ray.heading;
+  ray.bank.rotation.x = 0;
+  ray.bank.rotation.z = ray.bankAngle;
+  ray.material.uniforms.uTime.value = state.time;
+  ray.material.uniforms.uFlap.value = def.flap * (ray.resting ? 0.42 : 1) * (1 + ray.speed * 0.45);
+  updateTail(ray.tail, state.time, ray.speed, ray.phase);
+
+  const height = Math.max(0, ray.root.position.y + 0.43);
+  ray.shadow.position.set(ray.x + 0.34 + height * 0.15, -0.695, ray.z + 0.44 + height * 0.12);
+  ray.shadow.scale.setScalar(1 + height * 0.12);
+  ray.shadow.material.opacity = ray.resting ? 0.26 : 0.23 / (1 + height * 0.55);
+
+  if (!ray.resting && ray.speed > 0.35) {
+    ray.wakeTimer -= dt;
+    if (ray.wakeTimer <= 0) {
+      ray.wakeTimer = rr(0.42, 0.72);
+      spawnRing(ray.x + 0.1, ray.z + 0.22, rr(0.35, 0.62), 0.16, 0, 0xc8fff0);
+    }
+  }
+
+  if (def.index < 2 && ray.flee <= 0 && ray.breachTimer > 0) {
+    ray.breachTimer -= dt;
+    if (ray.breachTimer <= 0) {
+      ray.breach = { t: 0, dur: rr(2.05, 2.9) };
+      spawnSplash(ray.x, ray.z, 0.55);
+      audio.burst(0.38);
+    }
+  }
+}
+
+function startleRay(ray, fromX, fromZ) {
+  const dx = ray.x - fromX;
+  const dz = ray.z - fromZ;
+  const len = Math.hypot(dx, dz) || 1;
+  ray.flee = 3.0;
+  ray.resting = false;
+  ray.restTimer = 8.5;
+  ray.fleeTarget = {
+    x: clamp(ray.x + (dx / len) * 5.5, CAM_LEFT + 1.5, viewRight - 1.5),
+    z: clamp(ray.z + (dz / len) * 5.5, topZ + 1.5, bottomZ - 1.5),
+  };
+  ray.speed = 1.35;
+  ray.bankAngle = 0.2;
+  spawnRing(ray.x, ray.z, 0.55, 0.32, 0, 0xbaffeb);
+  if (ray.def.index === 2) spawnSilt(ray.x, ray.z);
+  audio.plink(ray.def.index === 0 ? 760 : 930);
+  toast(ray.def.index === 2 ? "魟鱼从沙里弹起，扬起一小团细沙" : "它被碰了一下，摆尾游向更深处");
+}
+
+function updateJelly(jelly, dt) {
+  const def = jelly.def;
+  jelly.age += dt;
+  jelly.spawn = Math.min(1, jelly.spawn + dt * 1.35);
+  const grow = jelly.spawn < 1 ? Math.max(0.02, easeOutBack(jelly.spawn)) : 1;
+  jelly.root.scale.setScalar(grow);
+  if (jelly.startle > 0) jelly.startle -= dt;
+
+  const rawPulse = state.time * 0.40 + jelly.phase;
+  const p = rawPulse % 1;
+  if (p < jelly.pulse) {
+    jelly.vx += -Math.sin(jelly.heading) * 0.15;
+    jelly.vz += -Math.cos(jelly.heading) * 0.15;
+    jelly.mouth = 1;
+  }
+  if (p < jelly.pulse && p > jelly.pulse - 0.02) {
+    audio.plink(420 + rr(0, 80));
+  }
+  jelly.pulse = p;
+  const contract = p < 0.23 ? Math.sin((p / 0.23) * Math.PI) : Math.max(0, Math.exp(-(p - 0.23) * 4.7) * 0.34);
+
+  jelly.vx += Math.sin(state.time * 0.22 + jelly.phase + 1.3) * 0.019 * dt;
+  jelly.vz += Math.cos(state.time * 0.18 + jelly.phase - 0.6) * 0.016 * dt;
+  if (jelly.startle > 0) {
+    jelly.vx += Math.sin(jelly.heading) * 0.28 * dt;
+    jelly.vz += Math.cos(jelly.heading) * 0.28 * dt;
+  }
+  if (state.whirlAmount > 0.05) {
+    const dx = jelly.x - state.pool.x;
+    const dz = jelly.z - state.pool.z;
+    const r = Math.hypot(dx, dz);
+    if (r < state.pool.z + 4.0 && r > 0.08) {
+      const pull = (1 - r / (state.pool.z + 4.0)) * state.whirlAmount;
+      jelly.vx += (-dz / r) * pull * 0.45 * dt;
+      jelly.vz += (dx / r) * pull * 0.45 * dt;
+      jelly.vx -= (dx / r) * pull * 0.18 * dt;
+      jelly.vz -= (dz / r) * pull * 0.18 * dt;
+    }
+  }
+  jelly.vx *= Math.exp(-0.58 * dt);
+  jelly.vz *= Math.exp(-0.58 * dt);
+  jelly.x += jelly.vx * dt;
+  jelly.z += jelly.vz * dt;
+
+  if (jelly.x < CAM_LEFT + 0.8 || jelly.x > viewRight - 0.8 || jelly.z < topZ + 0.8 || jelly.z > bottomZ - 0.8) {
+    jelly.heading = Math.atan2(-(CAM_LEFT + viewWidth * 0.5 - jelly.x), -(0 - jelly.z));
+    jelly.vx += Math.sin(jelly.heading) * 0.17;
+    jelly.vz += Math.cos(jelly.heading) * 0.17;
+    jelly.x = clamp(jelly.x, CAM_LEFT + 0.75, viewRight - 0.75);
+    jelly.z = clamp(jelly.z, topZ + 0.75, bottomZ - 0.75);
+  }
+  if (!isWater(jelly.x, jelly.z)) {
+    const q = nearestWater(jelly.x, jelly.z);
+    jelly.x = q.x;
+    jelly.z = q.z;
+  }
+
+  jelly.y = 0.82 + Math.sin(state.time * 0.67 + jelly.phase) * 0.11 + contract * 0.10;
+  jelly.root.position.set(jelly.x, jelly.y, jelly.z);
+  jelly.root.rotation.y = jelly.heading * 0.14 + Math.sin(state.time * 0.13 + jelly.phase) * 0.16;
+  jelly.bell.scale.set(1 - contract * 0.13, 1 + contract * 0.10, 1 - contract * 0.13);
+  jelly.bell.material.uniforms.uTime.value = state.time;
+  jelly.mouth = Math.max(0, jelly.mouth - dt * 1.7);
+  updateTentacles(jelly, state.time, false);
+  jelly.shadow.position.set(jelly.x + 0.28, -0.695, jelly.z + 0.32);
+  jelly.shadow.material.opacity = 0.14 / (1 + Math.max(0, jelly.y - 0.4) * 0.5);
+  jelly.shadow.scale.setScalar(0.9 + Math.max(0, jelly.y - 0.4) * 0.18);
+}
+
+function startleJelly(jelly, fromX, fromZ) {
+  const dx = jelly.x - fromX;
+  const dz = jelly.z - fromZ;
+  const len = Math.hypot(dx, dz) || 1;
+  jelly.heading = Math.atan2(-dx / len, -dz / len);
+  jelly.vx += (dx / len) * 0.55;
+  jelly.vz += (dz / len) * 0.55;
+  jelly.startle = 2.2;
+  spawnRing(jelly.x, jelly.z, 0.42, 0.15, 0, 0xc8fff4);
+  audio.drip();
+  toast("水母轻轻收缩，顺着水流漂开");
+}
+
+function findNearestRay(px, py) {
+  let best = null;
+  let bestD = 72;
+  for (let i = 0; i < rays.length; i++) {
+    const r = rays[i];
+    const p = worldToScreen(r.x, r.z);
+    const d = Math.hypot(p.x - px, p.y - py);
+    if (d < bestD) { bestD = d; best = r; }
+  }
+  return best;
+}
+function findNearestJelly(px, py) {
+  let best = null;
+  let bestD = 58;
+  for (let i = 0; i < jellies.length; i++) {
+    const j = jellies[i];
+    const p = worldToScreen(j.x, j.z);
+    const d = Math.hypot(p.x - px, p.y - py);
+    if (d < bestD) { bestD = d; best = j; }
+  }
+  return best;
+}
+
+/* ------------------------------------------------------------------ *
+ * Initial residents
+ * ------------------------------------------------------------------ */
+
+function pointFraction(fx, z) {
+  const x = CAM_LEFT + viewWidth * fx;
+  return nearestWater(x, z);
+}
+function seedResidents() {
+  const manta = pointFraction(0.55, -1.4);
+  createRay(speciesById.manta, manta.x, manta.z, { spawn: false });
+  const eagle = pointFraction(0.76, 3.7);
+  createRay(speciesById.eagle, eagle.x, eagle.z, { spawn: false });
+  const sting1 = pointFraction(0.44, 1.1);
+  createRay(speciesById.stingray, sting1.x, sting1.z, { spawn: false });
+  const sting2 = pointFraction(0.66, 4.9);
+  createRay(speciesById.stingray, sting2.x, sting2.z, { spawn: false });
+
+  const moon1 = pointFraction(0.47, -4.4);
+  createJelly(speciesById.moon, moon1.x, moon1.z, { spawn: false });
+  const moon2 = pointFraction(0.72, 1.8);
+  createJelly(speciesById.moon, moon2.x, moon2.z, { spawn: false });
+  const moon3 = pointFraction(0.86, 5.1);
+  createJelly(speciesById.moon, moon3.x, moon3.z, { spawn: false });
+  const nettle1 = pointFraction(0.59, 4.2);
+  createJelly(speciesById.nettle, nettle1.x, nettle1.z, { spawn: false });
+  const nettle2 = pointFraction(0.83, 0.8);
+  createJelly(speciesById.nettle, nettle2.x, nettle2.z, { spawn: false });
+  updateCounts();
+}
+
+/* ------------------------------------------------------------------ *
+ * Rain, whirlpool, UI state and input
+ * ------------------------------------------------------------------ */
+
+function setPressed(action, on) {
+  const button = document.querySelector('.toolbar button[data-action="' + action + '"]');
+  if (button) button.setAttribute("aria-pressed", on ? "true" : "false");
+}
+function cycleRain() {
+  state.rain = !state.rain;
+  state.rainTarget = state.rain ? 1 : 0;
+  document.body.classList.toggle("is-raining", state.rain);
+  setPressed("rain", state.rain);
+  toast(state.rain ? "阵雨落下 · 海面开始起皱" : "雨停了 · 水面重新亮起来");
+  if (state.rain) audio.plink(520);
+}
+function ensureWhirlVisible() {
+  const existing = worldToScreen(state.pool.x, state.pool.z);
+  if (existing.x < 40 || existing.x > window.innerWidth - 40 || existing.y < 70 || existing.y > window.innerHeight - 70) {
+    const q = randomWaterPoint(4, -2.2, 2.2);
+    state.pool.set(q.x, 1.4, q.z);
+  }
+}
+function cycleWhirl() {
+  state.whirl = !state.whirl;
+  state.whirlTarget = state.whirl ? 1 : 0;
+  if (state.whirl) {
+    ensureWhirlVisible();
+    vortexMesh.visible = true;
+    vortexMesh.position.set(state.pool.x, 0.09, state.pool.z);
+    toast("旋涡已出现 · 拖动水面可以移动它");
+  } else {
+    toast("旋涡收拢，水面重新平静");
+  }
+  setPressed("whirl", state.whirl);
+}
+function cycleCalm() {
+  state.calm = !state.calm;
+  state.calmTarget = state.calm ? 1 : 0;
+  setPressed("calm", state.calm);
+  toast(state.calm ? "风停了 · 长涌慢了下来" : "风又吹过海面");
+}
+function cycleClear() {
+  state.clear = !state.clear;
+  state.clearTarget = state.clear ? 1 : 0;
+  setPressed("clear", state.clear);
+  toast(state.clear ? "海水澄澈 · 能看见更远的海底" : "潮水带回一点绿意");
+}
+function cycleSound() {
+  if (audio.failed) {
+    toast("这个浏览器暂时没有可用的声音输出");
+    return;
+  }
+  state.sound = !state.sound;
+  audio.setEnabled(state.sound);
+  setPressed("sound", state.sound);
+  if (state.sound) {
+    toast("声音已开启 · 浪声跟着涌潮起伏");
+    audio.plink(640);
+  } else {
+    toast("声音已关闭");
+  }
+}
+function toggleUI(force) {
+  state.hidden = force == null ? !state.hidden : force;
+  document.body.classList.toggle("ui-hidden", state.hidden);
+  if (state.hidden) {
+    toast("界面已收起 · 按 H 或右下角圆点恢复", 2200);
+    window.setTimeout(() => {
+      if (state.hidden) toastEl.classList.remove("show");
+    }, 1700);
+  }
+}
+function action(name) {
+  if (name === "rain") cycleRain();
+  else if (name === "whirl") cycleWhirl();
+  else if (name === "calm") cycleCalm();
+  else if (name === "clear") cycleClear();
+  else if (name === "sound") cycleSound();
+  else if (name === "hide") toggleUI(true);
+}
+document.querySelectorAll(".toolbar button[data-action]").forEach((button) => {
+  button.addEventListener("click", () => action(button.dataset.action));
+});
+byId("show-ui").addEventListener("click", () => toggleUI(false));
+window.addEventListener("keydown", (event) => {
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  const target = event.target;
+  if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+  const key = event.key.toLowerCase();
+  if (key === "r") { event.preventDefault(); cycleRain(); }
+  else if (key === "w") { event.preventDefault(); cycleWhirl(); }
+  else if (key === "c") { event.preventDefault(); cycleCalm(); }
+  else if (key === "m") { event.preventDefault(); cycleClear(); }
+  else if (key === "h") { event.preventDefault(); toggleUI(); }
+  else if (key === "s") { event.preventDefault(); cycleSound(); }
+  else if (key === "escape" && state.hidden) { event.preventDefault(); toggleUI(false); }
+});
+
+let poolDrag = false;
+canvas.addEventListener("pointerdown", (event) => {
+  if (event.button != null && event.button !== 0) return;
+  if (state.whirl) {
+    const p = screenToWorld(event.clientX, event.clientY);
+    const q = nearestWater(clamp(p.x, CAM_LEFT + 1.2, viewRight - 1.2), clamp(p.z, topZ + 1.2, bottomZ - 1.2));
+    state.pool.x = q.x;
+    state.pool.z = q.z;
+    poolDrag = true;
+    canvas.setPointerCapture && canvas.setPointerCapture(event.pointerId);
+    return;
+  }
+  const p = screenToWorld(event.clientX, event.clientY);
+  const ray = findNearestRay(event.clientX, event.clientY);
+  if (ray) {
+    startleRay(ray, p.x, p.z);
+    return;
+  }
+  const jelly = findNearestJelly(event.clientX, event.clientY);
+  if (jelly) {
+    startleJelly(jelly, p.x, p.z);
+    return;
+  }
+  if (isWater(p.x, p.z)) {
+    addRipple((p.x - CAM_LEFT) / viewWidth, (9 - p.z) / 18, 0.42);
+    spawnRing(p.x, p.z, rr(0.26, 0.52), 0.24, 0, 0xd7fff3);
+    audio.plink(510 + rr(0, 240));
+  }
+});
+canvas.addEventListener("pointermove", (event) => {
+  if (!poolDrag) return;
+  const p = screenToWorld(event.clientX, event.clientY);
+  const q = nearestWater(clamp(p.x, CAM_LEFT + 1.2, viewRight - 1.2), clamp(p.z, topZ + 1.2, bottomZ - 1.2));
+  state.pool.x = q.x;
+  state.pool.z = q.z;
+});
+window.addEventListener("pointerup", () => { poolDrag = false; });
+window.addEventListener("pointercancel", () => { poolDrag = false; });
+
+/* ------------------------------------------------------------------ *
+ * Resize, quality and render loop
+ * ------------------------------------------------------------------ */
+
+function applyResolution() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  state.dpr = clamp(state.dpr, 1, state.dprCap);
+  renderer.setPixelRatio(state.dpr);
+  renderer.setSize(w, h, false);
+  viewWidth = Math.max(7.2, 18 * (w / h));
+  viewRight = CAM_LEFT + viewWidth;
+  camera.left = CAM_LEFT;
+  camera.right = viewRight;
+  camera.top = CAM_TOP;
+  camera.bottom = CAM_BOTTOM;
+  camera.position.x = 0;
+  camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
+  shoreUniforms.uShoreRadius.value = shoreRadiusForWidth(viewWidth);
+  waterUniforms.uView.value.set(CAM_LEFT, viewRight, topZ, bottomZ);
+  waterUniforms.uResolution.value.set(w * state.dpr, h * state.dpr);
+  sceneRT.setSize(Math.max(2, Math.floor(w * state.dpr)), Math.max(2, Math.floor(h * state.dpr)));
+  splashParticles.mat.uniforms.uPixelRatio.value = state.dpr;
+  siltParticles.mat.uniforms.uPixelRatio.value = state.dpr;
+}
+window.addEventListener("resize", applyResolution);
+window.addEventListener("orientationchange", () => window.setTimeout(applyResolution, 180));
+
+let fpsTime = 0;
+let fpsFrames = 0;
+function monitorQuality(dt) {
+  fpsTime += dt;
+  fpsFrames++;
+  if (fpsTime < 2.6) return;
+  const fps = fpsFrames / fpsTime;
+  fpsTime = 0;
+  fpsFrames = 0;
+  if (fps < 40 && state.dpr > 1.01) {
+    state.dpr = Math.max(1, state.dpr - 0.16);
+    applyResolution();
+    if (!state.qualityNoticed) {
+      state.qualityNoticed = true;
+      toast("画质已自动调低 · 保持海面流畅", 2200);
+    }
+  }
+}
+
+let lastFrame = 0;
+let palmClock = 0;
+function animate(now) {
+  requestAnimationFrame(animate);
+  if (!lastFrame) lastFrame = now;
+  const rawDt = (now - lastFrame) / 1000;
+  lastFrame = now;
+  if (document.hidden) return;
+  const dt = clamp(rawDt, 0.001, 0.05);
+  state.time += dt * (reducedMotion ? 0.62 : 1);
+
+  state.rainAmount = damp(state.rainAmount == null ? 0 : state.rainAmount, state.rain ? 1 : 0, 2.1, dt);
+  state.whirlAmount = damp(state.whirlAmount == null ? 0 : state.whirlAmount, state.whirl ? 1 : 0, 2.6, dt);
+  state.calmAmount = damp(state.calmAmount == null ? 0 : state.calmAmount, state.calm ? 1 : 0, 1.8, dt);
+  state.clearAmount = damp(state.clearAmount == null ? 0 : state.clearAmount, state.clear ? 1 : 0, 1.8, dt);
+
+  updateRippleSim();
+  for (let i = 0; i < rays.length; i++) updateRay(rays[i], dt);
+  for (let i = 0; i < jellies.length; i++) updateJelly(jellies[i], dt);
+  updateHeldVisual(dt);
+  updateFlights(dt);
+
+  if (state.rain && state.rainAmount > 0.4 && state.time - state.lastRain > 0.105) {
+    state.lastRain = state.time;
+    const sx = random();
+    const sy = random();
+    const wx = CAM_LEFT + sx * viewWidth;
+    const wz = topZ + sy * (bottomZ - topZ);
+    if (isWater(wx, wz)) {
+      addRipple(sx, 1 - sy, 0.1 + random() * 0.15);
+      if (random() < 0.18) spawnRing(wx, wz, rr(0.1, 0.26), 0.12, 0, 0xcbfff2);
+    }
+  }
+
+  splashParticles.update(dt);
+  siltParticles.update(dt);
+  updateRings(dt);
+
+  palmClock += dt;
+  if (palmClock > 0.12) {
+    palmClock = 0;
+    drawPalmShadow(state.time);
+  }
+
+  const swashPhase = state.time * 0.12 + 0.18;
+  const swashPulse = clamp(Math.sin((swashPhase % 1) * Math.PI), 0, 1);
+  audio.update(swashPulse, state.calmAmount, state.rainAmount);
+  if (state.rain && state.rainAmount > 0.6 && random() < dt * 0.5) audio.plink(420 + random() * 280);
+
+  waterUniforms.uTime.value = state.time;
+  waterUniforms.uRain.value = state.rainAmount;
+  waterUniforms.uCalm.value = state.calmAmount;
+  waterUniforms.uClear.value = state.clearAmount;
+  waterUniforms.uPool.value.set(state.pool.x, state.pool.z, 3.3, state.whirlAmount);
+  waterUniforms.uResolution.value.set(window.innerWidth * state.dpr, window.innerHeight * state.dpr);
+  floorUniforms.uTime.value = state.time;
+  floorUniforms.uClear.value = state.clearAmount;
+
+  vortexMesh.visible = state.whirlAmount > 0.01;
+  vortexMesh.position.set(state.pool.x, 0.09, state.pool.z);
+  vortexMesh.scale.setScalar(3.0);
+  vortexUniforms.uTime.value = state.time;
+  vortexUniforms.uOpacity.value = state.whirlAmount * 0.72;
+
+  waterUniforms.tScene.value = sceneRT.texture;
+  waterUniforms.tRipple.value = simA.texture;
+
+  renderer.setRenderTarget(sceneRT);
+  renderer.setClearColor(0x062c35, 1);
+  renderer.clear(true, true, false);
+  renderer.render(worldScene, camera);
+
+  renderer.setRenderTarget(null);
+  renderer.setClearColor(0x073f4a, 1);
+  renderer.clear(true, true, false);
+  renderer.render(waterScene, quadCamera);
+  renderer.clearDepth();
+  renderer.render(overlayScene, camera);
+
+  monitorQuality(dt);
+  if (!state.ready) {
+    state.ready = true;
+    window.setTimeout(() => {
+      loading.classList.add("done");
+      window.setTimeout(() => { loading.style.display = "none"; }, 1200);
+    }, 380);
+  }
+}
+
+/* Boot */
+buildCards();
+seedResidents();
+applyResolution();
+updateCounts();
+window.__shallows = {
+  state: state,
+  rays: rays,
+  jellies: jellies,
+  flights: flights,
+  camera: camera,
+  renderer: renderer,
+  worldScene: worldScene,
+  overlayScene: overlayScene,
+  sceneRT: sceneRT,
+  spawn: function (species, x, z) {
+    const def = speciesById[species] || speciesById.moon;
+    return addCreature(def, x, z, { spawn: true });
+  },
+  total: totalResidents,
+  flashBreach: function () {
+    const ray = rays.find((r) => r.def.index === 0);
+    if (ray) ray.breach = { t: 0, dur: 2.4 };
+  },
+};
+requestAnimationFrame(animate);
+
+
+
+
+})();
+</script>
+</body>
+</html>
