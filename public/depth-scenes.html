@@ -25,6 +25,7 @@
 .loading{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(circle at 40% 35%,#0b3e46,#021018 67%);transition:opacity .8s ease,visibility .8s ease}.loading.done{opacity:0;visibility:hidden;pointer-events:none}.load-copy{text-align:center;color:rgba(246,251,238,.85)}.load-copy span{display:block;margin-bottom:15px;font:7px/1.4 Georgia,serif;letter-spacing:.32em;color:rgba(207,255,242,.48)}.load-copy b{display:block;font:400 clamp(35px,5vw,56px)/1.1 var(--serif);letter-spacing:.16em}.load-copy i{display:block;margin-top:16px;font-style:normal;font-size:9px;letter-spacing:.26em;color:rgba(195,255,237,.42)}
 .toast{position:fixed;left:50%;bottom:132px;z-index:20;transform:translate(-50%,8px);padding:9px 15px;border:1px solid rgba(216,255,244,.25);border-radius:99px;background:rgba(1,27,37,.78);backdrop-filter:blur(16px);font-size:9px;letter-spacing:.1em;color:rgba(247,252,240,.9);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
 
+body.is-embedded .zone-title{right:70px}
 @media (max-width:900px){.back{top:14px;left:14px;font-size:8px;padding:7px 10px}.masthead{top:16px;left:16px;margin-top:40px}.masthead h1{font-size:clamp(30px,9vw,48px)}.masthead .lede{display:none}.masthead .eyebrow{font-size:7px;margin-bottom:7px}.zone-title{top:74px;right:16px;width:53vw}.zone-title .kicker{font-size:6.5px;margin-bottom:5px}.zone-title h2{font-size:clamp(28px,8vw,44px)}.zone-title .range{font-size:7px;margin-top:6px}.zone-title p:last-child{display:none}.zone-nav{top:auto;bottom:150px;left:12px;right:12px;transform:none;overflow-x:auto;justify-content:flex-start;gap:1px;padding:4px;border-radius:14px;scrollbar-width:none}.zone-nav::-webkit-scrollbar{display:none}.zone-nav button{min-width:58px;height:41px;padding:4px 6px;gap:2px;flex:0 0 auto}.zone-nav b{font-size:8px;letter-spacing:.04em}.zone-nav small{font-size:5.5px}.zone-nav .sep{height:20px}.dock{bottom:7px;width:calc(100vw - 14px);padding:8px 8px 7px;border-radius:15px}.dock-head{margin:0 3px 6px;font-size:6px;letter-spacing:.08em}.dock-head .count{font-size:6px}.cards{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.card{height:82px;border-radius:9px}.card canvas{inset:1px 1px 19px;width:calc(100% - 2px);height:calc(100% - 20px)}.card .copy{padding:4px 4px 3px}.card .copy b{font-size:7.5px;letter-spacing:0}.card .copy small{display:none}.card .tag{display:none}.card .num{top:3px;left:3px;font-size:5px}.hint{bottom:135px;font-size:6.5px;letter-spacing:.06em}.toast{bottom:132px;font-size:8px}.cards.is-single{grid-template-columns:minmax(0,78px)}.cards.is-double{grid-template-columns:repeat(2,minmax(0,78px))}}
 @media (max-height:550px){.masthead .lede,.zone-title p:last-child{display:none}.masthead{margin-top:7px}.zone-title{top:15px;right:15px}.zone-nav{top:14px;bottom:auto;left:auto;right:180px;transform:none;max-width:46vw}.dock{bottom:5px;padding:5px}.card{height:66px}.hint{display:none}}
 </style>
@@ -716,8 +717,8 @@ function switchZone(i){
   if(i===currentZone||switching||i<0||i>=zones.length)return;
   switching=true;
   flash.style.opacity=".85";
+  applyZone(i);
   setTimeout(()=>{
-    applyZone(i);
     flash.style.opacity="0";
     switching=false;
   },170);

@@ -74,6 +74,6 @@ test("海层剧场 opens from the depth axis and hands card clicks to the encycl
 
   await page.keyboard.press("Escape");
   await expect(page.locator("dialog.modal")).toHaveCount(0);
-  await frame.locator("#embed-close").click();
+  await page.locator(".scenes-overlay-close").click();
   await expect(page.locator(".scenes-overlay")).toHaveCount(0);
 });

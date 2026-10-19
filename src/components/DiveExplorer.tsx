@@ -441,6 +441,14 @@ export default function DiveExplorer({
           aria-modal="true"
           aria-label="海层剧场"
         >
+          <button
+            className="scenes-overlay-close"
+            type="button"
+            onClick={() => setScenesOpen(false)}
+            aria-label="退出海层剧场"
+          >
+            ×
+          </button>
           <iframe
             ref={scenesFrame}
             src={`${import.meta.env.BASE_URL}depth-scenes.html?embed=1`}
